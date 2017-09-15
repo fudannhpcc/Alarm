@@ -17,6 +17,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes {
+        debug {
+            manifestPlaceholders = [app_label:"@string/app_name_debug"]
+        }
+        release {
+            manifestPlaceholders = [app_label:"@string/app_name"]
+        }
+    }
 }
 
 dependencies {
