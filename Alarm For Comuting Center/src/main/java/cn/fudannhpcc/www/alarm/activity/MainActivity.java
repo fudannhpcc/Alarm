@@ -2,6 +2,7 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Process;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -9,15 +10,22 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
-import cn.fudannhpcc.www.alarm.commonclass.Utilites;
-import cn.fudannhpcc.www.alarm.commonclass.Log;
+import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 
 public class MainActivity extends AppCompatActivity {
+
+    private CustomDialog CustomDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Process.killProcess(Process.myPid());
+        super.onDestroy();
     }
 
     @Override
@@ -32,13 +40,25 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.network:
-                Toast.makeText(this, "开始游戏", Toast.LENGTH_SHORT).show();
+            case R.id.start:
+                if ( item.getTitle() == getString(R.string.start) ) {
+                    Toast.makeText(this, "开始", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.ic_stop);
+                    item.setTitle(getString(R.string.stop));
+                }
+                else {
+                    Toast.makeText(this, "结束", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.ic_start);
+                    item.setTitle(getString(R.string.start));
+                }
+                break;
+            case R.id.setting:
+                Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.exit:
-                Toast.makeText(this, "结束游戏", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
+                showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
                 break;
-
             default:
                 break;
         }
@@ -60,4 +80,26 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onMenuOpened(featureId, menu);
     }
+
+    public void showChangeLangDialog(String title, String message) {
+
+        CustomDialog = new CustomDialog(MainActivity.this);
+        CustomDialog.setTitle(title);
+        CustomDialog.setMessage(message);
+        CustomDialog.setYesOnclickListener("确定", new CustomDialog.onYesOnclickListener() {
+            @Override
+            public void onYesClick() {
+                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
+                onDestroy();
+            }
+        });
+        CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
+            @Override
+            public void onNoClick() {
+                Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
+                CustomDialog.dismiss();
+            }
+        });
+        CustomDialog.show();
+}
 }

@@ -4,8 +4,14 @@
     <string name="app_name">集群管理</string>
 
     <!--   系统设置菜单  -->
-    <string name="network">设置</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+
+    <string name="setting">设置</string>
     <string name="exit">退出</string>
+        <string name="exittitle">退出程序</string>
+        <string name="exitmessage">确定要退出吗？</string>
+
 
     <!--   网络和服务状态显示  -->
     <string name="network_status">网络状态</string>

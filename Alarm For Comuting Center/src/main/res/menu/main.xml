@@ -6,12 +6,23 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/network"
+        android:id="@+id/start"
         android:checkable="false"
         android:enabled="true"
-        android:icon="@mipmap/ic_network"
+        android:icon="@drawable/ic_start"
         android:orderInCategory="100"
-        android:title="@string/network"
+        android:title="@string/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/setting"
+        android:checkable="false"
+        android:enabled="true"
+        android:icon="@mipmap/ic_setting"
+        android:orderInCategory="100"
+        android:title="@string/setting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:showAsAction="never" />
