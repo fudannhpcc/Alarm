@@ -4,6 +4,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.commonclass.Utilites;
@@ -11,58 +14,50 @@ import cn.fudannhpcc.www.alarm.commonclass.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-    MenuItem menuItem_add_new_widget;
-    MenuItem menuItem_clear_dashboard;
-    Menu optionsMenu;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(getClass().getName(), "onCreate()");
         setContentView(R.layout.activity_main);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        optionsMenu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
-//        menuItem_add_new_widget = menu.findItem(R.id.Add_new_widget);
-//        menuItem_clear_dashboard = menu.findItem(R.id.Clean_dashboard);
-
-
-//        updatePlayPauseMenuItem();
-
-//        AppSettings appSettings = AppSettings.getInstance();
-//        if (appSettings.server == null) return true;
-//        if (appSettings.server.equals("ravend.asuscomm.com")) {
-//            optionsMenu.findItem(R.id.request_prices).setVisible(true);
-//            optionsMenu.findItem(R.id.action_board).setVisible(true);
-//            optionsMenu.findItem(R.id.action_lists).setVisible(true);
-//        }
-//
-//        getDashboardViewMode();
-
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
-    void updatePlayPauseMenuItem() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.network:
+                Toast.makeText(this, "开始游戏", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.exit:
+                Toast.makeText(this, "结束游戏", Toast.LENGTH_SHORT).show();
+                break;
 
-//        MenuItem menuItemPlayPause = optionsMenu.findItem(R.id.Edit_play_mode);
-
-//        MenuItem menuItemAutoCreateWidgets = optionsMenu.findItem(R.id.auto_create_widgets);
-
-//        if (presenter.isEditMode()) {
-//            menuItemPlayPause.setIcon(R.drawable.ic_play);
-//            menuItemAutoCreateWidgets.setVisible(presenter.getUnusedTopics().length > 0);
-//
-//        } else {
-//            menuItemPlayPause.setIcon(R.drawable.ic_pause);
-//            menuItemAutoCreateWidgets.setVisible(false);
-//        }
-//
-//        menuItem_add_new_widget.setVisible(presenter.isEditMode());
-//        menuItem_clear_dashboard.setVisible(presenter.isEditMode());
-
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
 }

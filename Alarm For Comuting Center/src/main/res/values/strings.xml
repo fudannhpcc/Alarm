@@ -1,5 +1,10 @@
 <resources>
+
     <string name="app_name">集群管理</string>
+
+    <string name="network">设置</string>
+    <string name="exit">退出</string>
+
     <string name="server">Server (\'tcp://\', \'ssl://\' or \'tls://\' prefixes available)</string>
     <string name="port">Port</string>
     <string name="username">Username</string>
