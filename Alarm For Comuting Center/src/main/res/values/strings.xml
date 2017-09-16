@@ -1,10 +1,17 @@
 <resources>
 
+    <!--   程序名称  -->
     <string name="app_name">集群管理</string>
 
+    <!--   系统设置菜单  -->
     <string name="network">设置</string>
     <string name="exit">退出</string>
 
+    <!--   网络和服务状态显示  -->
+    <string name="network_status">网络状态</string>
+    <string name="mqtt_status" translatable="false">MQTT服务</string>
+
+    <!--   待用
     <string name="server">Server (\'tcp://\', \'ssl://\' or \'tls://\' prefixes available)</string>
     <string name="port">Port</string>
     <string name="username">Username</string>
@@ -14,8 +21,6 @@
     <string name="keep_connection_in_the_background_for_receiving_push_notifications">Keep connection in the background for receiving push notifications</string>
     <string name="server_topic">Server topic</string>
     <string name="push_notifications_subscribe_topic">Push notifications subscribe topic</string>
-    <string name="network_status">网络状态</string>
-    <string name="mqtt_status" translatable="false">MQTT服务</string>
     <string name="tab_names">Tab names</string>
     <string name="if_the_name_is_not_specified_then_the_tab_is_not_visible">If the name is not specified, then the tab is not visible.</string>
     <string name="decimal_mode">Decimal mode</string>
@@ -47,4 +52,5 @@
     <string name="widget_mode">Mode</string>
     <string name="server_mode">Application server mode</string>
     <string name="pub_topic">Pub.topic (optional)</string>
+      -->
 </resources>
