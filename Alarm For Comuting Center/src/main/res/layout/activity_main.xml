@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:background="#E0E0E0"
         android:orientation="horizontal">
 
         <TextView
@@ -27,10 +28,10 @@
             android:id="@+id/connection_status_RGBLed"
             android:layout_width="20dp"
             android:layout_height="match_parent"
-            ads:size="64"
-            ads:isOn="true"
             android:layout_gravity="center_vertical"
-            ads:enabled="true" />
+            ads:enabled="true"
+            ads:isOn="true"
+            ads:size="64" />
 
         <TextView
             android:id="@+id/textView_text_mqtt_broker"
@@ -47,10 +48,10 @@
             android:id="@+id/mqtt_broker_status_RGBLed"
             android:layout_width="20dp"
             android:layout_height="match_parent"
-            ads:size="64"
-            ads:isOn="true"
             android:layout_gravity="center_vertical"
-            ads:enabled="true" />
+            ads:enabled="true"
+            ads:isOn="true"
+            ads:size="64" />
 
     </LinearLayout>
 
