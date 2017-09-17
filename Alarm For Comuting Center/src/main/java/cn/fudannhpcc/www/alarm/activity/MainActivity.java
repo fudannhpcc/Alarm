@@ -1,10 +1,12 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Process;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -15,6 +17,7 @@ import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 public class MainActivity extends AppCompatActivity {
 
     private CustomDialog CustomDialog;
+    private Intent intentSettingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +57,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.setting:
                 Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
-                break;
+                intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intentSettingActivity);
+                return true;
             case R.id.exit:
                 Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
-                break;
+                return true;
             default:
                 break;
         }
