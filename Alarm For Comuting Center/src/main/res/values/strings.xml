@@ -38,27 +38,4 @@
     <string name="network_status">网络状态</string>
     <string name="mqtt_status" translatable="false">MQTT服务</string>
 
-    <!--   待用
-    <string name="tab_names">Tab names</string>
-    <string name="if_the_name_is_not_specified_then_the_tab_is_not_visible">If the name is not specified, then the tab is not visible.</string>
-    <string name="decimal_mode">Decimal mode</string>
-    <string name="widget_type">Widget type</string>
-    <string name="widget_name">Name</string>
-
-    <string name="value_on">\'On\' value</string>
-    <string name="value_off">\'Off\' value (optional)</string>
-    <string name="range_from">Rage from</string>
-    <string name="range_to">to</string>
-    <string name="step">step</string>
-    <string name="alarm_zone_lower">Alarm zone, lower(%)</string>
-    <string name="alarm_zone_upper">Alarm zone, upper(%)</string>
-    <string name="widget_type_value">Value</string>
-    <string name="widget_type_switch">Switch</string>
-    <string name="widget_type_button">Button</string>
-    <string name="widget_type_rgb_led">RGB LED</string>
-    <string name="widget_type_slider">Slider</string>
-    <string name="widget_type_header">Header</string>
-    <string name="widget_type_meter">Meter</string>
-    <string name="widget_mode">Mode</string>
-      -->
 </resources>

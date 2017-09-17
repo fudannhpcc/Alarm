@@ -1,5 +1,7 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -15,9 +17,10 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
-import cn.fudannhpcc.www.alarm.commonclass.AppSettings;
 
 public class SettingActivity extends AppCompatActivity {
+
+    public static final String PREFS_NAME = "AppSettings";
 
     EditText server;
     EditText port;
@@ -43,54 +46,63 @@ public class SettingActivity extends AppCompatActivity {
         connection_in_background = (CheckBox) findViewById(R.id.checkBox_connection_in_background);
         server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
 
-        AppSettings appSettings = AppSettings.getInstance();
-        server.setText(appSettings.server);
-        port.setText(appSettings.port);
-        username.setText(appSettings.username);
-        password.setText(appSettings.password);
-        server_topic.setText(appSettings.server_topic);
-        push_notifications_subscribe_topic.setText(appSettings.push_notifications_subscribe_topic);
-        connection_in_background.setChecked(appSettings.connection_in_background);
-        server_mode.setChecked(appSettings.server_mode);
+        SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        server.setText(sprefs.getString("connection_server",""));
+        port.setText(sprefs.getString("connection_port",""));
+        username.setText(sprefs.getString("connection_username",""));
+        password.setText(sprefs.getString("connection_password",""));
+        server_topic.setText(sprefs.getString("connection_server_topic",""));
+        push_notifications_subscribe_topic.setText(sprefs.getString("connection_push_notifications_subscribe_topic",""));
+        connection_in_background.setChecked(sprefs.getBoolean("connection_in_background",false));
+        server_mode.setChecked(sprefs.getBoolean("server_mode",false));
 
-//        final ImageView help_topic = (ImageView) findViewById(R.id.help_push_topic);
-//        help_topic.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View arg0, MotionEvent arg1) {
-//                switch (arg1.getAction()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        System.out.println("topic down");
-////                        help.setImageBitmap(res.getDrawable(R.drawable.img_down));
-//                        break;
-//                    }
-//                    case MotionEvent.ACTION_CANCEL:{
-//                        System.out.println("topic cancel");
-////                        v.setImageBitmap(res.getDrawable(R.drawable.img_up));
-//                        break;
-//                    }
-//                }
-//                return true;
-//            }
-//        });
-//        final ImageView help_server_mode = (ImageView) findViewById(R.id.help_application_server_mode);
-//        help_server_mode.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View arg0, MotionEvent arg1) {
-//                switch (arg1.getAction()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        System.out.println("server down");
-////                        help.setImageBitmap(res.getDrawable(R.drawable.img_down));
-//                        break;
-//                    }
-//                    case MotionEvent.ACTION_CANCEL:{
-//                        System.out.println("server cancel");
-////                        v.setImageBitmap(res.getDrawable(R.drawable.img_up));
-//                        break;
-//                    }
-//                }
-//                return true;
-//            }
-//        });
+        if (server.getText().toString().equals("")) {
+            server.setText("m21.cloudmqtt.com");
+            port.setText("16796");
+            username.setText("ejoxlycf");
+            password.setText("odhSFqxSDACF");
+            push_notifications_subscribe_topic.setText("out/wcs/push_notifications/#");
+            connection_in_background.setChecked(false);
+        }
+
+        final ImageView help_topic = (ImageView) findViewById(R.id.help_push_topic);
+        help_topic.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                switch (arg1.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        System.out.println("topic down");
+//                        help.setImageBitmap(res.getDrawable(R.drawable.img_down));
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL:{
+                        System.out.println("topic cancel");
+//                        v.setImageBitmap(res.getDrawable(R.drawable.img_up));
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
+        final ImageView help_server_mode = (ImageView) findViewById(R.id.help_application_server_mode);
+        help_server_mode.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                switch (arg1.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        System.out.println("server down");
+//                        help.setImageBitmap(res.getDrawable(R.drawable.img_down));
+                        break;
+                    }
+                    case MotionEvent.ACTION_CANCEL:{
+                        System.out.println("server cancel");
+//                        v.setImageBitmap(res.getDrawable(R.drawable.img_up));
+                        break;
+                    }
+                }
+                return true;
+            }
+        });
 
     }
 
@@ -110,34 +122,25 @@ public class SettingActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save:
                 Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-                System.out.println(server.getText().toString());
                 if (!validateUrl(server.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "Server address is incorrect!", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                AppSettings appSettings = AppSettings.getInstance();
-                appSettings.server = server.getText().toString();
-                System.out.println(appSettings.server);
-                appSettings.port = port.getText().toString();
-                appSettings.username = username.getText().toString();
-                appSettings.password = password.getText().toString();
-                appSettings.server_topic = server_topic.getText().toString();
-                appSettings.push_notifications_subscribe_topic = push_notifications_subscribe_topic.getText().toString();
-                appSettings.connection_in_background = connection_in_background.isChecked();
-                appSettings.server_mode = server_mode.isChecked();
-
-                appSettings.saveConnectionSettingsToPrefs(this);
-//
-//                //MainActivity.presenter.restartService(this);
-//                if(MainActivity.presenter!=null) {
-//                    MainActivity.presenter.connectionSettingsChanged();
-//                }
-
+                SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences.Editor Editor = sprefs.edit();
+                Editor.putString("connection_server", server.getText().toString());
+                Editor.putString("connection_port", port.getText().toString());
+                Editor.putString("connection_username", username.getText().toString());
+                Editor.putString("connection_password", password.getText().toString());
+                Editor.putString("connection_server_topic", server_topic.getText().toString());
+                Editor.putString("connection_push_notifications_subscribe_topic", push_notifications_subscribe_topic.getText().toString());
+                Editor.putString("keep_alive", "60");
+                Editor.putBoolean("connection_in_background", connection_in_background.isChecked());
+                Editor.putBoolean("server_mode", server_mode.isChecked());
+                if (!Editor.commit()) {
+                    Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
+                }
                 finish();
-                //MainActivity.connectToMQTTServer(getApplicationContext());
-//                MainActivity.presenter.resetCurrentSessionTopicList();
-//
-//                MainActivity.presenter.subscribeToAllTopicsInDashboards(settings);
                 return true;
             case R.id.back:
                 Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
