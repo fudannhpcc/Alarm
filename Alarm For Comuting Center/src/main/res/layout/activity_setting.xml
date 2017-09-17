@@ -99,6 +99,12 @@
                         android:text="@string/push_notifications_subscribe_topic"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/help_push_topic"
+                        android:src="@drawable/help"
+                        android:onClick="OnClickHelp" />
                 </LinearLayout>
 
                 <EditText
@@ -139,6 +145,13 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:checked="false" />
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/help_application_server_mode"
+                    android:src="@drawable/help"
+                    android:onClick="OnClickHelp"
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
 
 

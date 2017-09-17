@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Process;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -106,5 +105,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         CustomDialog.show();
-}
+    }
 }
