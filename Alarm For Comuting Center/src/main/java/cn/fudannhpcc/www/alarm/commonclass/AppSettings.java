@@ -8,7 +8,7 @@ public class AppSettings {
     private static AppSettings instance;
 
     public int settingsVersion = 0;
-    public Boolean adfree;
+    public Boolean adfree = false;
 
     public String keep_alive;
     public String server;
@@ -26,7 +26,7 @@ public class AppSettings {
     Context context;
 
     private AppSettings() {
-        //Log.d(getClass().getName(), "ConnectionSettings_CHANGE()");
+        Log.d(getClass().getName(), "ConnectionSettings_CHANGE()");
     }
 
     public static AppSettings getInstance() {
@@ -42,13 +42,14 @@ public class AppSettings {
         if (settingsLoaded) return;
         settingsLoaded = true;
 
-        android.util.Log.d(getClass().getName(), "readFromPrefs()");
+        Log.d(getClass().getName(), "readFromPrefs()");
 
         SharedPreferences sprefs = con.getSharedPreferences("mysettings", Context.MODE_PRIVATE);
 
         adfree = sprefs.getBoolean("adfree", false);
 
         server = sprefs.getString("connection_server", "");
+        Log.d(getClass().getName(), sprefs.getString("connection_server", ""));
         port = sprefs.getString("connection_port", "");
         username = sprefs.getString("connection_username", "");
         password = sprefs.getString("connection_password", "");
@@ -71,6 +72,30 @@ public class AppSettings {
             push_notifications_subscribe_topic = "out/wcs/push_notifications/#";
             keep_alive = "60";
             connection_in_background = false;
+        }
+    }
+
+    public void saveConnectionSettingsToPrefs(Context con) {
+        Log.d(getClass().getName(), "saveConnectionSettingsToPrefs()");
+
+        SharedPreferences sprefs = con.getSharedPreferences("mysettings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = sprefs.edit();
+        ed.putBoolean("adfree", adfree);
+        ed.putString("connection_server", server);
+        ed.putString("connection_port", port);
+        ed.putString("connection_username", username);
+        ed.putString("connection_password", password);
+        //3.0 ed.putString("connection_subscribe_topic", subscribe_topic);
+        ed.putString("connection_server_topic", server_topic);
+        ed.putString("connection_push_notifications_subscribe_topic", push_notifications_subscribe_topic);
+        ed.putString("keep_alive", keep_alive);
+        ed.putBoolean("connection_in_background", connection_in_background);
+        ed.putBoolean("server_mode", server_mode);
+
+        ed.putInt("settingsVersion", settingsVersion);
+
+        if (!ed.commit()) {
+            android.util.Log.d(getClass().getName(), "commit failure!!!");
         }
     }
 }
