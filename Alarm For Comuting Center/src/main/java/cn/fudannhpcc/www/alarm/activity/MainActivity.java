@@ -38,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.start:
                 if ( item.getTitle() == getString(R.string.start) ) {
@@ -86,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showChangeLangDialog(String title, String message) {
-
         CustomDialog = new CustomDialog(MainActivity.this);
         CustomDialog.setTitle(title);
         CustomDialog.setMessage(message);
