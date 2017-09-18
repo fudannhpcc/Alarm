@@ -22,7 +22,7 @@ public class SettingActivity extends AppCompatActivity {
 
     public static final String PREFS_NAME = "AppSettings";
 
-    EditText server;
+//    EditText server;
     EditText port;
     EditText username;
     EditText password;
@@ -36,7 +36,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        server = (EditText) findViewById(R.id.editText_server);
+//        server = (EditText) findViewById(R.id.editText_server);
         port = (EditText) findViewById(R.id.editText_port);
         username = (EditText) findViewById(R.id.editText_username);
         password = (EditText) findViewById(R.id.editText_password);
@@ -47,7 +47,7 @@ public class SettingActivity extends AppCompatActivity {
         server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
 
         SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        server.setText(sprefs.getString("connection_server",""));
+//        server.setText(sprefs.getString("connection_server",""));
         port.setText(sprefs.getString("connection_port",""));
         username.setText(sprefs.getString("connection_username",""));
         password.setText(sprefs.getString("connection_password",""));
@@ -56,14 +56,14 @@ public class SettingActivity extends AppCompatActivity {
         connection_in_background.setChecked(sprefs.getBoolean("connection_in_background",false));
         server_mode.setChecked(sprefs.getBoolean("server_mode",false));
 
-        if (server.getText().toString().equals("")) {
-            server.setText("m21.cloudmqtt.com");
-            port.setText("16796");
-            username.setText("ejoxlycf");
-            password.setText("odhSFqxSDACF");
-            push_notifications_subscribe_topic.setText("out/wcs/push_notifications/#");
-            connection_in_background.setChecked(false);
-        }
+//        if (server.getText().toString().equals("")) {
+////            server.setText("m21.cloudmqtt.com");
+//            port.setText("16796");
+//            username.setText("ejoxlycf");
+//            password.setText("odhSFqxSDACF");
+//            push_notifications_subscribe_topic.setText("out/wcs/push_notifications/#");
+//            connection_in_background.setChecked(false);
+//        }
 
         final ImageView help_topic = (ImageView) findViewById(R.id.help_push_topic);
         help_topic.setOnTouchListener(new View.OnTouchListener() {
@@ -122,13 +122,13 @@ public class SettingActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save:
                 Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-                if (!validateUrl(server.getText().toString())) {
-                    Toast.makeText(getApplicationContext(), "Server address is incorrect!", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
+//                if (!validateUrl(server.getText().toString())) {
+//                    Toast.makeText(getApplicationContext(), "Server address is incorrect!", Toast.LENGTH_SHORT).show();
+//                    return false;
+//                }
                 SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 SharedPreferences.Editor Editor = sprefs.edit();
-                Editor.putString("connection_server", server.getText().toString());
+//                Editor.putString("connection_server", server.getText().toString());
                 Editor.putString("connection_port", port.getText().toString());
                 Editor.putString("connection_username", username.getText().toString());
                 Editor.putString("connection_password", password.getText().toString());
