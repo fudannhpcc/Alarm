@@ -4,18 +4,13 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Process;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -25,9 +20,6 @@ import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
-
-import static cn.fudannhpcc.www.alarm.R.id.container;
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         registerNetworkBroadcastForNougat();
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
+        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
     }
-
-
 
     @Override
     protected void onDestroy() {
@@ -65,16 +57,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
         switch (item.getItemId()) {
             case R.id.start:
                 if ( item.getTitle() == getString(R.string.start) ) {
                     Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_stop);
+                    mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
                 }
                 else {
                     Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
+                    mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
                     item.setTitle(getString(R.string.start));
                 }
                 break;

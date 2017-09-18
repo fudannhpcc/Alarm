@@ -18,14 +18,17 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent)
     {
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.connection_status_RGBLed);
+        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
         try
         {
             if (isOnline(context)) {
                 ConnectStatus(true);
                 connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
+                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
             } else {
                 ConnectStatus(false);
                 connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
+                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
