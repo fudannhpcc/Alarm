@@ -7,48 +7,54 @@
     <string name="start">开始</string>
     <string name="stop">停止</string>
 
+    <string name="exittitle">退出程序</string>
+    <string name="exitmessage">确定要退出吗？</string>
+
     <string name="setting">设置</string>
         <string name="save">保存</string>
         <string name="back">返回</string>
         <string name="title_activity_setting">设置</string>
+    <string name="exit">退出</string>
 
-        <string name="server">支持协议网络</string>
+    <!--   MQTT服务器设置  -->
+    <string name="connection_settings_to_the_mqtt_server">MQTT服务器设置</string>
         <string name="hostname">中心集群域名</string>
-            <string name="textEdit_hostname"></string>
             <string name="textEdit_hostname_hint">fudannhpcc.cn</string>
-        <string name="protocol">支持协议网络</string>
+        <string name="protocol">支持网络协议</string>
             <string name="protocol_tcp">TCP</string>
             <string name="protocol_ssl">SSL</string>
             <string name="protocol_xyz">XYZ</string>
         <string name="port">端口</string>
-            <string name="textEdit_port"></string>
-            <string name="textEdit_port_hint">1883</string>
+            <string name="textEdit_port_hint">18883</string>
         <string name="username">用户名</string>
-            <string name="textEdit_username"></string>
             <string name="textEdit_username_hint">nhpcc</string>
         <string name="password">密码</string>
-            <string name="textEdit_password"></string>
             <string name="textEdit_password_hint">rtfu2002</string>
-        <string name="sub_topic">Sub.topic</string>
-        <string name="retained">Retained</string>
-        <string name="topic_for_send_new_value">Topic for send new value (long tap on value field in \'Play\' mode)</string>
-        <string name="primary_color">Primary color</string>
-        <string name="input_new_value">input new value</string>
-        <string name="on_label">\'On\' label</string>
-        <string name="off_label">\'Off\' label</string>
-        <string name="connection_settings_to_the_mqtt_server">MQTT服务器设置</string>
-        <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5722465293744437/4245475504</string>
-        <string name="keep_connection_in_the_background_for_receiving_push_notifications">Keep connection in the background for receiving push notifications</string>
-        <string name="server_topic">Server topic</string>
-        <string name="push_notifications_subscribe_topic">Push notifications subscribe topic</string>
-        <string name="server_mode">Application server mode</string>
-        <string name="pub_topic">Pub.topic (optional)</string>
-    <string name="exit">退出</string>
-        <string name="exittitle">退出程序</string>
-        <string name="exitmessage">确定要退出吗？</string>
+        <string name="sub_topic">订阅主题</string>
+            <string name="textEdit_sub_topic_hint">fudannhpcc/warning/#</string>
+        <string name="keep_connection_in_the_background_for_receiving_push_notifications">后台保持连接接收通知</string>
+        <string name="server_mode">系统服务模式</string>
+        <string name="server_topic">发布主题</string>
+            <string name="editText_server_topic_hint">fudannhpcc/cluster/#</string>
 
     <!--   网络和服务状态显示  -->
     <string name="network_status">网络状态</string>
     <string name="mqtt_status" translatable="false">MQTT服务</string>
+
+    <!--   AppSetting 存储名称  -->
+    <string name="connection_hostname">connection_hostname</string>
+    <string name="connection_protocol_tcp">connection_protocol_tcp</string>
+    <string name="connection_protocol_ssl">connection_protocol_ssl</string>
+    <string name="connection_protocol_xyz">connection_protocol_xyz</string>
+    <string name="connection_port">connection_port</string>
+    <string name="connection_username">connection_username</string>
+    <string name="connection_password">connection_password</string>
+    <string name="connection_push_notifications_subscribe_topic">connection_push_notifications_subscribe_topic</string>
+    <string name="keep_alive">keep_alive</string>
+    <string name="connection_in_background">connection_in_background</string>
+    <string name="connection_server_mode">connection_server_mode</string>
+    <string name="connection_server_topic">connection_server_topic</string>
+    <string name="connection_mqtt_server">connection_mqtt_server</string>
+
 
 </resources>

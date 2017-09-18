@@ -44,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.start:
                 if ( item.getTitle() == getString(R.string.start) ) {
-                    Toast.makeText(this, "开始", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_stop);
                     item.setTitle(getString(R.string.stop));
                 }
                 else {
-                    Toast.makeText(this, "结束", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
                     item.setTitle(getString(R.string.start));
                 }
