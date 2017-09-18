@@ -1,33 +1,60 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Process;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
+import cn.fudannhpcc.www.alarm.commonclass.MyColors;
+import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
+import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
+
+import static cn.fudannhpcc.www.alarm.R.id.container;
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
+    private BroadcastReceiver mNetworkReceiver;
+
+    static Activity thisActivity = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        thisActivity = this;
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
+        RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
+        connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
     }
+
+
 
     @Override
     protected void onDestroy() {
-        Process.killProcess(Process.myPid());
         super.onDestroy();
+        unregisterNetworkChanges();
+        Process.killProcess(Process.myPid());
     }
 
     @Override
@@ -102,4 +129,32 @@ public class MainActivity extends AppCompatActivity {
         });
         CustomDialog.show();
     }
+
+    public static void ConnectStatus(boolean value){
+        if(value){
+            Toast.makeText(thisActivity, "网络通了", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(thisActivity, "网络不通", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+
+    protected void unregisterNetworkChanges() {
+        try {
+            unregisterReceiver(mNetworkReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
