@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     FrameLayout frame = null;
     TextView mqtt_message_echo = null;
+    TextView system_log = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
 
         mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
+        system_log = (TextView) findViewById(R.id.system_log);
 
     }
 
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onYesClick() {
                 Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
-                mqtt_message_echo.setText("点击了--确定--按钮");
+                system_log.setText("点击了--确定--按钮");
                 onDestroy();
             }
         });
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNoClick() {
                 Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
-                mqtt_message_echo.setText("点击了--取消--按钮");
+                system_log.setText("点击了--取消--按钮");
                 CustomDialog.dismiss();
             }
         });

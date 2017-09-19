@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.TextView;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
@@ -19,6 +20,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     {
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.connection_status_RGBLed);
         RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
+        TextView system_log = (TextView) ((Activity)context).findViewById(R.id.system_log);
         try
         {
             if (isOnline(context)) {
@@ -29,6 +31,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 ConnectStatus(false);
                 connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
                 mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+                system_log.setText("网络断开啦");
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
