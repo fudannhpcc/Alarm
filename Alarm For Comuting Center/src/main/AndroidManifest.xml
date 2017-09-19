@@ -33,7 +33,19 @@
             android:label="@string/title_activity_setting"
             android:theme="@style/MyTheme" />
 
-        <receiver android:name=".commonclass.NetworkChangeReceiver">
+        <service
+            android:name=".commonclass.MQTTService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Mqtt Service" >
+            <!--<intent-filter>-->
+                <!--<action android:name="com.test.SERVICE_TEST" />-->
+                <!--<category android:name="android.intent.category.default" />-->
+            <!--</intent-filter>-->
+        </service>
+
+        <receiver
+            android:name=".commonclass.NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

@@ -2,13 +2,17 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Process;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -19,6 +23,7 @@ import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
+import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
@@ -35,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     TextView mqtt_message_echo = null;
     TextView system_log = null;
 
+    private MQTTService mqttService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,10 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
         mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
         system_log = (TextView) findViewById(R.id.system_log);
-
     }
 
-    @Override
+     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterNetworkChanges();
