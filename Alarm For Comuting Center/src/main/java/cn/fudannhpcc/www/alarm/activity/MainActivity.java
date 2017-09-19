@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Process;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -29,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     static Activity thisActivity = null;
 
+    FrameLayout frame = null;
+    TextView mqtt_message_echo = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +41,14 @@ public class MainActivity extends AppCompatActivity {
         thisActivity = this;
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
+
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
         RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
         mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+
+        mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
+
     }
 
     @Override
@@ -112,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onYesClick() {
                 Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
+                mqtt_message_echo.setText("点击了--确定--按钮");
                 onDestroy();
             }
         });
@@ -119,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNoClick() {
                 Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
+                mqtt_message_echo.setText("点击了--取消--按钮");
                 CustomDialog.dismiss();
             }
         });
