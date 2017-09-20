@@ -52,7 +52,7 @@
     <string name="connection_username">connection_username</string>
     <string name="connection_password">connection_password</string>
     <string name="connection_push_notifications_subscribe_topic">connection_push_notifications_subscribe_topic</string>
-    <string name="keep_alive">keep_alive</string>
+    <string name="connection_keep_alive">connection_keep_alive</string>
     <string name="connection_in_background">connection_in_background</string>
     <string name="connection_server_mode">connection_server_mode</string>
     <string name="connection_server_topic">connection_server_topic</string>

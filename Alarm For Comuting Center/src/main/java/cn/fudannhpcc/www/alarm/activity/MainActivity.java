@@ -9,9 +9,9 @@ import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Process;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -82,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
+
+                    Intent service_intent = new Intent(this, MQTTService.class);
+                    service_intent.setAction("autostart");
+                    startService(service_intent);
+                    finish();
+//                    Intent intent = new Intent(this, MainActivity.class);
+//                    startActivity(intent);
+                    return true;
                 }
                 else {
                     Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
@@ -143,16 +151,6 @@ public class MainActivity extends AppCompatActivity {
         });
         CustomDialog.show();
     }
-
-    public static void ConnectStatus(boolean value){
-        if(value){
-            Toast.makeText(thisActivity, "网络通了", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(thisActivity, "网络不通", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     private void registerNetworkBroadcastForNougat() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

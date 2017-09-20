@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
@@ -27,11 +28,24 @@ public class SettingActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private EditText push_notifications_subscribe_topic;
-    private CheckBox connection_in_background;
+    private CheckBox in_background;
     private CheckBox server_mode;
     private EditText server_topic;
 
     private String mqtt_protocol = "";
+
+    public String connection_keep_alive;
+    public String connection_hostname;
+    public boolean connection_protocol_tcp;
+    public boolean connection_protocol_ssl;
+    public boolean connection_protocol_xyz;
+    public String connection_port;
+    public String connection_username;
+    public String connection_password;
+    public String connection_push_notifications_subscribe_topic;
+    public String connection_server_topic;
+    public boolean connection_in_background;
+    public boolean connection_server_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +60,7 @@ public class SettingActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.editText_username);
         password = (EditText) findViewById(R.id.editText_password);
         push_notifications_subscribe_topic = (EditText) findViewById(R.id.editText_push_notifications_subscribe_topic);
-        connection_in_background = (CheckBox) findViewById(R.id.checkBox_connection_in_background);
+        in_background = (CheckBox) findViewById(R.id.checkBox_connection_in_background);
         server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
         server_topic = (EditText) findViewById(R.id.editText_server_topic);
 
@@ -59,7 +73,7 @@ public class SettingActivity extends AppCompatActivity {
         username.setText(sprefs.getString(getString(R.string.connection_username),""));
         password.setText(sprefs.getString(getString(R.string.connection_password),""));
         push_notifications_subscribe_topic.setText(sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),""));
-        connection_in_background.setChecked(sprefs.getBoolean(getString(R.string.connection_in_background),false));
+        in_background.setChecked(sprefs.getBoolean(getString(R.string.connection_in_background),false));
         server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
 
@@ -128,8 +142,8 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_username), username.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_password), password.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), push_notifications_subscribe_topic.getText().toString().replace(" ", ""));
-                Editor.putString(getString(R.string.keep_alive), "60");
-                Editor.putBoolean(getString(R.string.connection_in_background), connection_in_background.isChecked());
+                Editor.putString(getString(R.string.connection_keep_alive), "60");
+                Editor.putBoolean(getString(R.string.connection_in_background), in_background.isChecked());
                 Editor.putBoolean(getString(R.string.connection_server_mode), server_mode.isChecked());
                 Editor.putString(getString(R.string.connection_server_topic), server_topic.getText().toString().replace(" ", ""));
                 if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_xyz.isChecked() ) {
@@ -180,5 +194,4 @@ public class SettingActivity extends AppCompatActivity {
         }
         return super.onMenuOpened(featureId, menu);
     }
-
 }

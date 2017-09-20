@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,9 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.activity.MainActivity;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
-import static cn.fudannhpcc.www.alarm.activity.MainActivity.ConnectStatus;
+//import static cn.fudannhpcc.www.alarm.activity.MainActivity.ConnectStatus;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
@@ -29,15 +32,15 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         try
         {
             if (isOnline(context)) {
-                ConnectStatus(true);
                 connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
                 mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                 system_log.setText("网络连通啦");
+                Toast.makeText(context, "网络连通啦",Toast.LENGTH_SHORT).show();
             } else {
-                ConnectStatus(false);
                 connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
                 mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
                 system_log.setText("网络断开啦");
+                Toast.makeText(context, "网络断开啦",Toast.LENGTH_SHORT).show();
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
