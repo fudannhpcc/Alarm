@@ -8,14 +8,11 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import cn.fudannhpcc.www.alarm.R;
 
@@ -29,7 +26,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     }
 
     private Context context;
-    private Handler handler = new Handler(Looper.getMainLooper());
 
     CallbackMQTTClient callbackMQTTClient;
 
@@ -37,7 +33,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     public MQTTService() {
         instance = this;
-
         SprefsMap = new HashMap<String,Object>();
     }
 
@@ -51,42 +46,54 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         super.onCreate();
         context = getApplicationContext();
 
-       SprefsMap = readFromPrefs();
+        SprefsMap = readFromPrefs();
 
-        handler.postAtTime(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Iterator it = SprefsMap.keySet().iterator();
                 while(it.hasNext()) {
                     String key = (String)it.next();
                     System.out.println("key:" + key);
                     System.out.println("value:" + SprefsMap.get(key));
                 }
-                Toast.makeText(context, "读取数据完毕",Toast.LENGTH_SHORT).show();
+                new Handler(Looper.getMainLooper()).post(
+                        new Runnable() {
+                            public void run() {
+                                Toast.makeText(context,"服务启动啦", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             }
-        }, SystemClock.uptimeMillis() + 10000);
+        }).start();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(getClass().getName(), "onDestroy()");
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-            Toast.makeText(context, "onDestroy()",Toast.LENGTH_SHORT).show();
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(
+                new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "onDestroy()",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-            Toast.makeText(context, "onStartCommand",Toast.LENGTH_SHORT).show();
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(
+                new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "onStartCommand",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
         return super.onStartCommand(intent, flags, startId);
     }
 
