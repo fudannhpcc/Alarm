@@ -25,6 +25,7 @@ import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
+import cn.fudannhpcc.www.alarm.commonclass.NotificationNum;
 import cn.fudannhpcc.www.alarm.commonclass.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         MQTTServiceName = getString(R.string.mqtt_service_name);
 
         isService = serviceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
+
+        NotificationNum.setPendingNotificationsCount(0);
 
         mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
         system_log = (TextView) findViewById(R.id.system_log);

@@ -1,13 +1,21 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.activity.MainActivity;
 
 public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
 
@@ -30,6 +39,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     private Context context;
 
     private boolean iService = true;
+    private int NOTIFY_ID = 1883;
 
     CallbackMQTTClient callbackMQTTClient;
 
@@ -104,10 +114,13 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             public void run() {
                 do {
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(180000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    String title = "中心集群故障报警";
+                    String message = "这是测试";
+                    qmtt_notification(NOTIFY_ID,title,message);
                     new Handler(Looper.getMainLooper()).post(
                             new Runnable() {
                                 public void run() {
@@ -150,5 +163,30 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         }
         return sprefsMap;
     }
-}
 
+    public void qmtt_notification(int NOTIFY_ID, String title, String message) {
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+// 设置通知的基本信息：icon、标题、内容
+        Drawable drawable=getApplicationInfo().loadIcon(getPackageManager());
+        Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+        builder.setSmallIcon(getApplicationInfo().icon);
+        builder.setLargeIcon(bitmap);
+        builder.setContentTitle(title);
+        builder.setContentText(message);
+        builder.setAutoCancel(true);
+        int pendingNotificationsCount = NotificationNum.getPendingNotificationsCount() + 1;
+        NotificationNum.setPendingNotificationsCount(pendingNotificationsCount);
+        builder.setNumber(pendingNotificationsCount);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.warning);
+        builder.setSound(sound);
+
+// 设置通知的点击行为：这里启动一个 Activity
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+// 发送通知 id 需要在应用内唯一
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, builder.build());
+    }
+}
