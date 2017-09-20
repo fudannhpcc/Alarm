@@ -51,6 +51,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".commonclass.BootCompletedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

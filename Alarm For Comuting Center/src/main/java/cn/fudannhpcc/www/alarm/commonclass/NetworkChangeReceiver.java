@@ -19,6 +19,7 @@ import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
+
 //import static cn.fudannhpcc.www.alarm.activity.MainActivity.ConnectStatus;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
