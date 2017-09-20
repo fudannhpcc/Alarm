@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -26,6 +25,7 @@ import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
+import cn.fudannhpcc.www.alarm.commonclass.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mNetworkReceiver;
 
     static Activity thisActivity = null;
+
+    private ServiceUtils serviceUtils;
+    private boolean isService = false;
+    private String MQTTServiceName = "";
 
     FrameLayout frame = null;
     TextView mqtt_message_echo = null;
@@ -52,8 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
-        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+
+        MQTTServiceName = getString(R.string.mqtt_service_name);
+
+        isService = serviceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
 
         mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
         system_log = (TextView) findViewById(R.id.system_log);
@@ -69,6 +75,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem item = menu.findItem(R.id.start);
+        if (isService) {
+            item.setTitle(getString(R.string.stop));
+            item.setIcon(R.drawable.ic_stop);
+            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
+        }
+        else {
+            item.setTitle(getString(R.string.start));
+            item.setIcon(R.drawable.ic_start);
+            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+        }
         return true;
     }
 
@@ -84,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
                     item.setTitle(getString(R.string.stop));
 
                     Intent service_intent = new Intent(this, MQTTService.class);
-                    service_intent.setAction("autostart");
+                    service_intent.setAction(MQTTServiceName);
                     startService(service_intent);
-                    finish();
+//                    finish();
 //                    Intent intent = new Intent(this, MainActivity.class);
 //                    startActivity(intent);
                     return true;
@@ -95,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+                    Intent service_intent = new Intent(this, MQTTService.class);
+                    service_intent.setAction(MQTTServiceName);
+                    stopService(service_intent);
                     item.setTitle(getString(R.string.start));
                 }
                 break;

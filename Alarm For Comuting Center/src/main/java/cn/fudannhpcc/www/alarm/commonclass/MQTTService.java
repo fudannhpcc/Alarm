@@ -10,6 +10,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -56,12 +59,12 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Iterator it = SprefsMap.keySet().iterator();
-                while(it.hasNext()) {
-                    String key = (String)it.next();
-                    System.out.println("key:" + key);
-                    System.out.println("value:" + SprefsMap.get(key));
-                }
+//                Iterator it = SprefsMap.keySet().iterator();
+//                while(it.hasNext()) {
+//                    String key = (String)it.next();
+//                    System.out.println("key:" + key);
+//                    System.out.println("value:" + SprefsMap.get(key));
+//                }
                 new Handler(Looper.getMainLooper()).post(
                         new Runnable() {
                             public void run() {
@@ -94,6 +97,27 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                     }
                 }
         );
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                do {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    new Handler(Looper.getMainLooper()).post(
+                            new Runnable() {
+                                public void run() {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    String datestr = sdf.format(new Date());
+                                    Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                    );
+                } while(true);
+            }
+        }).start();
         return super.onStartCommand(intent, flags, startId);
     }
 

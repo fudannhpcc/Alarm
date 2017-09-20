@@ -43,6 +43,8 @@
     <string name="lbl_mqtt_message_echo">信息输出</string>
     <string name="lbl_system_log">状态显示</string>
 
+    <string name="mqtt_service_name">cn.fudannhpcc.www.alarm.commonclass.MQTTService</string>
+
     <!--   AppSetting 存储名称  -->
     <string name="connection_hostname">connection_hostname</string>
     <string name="connection_protocol_tcp">connection_protocol_tcp</string>
