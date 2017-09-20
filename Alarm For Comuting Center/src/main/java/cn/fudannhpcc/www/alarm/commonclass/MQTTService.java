@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +28,8 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     }
 
     private Context context;
+
+    private boolean iService = true;
 
     CallbackMQTTClient callbackMQTTClient;
 
@@ -54,11 +55,11 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(10000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 //                Iterator it = SprefsMap.keySet().iterator();
 //                while(it.hasNext()) {
 //                    String key = (String)it.next();
@@ -79,6 +80,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     @Override
     public void onDestroy() {
         super.onDestroy();
+        iService = false;
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -115,7 +117,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                                 }
                             }
                     );
-                } while(true);
+                } while(iService);
             }
         }).start();
         return super.onStartCommand(intent, flags, startId);

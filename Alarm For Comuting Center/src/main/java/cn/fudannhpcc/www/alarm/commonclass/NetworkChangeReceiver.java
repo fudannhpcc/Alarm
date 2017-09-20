@@ -27,18 +27,18 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent)
     {
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.connection_status_RGBLed);
-        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
+//        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
         TextView system_log = (TextView) ((Activity)context).findViewById(R.id.system_log);
         try
         {
             if (isOnline(context)) {
                 connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
-                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
+//                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                 system_log.setText("网络连通啦");
                 Toast.makeText(context, "网络连通啦",Toast.LENGTH_SHORT).show();
             } else {
                 connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
-                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+//                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
                 system_log.setText("网络断开啦");
                 Toast.makeText(context, "网络断开啦",Toast.LENGTH_SHORT).show();
             }
