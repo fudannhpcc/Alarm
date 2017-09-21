@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     TextView mqtt_message_echo = null;
     TextView system_log = null;
 
+    public static final String PREFS_NAME = "AppSettings";
+
     private MQTTService mqttService;
 
     @Override

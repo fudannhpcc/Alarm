@@ -1,6 +1,5 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import cn.fudannhpcc.www.alarm.R;
@@ -94,10 +92,15 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "onDestroy()",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "服务退出",Toast.LENGTH_SHORT).show();
                     }
                 }
         );
+        boolean iservice = (boolean)SprefsMap.get("connection_server_mode");
+        if ( iservice ) {
+            Intent broadcastIntent = new Intent("cn.fudannhpcc.www.alarm.commonclass.MqttRestarterBroadcastReceiver");
+            sendBroadcast(broadcastIntent);
+        }
     }
 
     @Override
