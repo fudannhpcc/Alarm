@@ -87,7 +87,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         iService = false;
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
@@ -101,6 +100,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             Intent broadcastIntent = new Intent("cn.fudannhpcc.www.alarm.commonclass.MqttRestarterBroadcastReceiver");
             sendBroadcast(broadcastIntent);
         }
+        super.onDestroy();
     }
 
     @Override
@@ -117,7 +117,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             public void run() {
                 do {
                     try {
-                        Thread.sleep(180000);
+                        Thread.sleep(60000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -136,7 +136,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 } while(iService);
             }
         }).start();
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     public Map<String,Object> readFromPrefs() {
@@ -188,6 +188,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
+
 // 发送通知 id 需要在应用内唯一
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());

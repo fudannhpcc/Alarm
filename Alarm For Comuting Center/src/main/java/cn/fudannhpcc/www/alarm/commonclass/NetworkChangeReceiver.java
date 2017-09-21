@@ -9,6 +9,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,16 +21,18 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
 
-//import static cn.fudannhpcc.www.alarm.activity.MainActivity.ConnectStatus;
-
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.connection_status_RGBLed);
+        if(context == null || !(context instanceof MainActivity))
+            return;
+
+        AppCompatActivity yourActivity = (AppCompatActivity) context;
+        RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) yourActivity.findViewById(R.id.connection_status_RGBLed);
 //        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
-        TextView system_log = (TextView) ((Activity)context).findViewById(R.id.system_log);
+        TextView system_log = (TextView) yourActivity.findViewById(R.id.system_log);
         try
         {
             if (isOnline(context)) {

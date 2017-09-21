@@ -12,8 +12,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
-    <uses-sdk android:targetSdkVersion="23" android:minSdkVersion="7" />
-
     <meta-data android:name="com.onesignal.NotificationAccentColor.DEFAULT" android:value="FF00FF00" />
 
     <application
@@ -23,11 +21,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="集群管理"
         android:supportsRtl="true"
+
         android:theme="@style/MyTheme">
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,10 +39,6 @@
             android:enabled="true"
             android:exported="true"
             android:label="Mqtt Service" >
-            <!--<intent-filter>-->
-                <!--<action android:name="com.test.SERVICE_TEST" />-->
-                <!--<category android:name="android.intent.category.default" />-->
-            <!--</intent-filter>-->
         </service>
 
         <receiver
