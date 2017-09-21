@@ -117,7 +117,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             public void run() {
                 do {
                     try {
-                        Thread.sleep(60000);
+                        Thread.sleep(600000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
