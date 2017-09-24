@@ -218,6 +218,27 @@
                     android:textColor="@android:color/holo_blue_dark"
                     android:textSize="14sp" />
             </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/textView_keep_alive"
+                    android:layout_width="96dp"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/keep_alive"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/editText_keep_alive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/editText_keep_alive_hint"
+                    android:inputType="text"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -31,21 +31,9 @@ public class SettingActivity extends AppCompatActivity {
     private CheckBox in_background;
     private CheckBox server_mode;
     private EditText server_topic;
+    private EditText keep_alive;
 
     private String mqtt_protocol = "";
-
-    public String connection_keep_alive;
-    public String connection_hostname;
-    public boolean connection_protocol_tcp;
-    public boolean connection_protocol_ssl;
-    public boolean connection_protocol_xyz;
-    public String connection_port;
-    public String connection_username;
-    public String connection_password;
-    public String connection_push_notifications_subscribe_topic;
-    public String connection_server_topic;
-    public boolean connection_in_background;
-    public boolean connection_server_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +51,7 @@ public class SettingActivity extends AppCompatActivity {
         in_background = (CheckBox) findViewById(R.id.checkBox_connection_in_background);
         server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
         server_topic = (EditText) findViewById(R.id.editText_server_topic);
+        keep_alive = (EditText) findViewById(R.id.editText_keep_alive);
 
         SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         hostname.setText(sprefs.getString(getString(R.string.connection_hostname),""));
@@ -76,6 +65,7 @@ public class SettingActivity extends AppCompatActivity {
         in_background.setChecked(sprefs.getBoolean(getString(R.string.connection_in_background),false));
         server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
+        keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),60)));
 
         if (protocol_tcp.isChecked()) mqtt_protocol = "tcp://";
         if (protocol_ssl.isChecked()) mqtt_protocol = "ssl://";
@@ -142,10 +132,10 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_username), username.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_password), password.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), push_notifications_subscribe_topic.getText().toString().replace(" ", ""));
-                Editor.putString(getString(R.string.connection_keep_alive), "60");
                 Editor.putBoolean(getString(R.string.connection_in_background), in_background.isChecked());
                 Editor.putBoolean(getString(R.string.connection_server_mode), server_mode.isChecked());
                 Editor.putString(getString(R.string.connection_server_topic), server_topic.getText().toString().replace(" ", ""));
+                Editor.putInt(getString(R.string.connection_keep_alive), Integer.parseInt(keep_alive.getText().toString().replace(" ", "")));
                 if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_xyz.isChecked() ) {
                     String errmsg = "网络协议必须选择一个";
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();

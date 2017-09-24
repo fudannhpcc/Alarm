@@ -5,6 +5,7 @@ import java.util.List;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 
 public class ServiceUtils {
 
@@ -13,10 +14,8 @@ public class ServiceUtils {
      */
     public static boolean isServiceRunning(Context context,String serviceName){
         // 校验服务是否还存在
-        ActivityManager am = (ActivityManager) context
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        List<RunningServiceInfo> services = am.getRunningServices(100);
-        for (RunningServiceInfo info : services) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
             // 得到所有正在运行的服务的名称
             String name = info.service.getClassName();
             if (serviceName.equals(name)) {
@@ -25,5 +24,4 @@ public class ServiceUtils {
         }
         return false;
     }
-
 }

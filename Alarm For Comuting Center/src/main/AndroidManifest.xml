@@ -38,7 +38,16 @@
             android:name=".commonclass.MQTTService"
             android:enabled="true"
             android:exported="true"
-            android:label="Mqtt Service" >
+            android:process=":ServiceProcess"
+            android:label="MqttService" >
+        </service>
+
+        <service
+            android:name=".commonclass.CoreService"
+            android:enabled="true"
+            android:process=":ServiceProcess"
+            android:label="CoreService"
+            android:exported="true" >
         </service>
 
         <receiver

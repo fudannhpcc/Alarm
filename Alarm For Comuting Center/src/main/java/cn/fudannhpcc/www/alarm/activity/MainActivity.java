@@ -3,6 +3,7 @@ package cn.fudannhpcc.www.alarm.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -14,18 +15,19 @@ import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.commonclass.CoreService;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
+import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
-import cn.fudannhpcc.www.alarm.commonclass.NotificationNum;
 import cn.fudannhpcc.www.alarm.commonclass.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
@@ -37,22 +39,19 @@ public class MainActivity extends AppCompatActivity {
 
     static Activity thisActivity = null;
 
-    private ServiceUtils serviceUtils;
     private boolean isService = false;
-    private String MQTTServiceName = "";
+    private String CoreServiceName = "";
 
-    FrameLayout frame = null;
     TextView mqtt_message_echo = null;
     TextView system_log = null;
 
-    public static final String PREFS_NAME = "AppSettings";
-
-    private MQTTService mqttService;
+    String notificationMessage = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         thisActivity = this;
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
@@ -60,14 +59,49 @@ public class MainActivity extends AppCompatActivity {
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
-        MQTTServiceName = getString(R.string.mqtt_service_name);
+        CoreServiceName = getString(R.string.core_service_name);
 
-        isService = serviceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
-
-        NotificationNum.setPendingNotificationsCount(0);
+        isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
         mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
         system_log = (TextView) findViewById(R.id.system_log);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            notificationMessage = extras.getString("NotificationMessage");
+            mqtt_message_echo.setText(notificationMessage);
+        }
+
+//        doBindService();
+
+        if (mService != null) {
+        }else {
+            Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private MQTTService mService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            MQTTService.LocalBinder binder = (MQTTService.LocalBinder) service;
+            mService = binder.getService();
+        }
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
+
+    private boolean mIsBound;
+    private void doBindService() {
+        bindService(new Intent(MainActivity.this, MQTTService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+    private void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
     }
 
      @Override
@@ -106,11 +140,10 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
-
-                    Intent service_intent = new Intent(this, MQTTService.class);
-                    service_intent.setAction(MQTTServiceName);
-                    startService(service_intent);
-//                    finish();
+                    Intent coreservice_intent = new Intent(this, CoreService.class);
+                    coreservice_intent.setAction(CoreServiceName);
+                    startService(coreservice_intent);
+                    finish();
 //                    Intent intent = new Intent(this, MainActivity.class);
 //                    startActivity(intent);
                     return true;
@@ -119,9 +152,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
-                    Intent service_intent = new Intent(this, MQTTService.class);
-                    service_intent.setAction(MQTTServiceName);
-                    stopService(service_intent);
+                    Intent coreservice_intent = new Intent(this, CoreService.class);
+                    coreservice_intent.setAction(CoreServiceName);
+                    stopService(coreservice_intent);
                     item.setTitle(getString(R.string.start));
                 }
                 break;
