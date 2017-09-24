@@ -40,8 +40,12 @@ public class MainActivity extends AppCompatActivity {
     static Activity thisActivity = null;
 
     private boolean isService = false;
+    private boolean isMQTTService = false;
     private String CoreServiceName = "";
     private String MQTTServiceName = "";
+
+    MQTTService mqttService;
+    boolean mqttBound = false;
 
     TextView mqtt_message_echo = null;
     TextView system_log = null;
@@ -74,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
             mqtt_message_echo.setText(notificationMessage);
         }
 
-    }
+        isMQTTService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
+//        if ( isMQTTService ) mqttBound = true;
 
-    MQTTService mqttService;
-    boolean mqttBound = false;
+    }
 
     @Override
     protected void onStart() {
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 //        Log.d("onResume()","HELLO");
 //        Log.d(String.valueOf(mqttBound),"HELLO");
-//        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
         if (mqttBound) {
             // Call a method from the LocalService.
             // However, if this call were something that might hang, then this request should
@@ -229,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
             public void onYesClick() {
                 Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
                 system_log.setText("点击了--确定--按钮");
+                CustomDialog.dismiss();
                 finish();
             }
         });
