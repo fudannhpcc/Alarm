@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
@@ -33,7 +35,9 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
 
     public static final String PREFS_NAME = "AppSettings";
+
     private int pendingNotificationsCount = 0;
+
 
     private static MQTTService instance;
     static public MQTTService getInstance() {
@@ -55,27 +59,28 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         SprefsMap = new HashMap<String,Object>();
     }
 
-    private final IBinder mBinder = new LocalBinder();
+    public static final int NOTIFICATION_READED = 1;
 
-    private final Random mGenerator = new Random();
-
-    public class LocalBinder extends Binder {
-        public MQTTService getService() {
-//            Log.d("LocalBinder","HELLO");
-            // Return this instance of LocalService so clients can call public methods
-            return MQTTService.this;
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case NOTIFICATION_READED:
+                    pendingNotificationsCount = 0;
+                    Toast.makeText(getApplicationContext(), "NOTIFICATION_READED", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
         }
     }
 
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
     @Override
     public IBinder onBind(Intent intent) {
-//        Log.d("onBind","HELLO");
-        return mBinder;
-    }
-
-    /** method for clients */
-    public void setpendingNotificationsCount() {
-        pendingNotificationsCount = 0;
+//        Toast.makeText(getApplicationContext(), "binding", Toast.LENGTH_SHORT).show();
+        return mMessenger.getBinder();
     }
 
 
@@ -139,6 +144,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 //                    }
 //                }
 //        );
+        SprefsMap = readFromPrefs();
         new Thread(new Runnable() {
             @Override
             public void run() {

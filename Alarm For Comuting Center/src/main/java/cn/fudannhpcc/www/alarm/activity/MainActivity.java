@@ -11,7 +11,9 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Bundle;
-import android.os.Process;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.commonclass.CoreService;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private String CoreServiceName = "";
     private String MQTTServiceName = "";
 
-    MQTTService mqttService;
+    Messenger mqttService = null;
     boolean mqttBound = false;
 
     TextView mqtt_message_echo = null;
@@ -108,11 +109,12 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d("onResume()","HELLO");
 //        Log.d(String.valueOf(mqttBound),"HELLO");
         Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
-        if (mqttBound) {
-            // Call a method from the LocalService.
-            // However, if this call were something that might hang, then this request should
-            // occur in a separate thread to avoid slowing down the activity performance.
-            mqttService.setpendingNotificationsCount();
+        if (!mqttBound) return;
+        Message msg = Message.obtain(null, MQTTService.NOTIFICATION_READED, 0, 0);
+        try {
+            mqttService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
@@ -122,15 +124,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
 //            Log.d("onServiceConnected","HELLO");
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MQTTService.LocalBinder binder = (MQTTService.LocalBinder) service;
-            mqttService = binder.getService();
+            mqttService = new Messenger(service);
             mqttBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
 //            Log.d("onServiceDisconnected","HELLO");
+            mqttService = null;
             mqttBound = false;
         }
     };
