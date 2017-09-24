@@ -84,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Intent intent = new Intent(this, MQTTService.class);
         bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
-        Log.d("onStart()","HELLO");
+//        Log.d("onStart()","HELLO");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("onStop()","HELLO");
+//        Log.d("onStop()","HELLO");
         // Unbind from the service
         if (mqttBound) {
             unbindService(mqttConnection);
@@ -101,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("onResume()","HELLO");
-        Log.d(String.valueOf(mqttBound),"HELLO");
-        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
+//        Log.d("onResume()","HELLO");
+//        Log.d(String.valueOf(mqttBound),"HELLO");
+//        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
         if (mqttBound) {
             // Call a method from the LocalService.
             // However, if this call were something that might hang, then this request should
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("onServiceConnected","HELLO");
+//            Log.d("onServiceConnected","HELLO");
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MQTTService.LocalBinder binder = (MQTTService.LocalBinder) service;
             mqttService = binder.getService();
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.d("onServiceDisconnected","HELLO");
+//            Log.d("onServiceDisconnected","HELLO");
             mqttBound = false;
         }
     };
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
      @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("onDestroy","HELLO");
+//        Log.d("onDestroy","HELLO");
 //        if (mqttBound) {
 //            unbindService(mqttConnection);
 //            mqttBound = false;

@@ -61,7 +61,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     public class LocalBinder extends Binder {
         public MQTTService getService() {
-            Log.d("LocalBinder","HELLO");
+//            Log.d("LocalBinder","HELLO");
             // Return this instance of LocalService so clients can call public methods
             return MQTTService.this;
         }
@@ -69,7 +69,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d("onBind","HELLO");
+//        Log.d("onBind","HELLO");
         return mBinder;
     }
 
