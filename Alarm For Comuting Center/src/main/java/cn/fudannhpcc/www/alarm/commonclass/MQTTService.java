@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
@@ -32,6 +33,7 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
 
     public static final String PREFS_NAME = "AppSettings";
+    private int pendingNotificationsCount = 0;
 
     private static MQTTService instance;
     static public MQTTService getInstance() {
@@ -53,19 +55,30 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         SprefsMap = new HashMap<String,Object>();
     }
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
-        return mqttBinder;
-    }
+    private final IBinder mBinder = new LocalBinder();
 
-    private final IBinder mqttBinder = new LocalBinder();
+    private final Random mGenerator = new Random();
 
     public class LocalBinder extends Binder {
         public MQTTService getService() {
+            Log.d("LocalBinder","HELLO");
+            // Return this instance of LocalService so clients can call public methods
             return MQTTService.this;
         }
     }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d("onBind","HELLO");
+        return mBinder;
+    }
+
+    /** method for clients */
+    public void setpendingNotificationsCount() {
+        pendingNotificationsCount = 0;
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -180,6 +193,8 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     public void qmtt_notification(int NOTIFY_ID, String title, String message) {
 
+        pendingNotificationsCount++;
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 // 设置通知的基本信息：icon、标题、内容
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
@@ -188,7 +203,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         builder.setWhen(System.currentTimeMillis());
         builder.setContentTitle(title);
         builder.setContentText(message);
-//        builder.setContentInfo(pendingNotificationsCount + " 条新消息");
+        builder.setContentInfo(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
         builder.setVibrate(new long[] {0,300,500,700});
         builder.setLights(0xff0000ff, 300, 0);
@@ -201,7 +216,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
-//        builder.setNumber(pendingNotificationsCount);
+        builder.setNumber(pendingNotificationsCount);
 
         // 设置通知的点击行为：这里启动一个 Activity
         Intent intent = new Intent(this, MainActivity.class);

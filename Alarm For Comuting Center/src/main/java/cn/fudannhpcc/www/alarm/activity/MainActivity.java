@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isService = false;
     private String CoreServiceName = "";
+    private String MQTTServiceName = "";
 
     TextView mqtt_message_echo = null;
     TextView system_log = null;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
         CoreServiceName = getString(R.string.core_service_name);
+        MQTTServiceName = getString(R.string.mqtt_service_name);
 
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
@@ -72,43 +74,72 @@ public class MainActivity extends AppCompatActivity {
             mqtt_message_echo.setText(notificationMessage);
         }
 
-//        doBindService();
+    }
 
-        if (mService != null) {
-        }else {
-            Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_LONG).show();
+    MQTTService mqttService;
+    boolean mqttBound = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, MQTTService.class);
+        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
+        Log.d("onStart()","HELLO");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("onStop()","HELLO");
+        // Unbind from the service
+        if (mqttBound) {
+            unbindService(mqttConnection);
+            mqttBound = false;
         }
     }
 
-    private MQTTService mService;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            MQTTService.LocalBinder binder = (MQTTService.LocalBinder) service;
-            mService = binder.getService();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("onResume()","HELLO");
+        Log.d(String.valueOf(mqttBound),"HELLO");
+        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
+        if (mqttBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            mqttService.setpendingNotificationsCount();
         }
-        public void onServiceDisconnected(ComponentName className) {
-            mService = null;
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mqttConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("onServiceConnected","HELLO");
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MQTTService.LocalBinder binder = (MQTTService.LocalBinder) service;
+            mqttService = binder.getService();
+            mqttBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d("onServiceDisconnected","HELLO");
+            mqttBound = false;
         }
     };
-
-    private boolean mIsBound;
-    private void doBindService() {
-        bindService(new Intent(MainActivity.this, MQTTService.class), mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-    private void doUnbindService() {
-        if (mIsBound) {
-            // Detach our existing connection.
-            unbindService(mConnection);
-            mIsBound = false;
-        }
-    }
 
      @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("onDestroy","HELLO");
+//        if (mqttBound) {
+//            unbindService(mqttConnection);
+//            mqttBound = false;
+//        }
         unregisterNetworkChanges();
-        Process.killProcess(Process.myPid());
     }
 
     @Override
@@ -143,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
-                    finish();
+//                    finish();
 //                    Intent intent = new Intent(this, MainActivity.class);
 //                    startActivity(intent);
                     return true;
@@ -198,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             public void onYesClick() {
                 Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
                 system_log.setText("点击了--确定--按钮");
-                onDestroy();
+                finish();
             }
         });
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {

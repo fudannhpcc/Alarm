@@ -44,7 +44,7 @@ public class CoreService extends Service {
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "服务退出",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "CORE服务退出",Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -53,22 +53,20 @@ public class CoreService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-//        // send status notice
-////        IntentHandler.sendStatusNoticeToAll(this);
-//        ServiceUtils serviceUtils = new ServiceUtils();
-//        String MQTTerviceName = getString(R.string.mqtt_service_name);
-//        boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
-//        Log.d("MQTTerviceName",String.valueOf(isService));
-//        if ( !isService ) this.startService(new Intent(this,MQTTService.class));
-////        new Handler(Looper.getMainLooper()).post(
-////                new Runnable() {
-////                    public void run() {
-////                        Toast.makeText(getApplicationContext(), "CoreService onStartCommand()",Toast.LENGTH_SHORT).show();
-////                    }
-////                }
-////        );
+        String MQTTerviceName = getString(R.string.mqtt_service_name);
+        boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
+        Log.d("MQTTerviceName",String.valueOf(isService));
+        if ( !isService ) this.startService(new Intent(this,MQTTService.class));
+        new Handler(Looper.getMainLooper()).post(
+                new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "CoreService onStartCommand()",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
         return START_STICKY;
     }
+
     public void keepMeAlive() {
         final long now = System.currentTimeMillis();
         final long intervalMillis = 1000 * keepaliveTimer;
