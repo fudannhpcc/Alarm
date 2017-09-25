@@ -180,7 +180,8 @@ public class MainActivity extends AppCompatActivity {
             if(msg.what == RECEIVE_MESSAGE_CODE){
                 Bundle data = msg.getData();
                 if(data != null){
-                    ArrayList<HashMap<String, Object>> mNotificationList = (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                    ArrayList<HashMap<String, Object>> mNotificationList =
+                            (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
                     UpdateListView(mNotificationList);
                 }
             }
@@ -190,33 +191,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        Map<String, Object> map = new HashMap<String, Object>();
         assert mNotificationList != null;
         for (HashMap<String, Object> tempMap : mNotificationList) {
+            Map<String, Object> map = new HashMap<String, Object>();
             Set<String> set = tempMap.keySet();
             for (String s : set) {
-                map.put("img", R.drawable.ic_start);
-                switch (s) {
-                    case "title":
-                        map.put("title", String.valueOf(tempMap.get(s)));
-                        break;
-                    case "Count":
-                        System.out.println(tempMap.get(s));
-                        break;
-                    case "datetime":
-                        System.out.println(tempMap.get(s));
-                        break;
-                    case "message":
-                        map.put("info", String.valueOf(tempMap.get(s)));
-                        break;
-                    default:
-                        break;
-                }
+                map.put(s, String.valueOf(tempMap.get(s)));
+                System.out.println(String.valueOf(tempMap.get(s)));
             }
+            map.put("img", R.drawable.ic_start);
+            list.add(map);
         }
         SimpleAdapter adapter = new SimpleAdapter(this, list,
-                R.layout.activity_list_item, new String[] { "img", "title", "info" },
-                new int[] { R.id.img, R.id.title, R.id.info });
+                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "info" },
+                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.info });
         adapter.notifyDataSetChanged();
         mqtt_message_echo.setAdapter(adapter);
     }
