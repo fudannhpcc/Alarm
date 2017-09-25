@@ -19,10 +19,19 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.commonclass.CoreService;
@@ -33,6 +42,8 @@ import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.commonclass.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
+
+import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     Messenger mActivityMessenger = null;
     boolean mqttBound = false;
 
-    TextView mqtt_message_echo = null;
+    ListView mqtt_message_echo;
     TextView system_log = null;
 
     String notificationMessage = null;
@@ -74,19 +85,20 @@ public class MainActivity extends AppCompatActivity {
 
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
-        mqtt_message_echo = (TextView) findViewById(R.id.mqtt_message_echo);
+        mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
         system_log = (TextView) findViewById(R.id.system_log);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             notificationMessage = extras.getString("NotificationMessage");
-            mqtt_message_echo.setText(notificationMessage);
+//            mqtt_message_echo.setText(notificationMessage);
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
         intent = new Intent(this, MQTTService.class);
 
         isMQTTService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
+
 //        if ( isMQTTService ) mqttBound = true;
 
     }
@@ -161,9 +173,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private void updateCountUI() {
-
-    }
     private Handler mMessengerHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -171,14 +180,46 @@ public class MainActivity extends AppCompatActivity {
             if(msg.what == RECEIVE_MESSAGE_CODE){
                 Bundle data = msg.getData();
                 if(data != null){
-                    String NotificationMessage = data.getString("NotificationMessage");
-                    mqtt_message_echo.setText(NotificationMessage);
-//                    Log.d("DemoLog-Client", "客户端收到Service的消息: " + NotificationMessage);
+                    ArrayList<HashMap<String, Object>> mNotificationList = (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                    UpdateListView(mNotificationList);
                 }
             }
             super.handleMessage(msg);
         }
     };
+
+    private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map = new HashMap<String, Object>();
+        assert mNotificationList != null;
+        for (HashMap<String, Object> tempMap : mNotificationList) {
+            Set<String> set = tempMap.keySet();
+            for (String s : set) {
+                map.put("img", R.drawable.ic_start);
+                switch (s) {
+                    case "title":
+                        map.put("title", String.valueOf(tempMap.get(s)));
+                        break;
+                    case "Count":
+                        System.out.println(tempMap.get(s));
+                        break;
+                    case "datetime":
+                        System.out.println(tempMap.get(s));
+                        break;
+                    case "message":
+                        map.put("info", String.valueOf(tempMap.get(s)));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        SimpleAdapter adapter = new SimpleAdapter(this, list,
+                R.layout.activity_list_item, new String[] { "img", "title", "info" },
+                new int[] { R.id.img, R.id.title, R.id.info });
+        adapter.notifyDataSetChanged();
+        mqtt_message_echo.setAdapter(adapter);
+    }
 
     @Override
     protected void onDestroy() {

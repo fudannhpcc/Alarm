@@ -19,10 +19,12 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +42,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
-    private int LOOPMAX = 10;
+    private int LOOPMAX = 1;
 
 
     private static MQTTService instance;
@@ -183,9 +185,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 public void run() {
                     if (iService) {
                         String title = "中心集群故障报警";
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String datestr = sdf.format(new Date());
-                        String message = datestr + ": 这是测试";
+                        String message = "这是测试";
                         qmtt_notification(NOTIFY_ID, title, message);
                         new Handler(Looper.getMainLooper()).post(
                                 new Runnable() {
@@ -232,8 +232,21 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         return sprefsMap;
     }
 
+    private List<Map<String, Object>> mNotificationList = new ArrayList<Map<String, Object>>();
+
     public void qmtt_notification(int NOTIFY_ID, String title, String message) {
+
         pendingNotificationsCount++;
+
+        Map<String, Object> mNotificationMap = new HashMap<String, Object>();
+        mNotificationMap.put("title", title);
+        mNotificationMap.put("message", message);
+        mNotificationMap.put("Count", pendingNotificationsCount);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datestr = sdf.format(new Date());
+        mNotificationMap.put("datetime", datestr);
+        if (pendingNotificationsCount==1) mNotificationList.clear();
+        mNotificationList.add(mNotificationMap);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 // 设置通知的基本信息：icon、标题、内容
@@ -270,7 +283,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             Message NotificationMessage = Message.obtain();
             NotificationMessage.what = SEND_MESSAGE_CODE;
             Bundle bundle = new Bundle();
-            bundle.putString("NotificationMessage", message);
+            bundle.putSerializable("NotificationMessage", (Serializable) mNotificationList);
             NotificationMessage.setData(bundle);
             try {
                 activityMessenger.send(NotificationMessage);
