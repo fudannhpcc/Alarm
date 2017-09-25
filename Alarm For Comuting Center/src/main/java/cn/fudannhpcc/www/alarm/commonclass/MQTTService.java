@@ -42,7 +42,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
-    private int LOOPMAX = 1;
+    private int LOOPMAX = 10;
 
 
     private static MQTTService instance;
@@ -185,7 +185,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 public void run() {
                     if (iService) {
                         String title = "中心集群故障报警";
-                        String message = "这是测试";
+                        String message = "这是测试一\n这是测试二";
                         qmtt_notification(NOTIFY_ID, title, message);
                         new Handler(Looper.getMainLooper()).post(
                                 new Runnable() {

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
@@ -197,14 +198,13 @@ public class MainActivity extends AppCompatActivity {
             Set<String> set = tempMap.keySet();
             for (String s : set) {
                 map.put(s, String.valueOf(tempMap.get(s)));
-                System.out.println(String.valueOf(tempMap.get(s)));
             }
-            map.put("img", R.drawable.ic_start);
+            map.put("img", R.drawable.ic_notification);
             list.add(map);
         }
         SimpleAdapter adapter = new SimpleAdapter(this, list,
-                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "info" },
-                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.info });
+                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "message" },
+                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
         adapter.notifyDataSetChanged();
         mqtt_message_echo.setAdapter(adapter);
     }
