@@ -13,11 +13,13 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     public static final String PREFS_NAME = "AppSettings";
 
     private int pendingNotificationsCount = 0;
+    private int LOOPNUM = 5;
 
 
     private static MQTTService instance;
@@ -59,21 +62,40 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         SprefsMap = new HashMap<String,Object>();
     }
 
-    public static final int NOTIFICATION_READED = 1;
+    private Messenger activityMessenger;
 
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case NOTIFICATION_READED:
-                    pendingNotificationsCount = 0;
-                    Toast.makeText(getApplicationContext(), "NOTIFICATION_READED", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    super.handleMessage(msg);
+//            Log.d("DemoLog-Service", "ServiceHandler -> handleMessage");
+            if(msg.what == RECEIVE_MESSAGE_CODE){
+                Bundle data = msg.getData();
+                if(data != null){
+                    pendingNotificationsCount = data.getInt("pendingNotificationsCount");
+//                    Log.d("DemoLog", "MyService收到客户端如下信息: " + pendingNotificationsCount);
+                }
+                activityMessenger = msg.replyTo;
+//                if(activityMessenger != null){
+//                    Log.d("DemoLog-Reply", "MyService向客户端回信");
+//                    Message message = Message.obtain();
+//                    message.what = SEND_MESSAGE_CODE;
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("NotificationMessage", "你好，客户端，我是MyService");
+//                    message.setData(bundle);
+//                    try{
+//                        activityMessenger.send(message);
+//                    }catch (RemoteException e){
+//                        e.printStackTrace();
+//                        Log.d("DemoLog-Reply", "MyService向客户端发送信息失败: " + e.getMessage());
+//                    }
+//                }
             }
+            super.handleMessage(msg);
         }
     }
+
+    private static final int RECEIVE_MESSAGE_CODE = 0x0001;
+    private static final int SEND_MESSAGE_CODE = 0x0002;
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
@@ -81,6 +103,14 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     public IBinder onBind(Intent intent) {
 //        Toast.makeText(getApplicationContext(), "binding", Toast.LENGTH_SHORT).show();
         return mMessenger.getBinder();
+    }
+
+    private static volatile boolean isRunning;
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        isRunning = false;
+        return super.onUnbind(intent);
     }
 
 
@@ -145,27 +175,31 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 //                }
 //        );
         SprefsMap = readFromPrefs();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-            if ( iService ) {
-                String title = "中心集群故障报警";
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String datestr = sdf.format(new Date());
-                String message = datestr + ": 这是测试";
-                qmtt_notification(NOTIFY_ID, title, message);
-                new Handler(Looper.getMainLooper()).post(
-                        new Runnable() {
-                            public void run() {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                String datestr = sdf.format(new Date());
-                                Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
-            }
-            }
-        }).start();
+        LOOPNUM++;
+        if ( LOOPNUM >= 5 ) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (iService) {
+                        String title = "中心集群故障报警";
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String datestr = sdf.format(new Date());
+                        String message = datestr + ": 这是测试";
+                        qmtt_notification(NOTIFY_ID, title, message);
+                        new Handler(Looper.getMainLooper()).post(
+                                new Runnable() {
+                                    public void run() {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        String datestr = sdf.format(new Date());
+                                        Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                        );
+                    }
+                }
+            }).start();
+            LOOPNUM = 0;
+        }
         return START_STICKY;
     }
 
@@ -198,7 +232,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     }
 
     public void qmtt_notification(int NOTIFY_ID, String title, String message) {
-
         pendingNotificationsCount++;
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -231,6 +264,19 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if(activityMessenger != null) {
+            Message NotificationMessage = Message.obtain();
+            NotificationMessage.what = SEND_MESSAGE_CODE;
+            Bundle bundle = new Bundle();
+            bundle.putString("NotificationMessage", message);
+            NotificationMessage.setData(bundle);
+            try {
+                activityMessenger.send(NotificationMessage);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+//                Log.d("DemoLog-NotificationMessage", "MyService向客户端发送信息失败: " + e.getMessage());
+            }
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);

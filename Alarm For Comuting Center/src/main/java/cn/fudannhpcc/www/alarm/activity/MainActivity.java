@@ -9,8 +9,10 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -46,12 +48,14 @@ public class MainActivity extends AppCompatActivity {
     private String MQTTServiceName = "";
 
     Messenger mqttService = null;
+    Messenger mActivityMessenger = null;
     boolean mqttBound = false;
 
     TextView mqtt_message_echo = null;
     TextView system_log = null;
 
     String notificationMessage = null;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
             notificationMessage = extras.getString("NotificationMessage");
             mqtt_message_echo.setText(notificationMessage);
         }
+
+        mActivityMessenger = new Messenger(mMessengerHandler);
+        intent = new Intent(this, MQTTService.class);
 
         isMQTTService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
 //        if ( isMQTTService ) mqttBound = true;
@@ -106,26 +113,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Intent intent = new Intent(this, MQTTService.class);
+        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
 //        Log.d("onResume()","HELLO");
 //        Log.d(String.valueOf(mqttBound),"HELLO");
-        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
-        if (!mqttBound) return;
-        Message msg = Message.obtain(null, MQTTService.NOTIFICATION_READED, 0, 0);
-        try {
-            mqttService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+//        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
+//        if (!mqttBound) return;
+//        Message msg = Message.obtain(null, MQTTService.NOTIFICATION_READED, 0, 0);
+//        try {
+//            mqttService.send(msg);
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mqttConnection = new ServiceConnection() {
+    private static final int SEND_MESSAGE_CODE = 0x0001;
+    private static final int RECEIVE_MESSAGE_CODE = 0x0002;
 
+    private ServiceConnection mqttConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-//            Log.d("onServiceConnected","HELLO");
             mqttService = new Messenger(service);
             mqttBound = true;
+
+            Message message = Message.obtain();
+            message.what = SEND_MESSAGE_CODE;
+            Bundle data = new Bundle();
+            data.putInt("pendingNotificationsCount", 0);
+            message.setData(data);
+            message.replyTo = mActivityMessenger;
+            try {
+//                Log.d("DemoLog-Client", "客户端向service发送信息");
+                mqttService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+//                Log.d("DemoLog", "客户端向service发送消息失败: " + e.getMessage());
+            }
         }
 
         @Override
@@ -136,7 +160,27 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-     @Override
+
+    private void updateCountUI() {
+
+    }
+    private Handler mMessengerHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+//            Log.d("DemoLog-Client", "ClientHandler -> handleMessage");
+            if(msg.what == RECEIVE_MESSAGE_CODE){
+                Bundle data = msg.getData();
+                if(data != null){
+                    String NotificationMessage = data.getString("NotificationMessage");
+                    mqtt_message_echo.setText(NotificationMessage);
+//                    Log.d("DemoLog-Client", "客户端收到Service的消息: " + NotificationMessage);
+                }
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 //        Log.d("onDestroy","HELLO");
