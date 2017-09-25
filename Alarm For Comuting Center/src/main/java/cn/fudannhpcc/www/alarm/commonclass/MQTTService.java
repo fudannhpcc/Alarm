@@ -39,7 +39,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     public static final String PREFS_NAME = "AppSettings";
 
     private int pendingNotificationsCount = 0;
-    private int LOOPNUM = 5;
+    private int LOOPNUM = 0;
 
 
     private static MQTTService instance;
