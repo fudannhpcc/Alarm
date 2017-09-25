@@ -40,6 +40,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
+    private int LOOPMAX = 10;
 
 
     private static MQTTService instance;
@@ -176,7 +177,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 //        );
         SprefsMap = readFromPrefs();
         LOOPNUM++;
-        if ( LOOPNUM >= 5 ) {
+        if ( LOOPNUM >= LOOPMAX ) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
