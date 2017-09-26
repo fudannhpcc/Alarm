@@ -45,7 +45,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
-    private int LOOPMAX = 1;
+    private int LOOPMAX = 10;
 
 
     private static MQTTService instance;
@@ -194,7 +194,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                         Random rnd = new Random();
                         int WARNINGID = rnd.nextInt(3);
                         String title = WARNINGTITLE[WARNINGID];
-                        String message = "这是测试一\n这是测试二";
+                        String message = "这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一\n这是测试二";
                         Uri WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
                         qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
 //                        new Handler(Looper.getMainLooper()).post(

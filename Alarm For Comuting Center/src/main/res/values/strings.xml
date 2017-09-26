@@ -45,7 +45,11 @@
 
     <string name="listview_activity_name">中心集群报警</string>
         <string name="listview_activity_lbltitle">报警类型</string>
-        <string name="listview_activity_title"></string>
+            <string name="listview_activity_title"></string>
+        <string name="listview_activity_lbldatetime">发生时间</string>
+            <string name="listview_activity_datetime"></string>
+        <string name="listview_activity_lblmessage">报警信息</string>
+            <string name="listview_activity_message"></string>
 
 
     <!--   网络和服务状态显示  -->

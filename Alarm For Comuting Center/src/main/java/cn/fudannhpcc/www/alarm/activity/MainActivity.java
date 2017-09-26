@@ -223,12 +223,11 @@ public class MainActivity extends AppCompatActivity {
         mqtt_message_echo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, Object> obj = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
-                String result= (String) obj.get("title");
-
+                HashMap<String, Object> objItem = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
+                String result= (String) objItem.get("title");
                 intentListViewActivity = new Intent(MainActivity.this, ListViewActivity.class);
+                intentListViewActivity.putExtra("listviewItem", objItem);
                 startActivity(intentListViewActivity);
-
             }
         });
 

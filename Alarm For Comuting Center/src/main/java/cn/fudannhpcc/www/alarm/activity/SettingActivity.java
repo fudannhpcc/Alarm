@@ -64,7 +64,7 @@ public class SettingActivity extends AppCompatActivity {
         in_background.setChecked(sprefs.getBoolean(getString(R.string.connection_in_background),false));
         server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
-        keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),30)));
+        keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),60)));
 
         if (protocol_tcp.isChecked()) mqtt_protocol = "tcp://";
         if (protocol_ssl.isChecked()) mqtt_protocol = "ssl://";

@@ -16,6 +16,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
         <LinearLayout
@@ -57,9 +58,10 @@
             android:layout_gravity="center_vertical"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:lines="1"
+            android:ellipsize="end"
             android:textColor="@android:color/darker_gray"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:maxLines="10"
             android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>
