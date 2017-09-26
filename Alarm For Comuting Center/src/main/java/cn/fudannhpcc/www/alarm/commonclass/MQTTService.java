@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -39,6 +40,10 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
 
     public static final String PREFS_NAME = "AppSettings";
+
+    public static final String WARNINGTITLE[] = {"机房温度探测器报警","计算节点运行故障报警","计算节点宕机报警"};
+    public static final int WARNINGSOUNDID[] = {R.raw.temperaturewarning,R.raw.clusterwarning,R.raw.shutdownwarning};
+
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
@@ -184,9 +189,12 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 @Override
                 public void run() {
                     if (iService) {
-                        String title = "中心集群故障报警";
+                        Random rnd = new Random();
+                        int WARNINGID = rnd.nextInt(3);
+                        String title = WARNINGTITLE[WARNINGID];
                         String message = "这是测试一\n这是测试二";
-                        qmtt_notification(NOTIFY_ID, title, message);
+                        Uri WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
+                        qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
                         new Handler(Looper.getMainLooper()).post(
                                 new Runnable() {
                                     public void run() {
@@ -234,11 +242,12 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private List<Map<String, Object>> mNotificationList = new ArrayList<Map<String, Object>>();
 
-    public void qmtt_notification(int NOTIFY_ID, String title, String message) {
+    public void qmtt_notification(int NOTIFY_ID, int WARINGID, String title, String message, Uri WARNINGSOUND) {
 
         pendingNotificationsCount++;
 
         Map<String, Object> mNotificationMap = new HashMap<String, Object>();
+        mNotificationMap.put("warningid", WARINGID);
         mNotificationMap.put("title", title);
         mNotificationMap.put("message", message);
         mNotificationMap.put("Count", pendingNotificationsCount);
@@ -251,7 +260,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 // 设置通知的基本信息：icon、标题、内容
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
-        builder.setSmallIcon(R.drawable.help);
+        builder.setSmallIcon(context.getResources().getIdentifier("ic_notification_smallicon", "mipmap", context.getPackageName()));
         builder.setLargeIcon(bitmap);
         builder.setWhen(System.currentTimeMillis());
         builder.setContentTitle(title);
@@ -262,13 +271,11 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         builder.setLights(0xff0000ff, 300, 0);
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.warning);
-        builder.setSound(sound);
+        builder.setSound(WARNINGSOUND);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
-
         builder.setNumber(pendingNotificationsCount);
 
         // 设置通知的点击行为：这里启动一个 Activity

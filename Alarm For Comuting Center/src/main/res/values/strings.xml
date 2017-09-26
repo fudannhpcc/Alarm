@@ -44,7 +44,6 @@
     <string name="mqtt_status" translatable="false">MQTT服务</string>
     <string name="core_status" translatable="false">CORE服务</string>
     <string name="lbl_mqtt_message_echo">信息输出</string>
-    <string name="lbl_system_log">状态显示</string>
 
     <string name="mqtt_service_name">cn.fudannhpcc.www.alarm.commonclass.MQTTService</string>
     <string name="core_service_name">cn.fudannhpcc.www.alarm.commonclass.CoreService</string>

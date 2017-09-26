@@ -94,32 +94,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="10sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="@string/lbl_system_log"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/system_log"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="0dp"
-                android:layout_marginTop="1dp"
-                android:background="@drawable/ic_border"
-                android:gravity="left"
-                android:scrollHorizontally="true"
-                android:text=""
-                android:textColor="@android:color/black"
-                android:textSize="10sp" />
-
         </LinearLayout>
 
     </FrameLayout>

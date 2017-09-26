@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="3px"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_notification"
+        android:src="@mipmap/ic_notification"
         />
 
     <LinearLayout
@@ -35,7 +35,7 @@
                 android:paddingRight="10dp"
                 android:textColor="@android:color/background_dark"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/datetime"
@@ -47,7 +47,7 @@
                 android:textColor="@android:color/darker_gray"
                 android:gravity="right"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <TextView
@@ -60,6 +60,6 @@
             android:textColor="@android:color/darker_gray"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:maxLines="10"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>
