@@ -169,7 +169,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         );
         boolean iservice = (boolean)SprefsMap.get("connection_server_mode");
         if ( iservice ) {
-            Intent broadcastIntent = new Intent("cn.fudannhpcc.www.alarm.receiver.MqttRestarterBroadcastReceiver");
+            Intent broadcastIntent = new Intent(String.valueOf(R.string.mqtt_restart_name));
             sendBroadcast(broadcastIntent);
         }
         super.onDestroy();

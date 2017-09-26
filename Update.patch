@@ -1,0 +1,121 @@
+Index: Alarm For Comuting Center/src/main/java/cn/fudannhpcc/www/alarm/activity/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Alarm For Comuting Center/src/main/java/cn/fudannhpcc/www/alarm/activity/MainActivity.java	(revision 750cac948f7c2132596b62216c11c02ccf5397b9)
++++ Alarm For Comuting Center/src/main/java/cn/fudannhpcc/www/alarm/activity/MainActivity.java	(revision )
+@@ -180,7 +180,8 @@
+             if(msg.what == RECEIVE_MESSAGE_CODE){
+                 Bundle data = msg.getData();
+                 if(data != null){
+-                    ArrayList<HashMap<String, Object>> mNotificationList = (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
++                    ArrayList<HashMap<String, Object>> mNotificationList =
++                            (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                     UpdateListView(mNotificationList);
+                 }
+             }
+@@ -190,33 +191,20 @@
+ 
+     private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
+         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+-        Map<String, Object> map = new HashMap<String, Object>();
+         assert mNotificationList != null;
+         for (HashMap<String, Object> tempMap : mNotificationList) {
++            Map<String, Object> map = new HashMap<String, Object>();
+             Set<String> set = tempMap.keySet();
+             for (String s : set) {
++                map.put(s, String.valueOf(tempMap.get(s)));
++                System.out.println(String.valueOf(tempMap.get(s)));
++            }
+-                map.put("img", R.drawable.ic_start);
++            map.put("img", R.drawable.ic_start);
+-                switch (s) {
+-                    case "title":
+-                        map.put("title", String.valueOf(tempMap.get(s)));
+-                        break;
+-                    case "Count":
+-                        System.out.println(tempMap.get(s));
+-                        break;
+-                    case "datetime":
+-                        System.out.println(tempMap.get(s));
+-                        break;
+-                    case "message":
+-                        map.put("info", String.valueOf(tempMap.get(s)));
+-                        break;
+-                    default:
+-                        break;
++            list.add(map);
+-                }
++        }
+-            }
+-        }
+         SimpleAdapter adapter = new SimpleAdapter(this, list,
+-                R.layout.activity_list_item, new String[] { "img", "title", "info" },
+-                new int[] { R.id.img, R.id.title, R.id.info });
++                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "info" },
++                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.info });
+         adapter.notifyDataSetChanged();
+         mqtt_message_echo.setAdapter(adapter);
+     }
+Index: Alarm For Comuting Center/src/main/res/layout/activity_list_item.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Alarm For Comuting Center/src/main/res/layout/activity_list_item.xml	(revision 750cac948f7c2132596b62216c11c02ccf5397b9)
++++ Alarm For Comuting Center/src/main/res/layout/activity_list_item.xml	(revision )
+@@ -11,21 +11,41 @@
+         android:layout_margin="3px"
+         />
+     <LinearLayout
+-        android:layout_width="fill_parent"
++        android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+         >
++        <LinearLayout
++            android:id="@+id/linearLayout"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:layout_alignParentTop="true"
++            android:orientation="horizontal">
++            >
+-        <TextView
+-            android:id="@+id/title"
++            <TextView
++                android:id="@+id/title"
+-            android:layout_width="fill_parent"
++                android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
++                android:layout_height="wrap_content"
+-            android:textSize="16sp"
+-            />
++                android:layout_gravity="center_vertical"
++                android:paddingRight="4dp"
++                android:textAppearance="?android:attr/textAppearanceSmall"
++                android:textSize="12sp" />
+-        <TextView
++            <TextView
++                android:id="@+id/datetime"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_gravity="center_vertical"
++                android:paddingRight="4dp"
++                android:textAppearance="?android:attr/textAppearanceSmall"
++                android:textSize="12sp" />
++        </LinearLayout>
++        <TextView
+             android:id="@+id/info"
+-            android:layout_width="fill_parent"
++            android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+-            android:textSize="10sp"
+-            />
++            android:layout_gravity="center_vertical"
++            android:paddingRight="4dp"
++            android:textAppearance="?android:attr/textAppearanceSmall"
++            android:textSize="10sp" />
+     </LinearLayout>
+ </LinearLayout>
+\ No newline at end of file
