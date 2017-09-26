@@ -105,40 +105,43 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    boolean monStart = false;
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, MQTTService.class);
-        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
-//        Log.d("onStart()","HELLO");
+        monStart = true;
+        Log.d("onStart()","HELLO:" + String.valueOf(monStart));
     }
 
+    boolean monResume = false;
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(this, MQTTService.class);
+        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
+        monResume = true;
+        Log.d("onResume()","HELLO:" + String.valueOf(monResume));
+        super.onResume();
+    }
+
+    boolean monPause = false;
+    @Override
+    protected void onPause() {
+        monPause = true;
+        Log.d("onPause()","HELLO:" + String.valueOf(monPause));
+        super.onPause();
+    }
+
+    boolean monStop = false;
     @Override
     protected void onStop() {
         super.onStop();
-//        Log.d("onStop()","HELLO");
+        monStop = true;
+        Log.d("onStop()","HELLO:" + String.valueOf(monStop));
         // Unbind from the service
         if (mqttBound) {
             unbindService(mqttConnection);
             mqttBound = false;
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Intent intent = new Intent(this, MQTTService.class);
-        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
-//        Log.d("onResume()","HELLO");
-//        Log.d(String.valueOf(mqttBound),"HELLO");
-//        Toast.makeText(this, String.valueOf(mqttBound), Toast.LENGTH_SHORT).show();
-//        if (!mqttBound) return;
-//        Message msg = Message.obtain(null, MQTTService.NOTIFICATION_READED, 0, 0);
-//        try {
-//            mqttService.send(msg);
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -154,7 +157,9 @@ public class MainActivity extends AppCompatActivity {
             Message message = Message.obtain();
             message.what = SEND_MESSAGE_CODE;
             Bundle data = new Bundle();
-            data.putInt("pendingNotificationsCount", 0);
+            int clickNotification = -999;
+            if (!monPause) clickNotification = 0;
+            data.putInt("pendingNotificationsCount", clickNotification);
             message.setData(data);
             message.replyTo = mActivityMessenger;
             try {

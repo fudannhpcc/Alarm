@@ -71,32 +71,36 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
     }
 
     private Messenger activityMessenger;
+    private Messenger activityMessengerReply;
 
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-//            Log.d("DemoLog-Service", "ServiceHandler -> handleMessage");
+            Log.d("DemoLog-Service", "ServiceHandler -> handleMessage");
             if(msg.what == RECEIVE_MESSAGE_CODE){
                 Bundle data = msg.getData();
                 if(data != null){
-                    pendingNotificationsCount = data.getInt("pendingNotificationsCount");
-//                    Log.d("DemoLog", "MyService收到客户端如下信息: " + pendingNotificationsCount);
+                    int clickNotification = data.getInt("pendingNotificationsCount");
+                    if ( clickNotification != -999 ) pendingNotificationsCount = clickNotification;
+                    Log.d("DemoLog-Service", "MyService收到客户端如下信息: " + pendingNotificationsCount);
                 }
                 activityMessenger = msg.replyTo;
-//                if(activityMessenger != null){
-//                    Log.d("DemoLog-Reply", "MyService向客户端回信");
-//                    Message message = Message.obtain();
-//                    message.what = SEND_MESSAGE_CODE;
-//                    Bundle bundle = new Bundle();
-//                    bundle.putString("NotificationMessage", "你好，客户端，我是MyService");
-//                    message.setData(bundle);
-//                    try{
-//                        activityMessenger.send(message);
-//                    }catch (RemoteException e){
-//                        e.printStackTrace();
-//                        Log.d("DemoLog-Reply", "MyService向客户端发送信息失败: " + e.getMessage());
-//                    }
-//                }
+                Log.d("DemoLog-Service", "activityMessengerReply");
+                activityMessengerReply = msg.replyTo;
+                if(activityMessengerReply != null) {
+                    Log.d("DemoLog-Service", "activityMessengerReply-send");
+                    Message NotificationMessage = Message.obtain();
+                    NotificationMessage.what = SEND_MESSAGE_CODE;
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("NotificationMessage", (Serializable) mNotificationList);
+                    NotificationMessage.setData(bundle);
+                    try {
+                        activityMessengerReply.send(NotificationMessage);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+//                Log.d("DemoLog-NotificationMessage", "MyService向客户端发送信息失败: " + e.getMessage());
+                    }
+                }
             }
             super.handleMessage(msg);
         }
@@ -195,15 +199,15 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                         String message = "这是测试一\n这是测试二";
                         Uri WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
                         qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
-                        new Handler(Looper.getMainLooper()).post(
-                                new Runnable() {
-                                    public void run() {
-                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                        String datestr = sdf.format(new Date());
-                                        Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                        );
+//                        new Handler(Looper.getMainLooper()).post(
+//                                new Runnable() {
+//                                    public void run() {
+//                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                                        String datestr = sdf.format(new Date());
+//                                        Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
+//                                    }
+//                                }
+//                        );
                     }
                 }
             }).start();
