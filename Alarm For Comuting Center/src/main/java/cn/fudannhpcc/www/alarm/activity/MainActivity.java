@@ -18,8 +18,11 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
+    private Intent intentListViewActivity;
     private BroadcastReceiver mNetworkReceiver;
 
     static Activity thisActivity = null;
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     boolean mqttBound = false;
 
     ListView mqtt_message_echo;
+    SimpleAdapter mqtt_message_adapter;
 
     String notificationMessage = null;
     Intent intent;
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
         mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
+
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -208,11 +214,24 @@ public class MainActivity extends AppCompatActivity {
             list.add(map);
         }
         Collections.reverse(list);
-        SimpleAdapter adapter = new SimpleAdapter(this, list,
+        mqtt_message_adapter = new SimpleAdapter(this, list,
                 R.layout.activity_list_item, new String[] { "img", "title", "datetime", "message" },
                 new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
-        adapter.notifyDataSetChanged();
-        mqtt_message_echo.setAdapter(adapter);
+        mqtt_message_adapter.notifyDataSetChanged();
+        mqtt_message_echo.setAdapter(mqtt_message_adapter);
+
+        mqtt_message_echo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String, Object> obj = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
+                String result= (String) obj.get("title");
+
+                intentListViewActivity = new Intent(MainActivity.this, ListViewActivity.class);
+                startActivity(intentListViewActivity);
+
+            }
+        });
+
     }
 
     @Override

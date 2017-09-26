@@ -16,6 +16,10 @@
         <string name="title_activity_setting">设置</string>
     <string name="exit">退出</string>
 
+    <string name="listview">设置</string>
+        <string name="title_activity_listview">集群报警详情</string>
+
+
     <!--   MQTT服务器设置  -->
     <string name="connection_settings_to_the_mqtt_server">MQTT服务器设置</string>
         <string name="hostname">中心集群域名</string>
@@ -38,6 +42,11 @@
             <string name="editText_server_topic_hint">fudannhpcc/cluster/#</string>
         <string name="keep_alive">服务保活间隔（秒）</string>
             <string name="editText_keep_alive_hint">60</string>
+
+    <string name="listview_activity_name">中心集群报警</string>
+        <string name="listview_activity_lbltitle">报警类型</string>
+        <string name="listview_activity_title"></string>
+
 
     <!--   网络和服务状态显示  -->
     <string name="network_status">网络状态</string>
