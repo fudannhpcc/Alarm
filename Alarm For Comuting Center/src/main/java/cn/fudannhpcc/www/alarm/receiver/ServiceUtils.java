@@ -1,4 +1,4 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.receiver;
 
 import java.util.List;
 

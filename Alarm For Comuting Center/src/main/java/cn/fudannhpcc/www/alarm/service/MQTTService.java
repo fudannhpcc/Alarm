@@ -1,4 +1,4 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -9,10 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +17,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
@@ -36,6 +32,8 @@ import java.util.Random;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
+import cn.fudannhpcc.www.alarm.commonclass.CallbackMQTTClient;
+import cn.fudannhpcc.www.alarm.commonclass.Log;
 
 public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
 
@@ -47,7 +45,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
-    private int LOOPMAX = 10;
+    private int LOOPMAX = 1;
 
 
     private static MQTTService instance;
@@ -171,7 +169,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         );
         boolean iservice = (boolean)SprefsMap.get("connection_server_mode");
         if ( iservice ) {
-            Intent broadcastIntent = new Intent("cn.fudannhpcc.www.alarm.commonclass.MqttRestarterBroadcastReceiver");
+            Intent broadcastIntent = new Intent("cn.fudannhpcc.www.alarm.receiver.MqttRestarterBroadcastReceiver");
             sendBroadcast(broadcastIntent);
         }
         super.onDestroy();

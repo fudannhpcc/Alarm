@@ -1,4 +1,4 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.service;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,9 +12,7 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 
 import cn.fudannhpcc.www.alarm.R;
 

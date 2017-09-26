@@ -1,10 +1,11 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.receiver;
 
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
+
+import cn.fudannhpcc.www.alarm.service.CoreService;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
     @Override

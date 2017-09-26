@@ -1,4 +1,4 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+
+import cn.fudannhpcc.www.alarm.service.MQTTService;
 
 public class MqttRestarterBroadcastReceiver extends BroadcastReceiver {
     @Override

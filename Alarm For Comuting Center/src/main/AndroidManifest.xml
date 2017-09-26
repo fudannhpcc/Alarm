@@ -35,7 +35,7 @@
             android:theme="@style/MyTheme" />
 
         <service
-            android:name=".commonclass.MQTTService"
+            android:name=".service.MQTTService"
             android:process=":ServiceProcess"
             android:enabled="true"
             android:exported="true"
@@ -45,7 +45,7 @@
         <!--android:process=":ServiceProcess"-->
 
         <service
-            android:name=".commonclass.CoreService"
+            android:name=".service.CoreService"
             android:process=":ServiceProcess"
             android:enabled="true"
             android:label="CoreService"
@@ -53,13 +53,13 @@
         </service>
 
         <receiver
-            android:name=".commonclass.NetworkChangeReceiver">
+            android:name=".receiver.NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".commonclass.BootCompletedReceiver">
+        <receiver android:name=".receiver.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -67,12 +67,12 @@
         </receiver>
 
         <receiver
-            android:name=".commonclass.MqttRestarterBroadcastReceiver"
+            android:name=".receiver.MqttRestarterBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:label="MqttRestartServiceWhenStopped">
             <intent-filter>
-                <action android:name="cn.fudannhpcc.www.alarm.commonclass.MqttRestarterBroadcastReceiver"/>
+                <action android:name="cn.fudannhpcc.www.alarm.receiver.MqttRestarterBroadcastReceiver"/>
             </intent-filter>
         </receiver>
 

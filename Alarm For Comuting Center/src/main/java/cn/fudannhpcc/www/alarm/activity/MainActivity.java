@@ -7,45 +7,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import cn.fudannhpcc.www.alarm.R;
-import cn.fudannhpcc.www.alarm.commonclass.CoreService;
+import cn.fudannhpcc.www.alarm.service.CoreService;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
-import cn.fudannhpcc.www.alarm.commonclass.MQTTService;
+import cn.fudannhpcc.www.alarm.service.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
-import cn.fudannhpcc.www.alarm.commonclass.NetworkChangeReceiver;
-import cn.fudannhpcc.www.alarm.commonclass.ServiceUtils;
+import cn.fudannhpcc.www.alarm.receiver.NetworkChangeReceiver;
+import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
-
-import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
 

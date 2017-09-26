@@ -1,4 +1,4 @@
-package cn.fudannhpcc.www.alarm.commonclass;
+package cn.fudannhpcc.www.alarm.receiver;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
+import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
 
