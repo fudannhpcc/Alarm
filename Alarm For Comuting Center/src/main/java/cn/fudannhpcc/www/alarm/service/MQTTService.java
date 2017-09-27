@@ -54,8 +54,8 @@ public class MQTTService extends Service {
 
 
     private int pendingNotificationsCount = 0;
-    private int LOOPNUM = 0;
-    private int LOOPMAX = 1;
+//    private int LOOPNUM = 0;
+//    private int LOOPMAX = 1;
 
     private static final String TAG = "MqttMessageService";
     private PahoMqttClient pahoMqttClient;
@@ -215,24 +215,6 @@ public class MQTTService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SprefsMap = readFromPrefs();
-
-        LOOPNUM++;
-        if ( LOOPNUM >= LOOPMAX ) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (iService) {
-                        Random rnd = new Random();
-                        int WARNINGID = rnd.nextInt(3);
-                        String title = WARNINGTITLE[WARNINGID];
-                        String message = "这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一\n这是测试二";
-                        Uri WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
-                        qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
-                    }
-                }
-            }).start();
-            LOOPNUM = 0;
-        }
         return START_STICKY;
     }
 
@@ -322,8 +304,6 @@ public class MQTTService extends Service {
         notificationManager.notify(NOTIFY_ID, builder.build());
     }
 
-    private String warning;
-
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         int itype = 0;
         for(Iterator it = mqtttype.iterator(); it.hasNext(); itype++) {
@@ -338,15 +318,35 @@ public class MQTTService extends Service {
 //                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
 //                break;
             case 2:
-                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
-                warning = msg;
-                new Handler(Looper.getMainLooper()).post(
-                        new Runnable() {
-                            public void run() {
-                                Toast.makeText(context, warning, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
+                Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+                int WARNINGID = 0;
+                boolean mWarning = false;
+                String title = null, message = null; Uri WARNINGSOUND = null;
+                if ( msg.contains("温度报警") ) {
+                    WARNINGID = 0;
+                    Log.d(TAG, String.valueOf(WARNINGID));
+                    title = WARNINGTITLE[WARNINGID];
+                    message = "温度报警" + msg.split("温度报警")[1];
+                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
+                    mWarning = true;
+                }
+                if ( msg.contains("节点宕机") ) {
+                    WARNINGID = 2;
+                    Log.d(TAG, String.valueOf(WARNINGID));
+                    title = WARNINGTITLE[WARNINGID];
+                    message = "节点宕机" + msg.split("节点宕机")[1];
+                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
+                    mWarning = true;
+                }
+                if ( msg.contains("节点故障") ) {
+                    WARNINGID = 2;
+                    Log.d(TAG, String.valueOf(WARNINGID));
+                    title = WARNINGTITLE[WARNINGID];
+                    message = "节点故障" + msg.split("节点故障")[1];
+                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
+                    mWarning = true;
+                }
+                if ( mWarning ) qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
                 break;
             default:
                 break;
