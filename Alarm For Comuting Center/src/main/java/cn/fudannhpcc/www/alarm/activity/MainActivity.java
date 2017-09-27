@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     String notificationMessage = null;
     Intent intent;
 
-    public static final int WARNINGIMG[] = {R.mipmap.ic_temperature,R.mipmap.ic_error,R.mipmap.ic_shutdown};
+    public static final int WARNINGIMG = R.mipmap.ic_notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,16 +195,10 @@ public class MainActivity extends AppCompatActivity {
         for (HashMap<String, Object> tempMap : mNotificationList) {
             Map<String, Object> map = new HashMap<String, Object>();
             Set<String> set = tempMap.keySet();
-            int WARNINGID = -1;
             for (String s : set) {
-                if ( s.equals("warningid") ) {
-                    WARNINGID = Integer.parseInt(String.valueOf(tempMap.get(s)));
-                }
-                else {
-                    map.put(s, String.valueOf(tempMap.get(s)));
-                }
+                map.put(s, String.valueOf(tempMap.get(s)));
             }
-            map.put("img", WARNINGIMG[WARNINGID]);
+            map.put("img", WARNINGIMG);
             list.add(map);
         }
         Collections.reverse(list);

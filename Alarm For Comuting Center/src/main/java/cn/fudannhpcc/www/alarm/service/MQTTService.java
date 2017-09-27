@@ -49,13 +49,11 @@ public class MQTTService extends Service {
 
     public static final String PREFS_NAME = "AppSettings";
 
-    public static final String WARNINGTITLE[] = {"机房温度探测器报警","计算节点运行故障报警","计算节点宕机报警"};
-    public static final int WARNINGSOUNDID[] = {R.raw.temperaturewarning,R.raw.clusterwarning,R.raw.shutdownwarning};
+    public static final String WARNINGTITLE = "中心集群故障";
+    public static final int WARNINGSOUNDID = R.raw.warning;
 
 
     private int pendingNotificationsCount = 0;
-//    private int LOOPNUM = 0;
-//    private int LOOPMAX = 1;
 
     private static final String TAG = "MqttMessageService";
     private PahoMqttClient pahoMqttClient;
@@ -183,7 +181,7 @@ public class MQTTService extends Service {
 
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                Log.d(TAG, "messageArrived");
+//                Log.d(TAG, "messageArrived");
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
@@ -197,7 +195,6 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
-        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -205,8 +202,12 @@ public class MQTTService extends Service {
                     }
                 }
         );
-        boolean iservice = (boolean)SprefsMap.get("connection_server_mode");
-        if ( iservice ) {
+        try {
+            iService = (boolean) SprefsMap.get("connection_server_mode");
+        } catch ( Exception e ) {
+
+        }
+        if ( iService ) {
             Intent broadcastIntent = new Intent(String.valueOf(R.string.mqtt_restart_name));
             sendBroadcast(broadcastIntent);
         }
@@ -249,12 +250,11 @@ public class MQTTService extends Service {
 
     private List<Map<String, Object>> mNotificationList = new ArrayList<Map<String, Object>>();
 
-    public void qmtt_notification(int NOTIFY_ID, int WARINGID, String title, String message, Uri WARNINGSOUND) {
+    public void qmtt_notification(int NOTIFY_ID, String title, String message, Uri WARNINGSOUND) {
 
         pendingNotificationsCount++;
 
         Map<String, Object> mNotificationMap = new HashMap<String, Object>();
-        mNotificationMap.put("warningid", WARINGID);
         mNotificationMap.put("title", title);
         mNotificationMap.put("message", message);
         mNotificationMap.put("Count", pendingNotificationsCount);
@@ -312,42 +312,13 @@ public class MQTTService extends Service {
         }
 
         switch ( itype ) {
-//            case 0:
-//                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
-//                break;
-//            case 1:
-//                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
-//                break;
             case 2:
                 Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
-                int WARNINGID = 0;
-                boolean mWarning = false;
                 String title = null, message = null; Uri WARNINGSOUND = null;
-                if ( msg.contains("温度报警") ) {
-                    WARNINGID = 0;
-                    Log.d(TAG, String.valueOf(WARNINGID));
-                    title = WARNINGTITLE[WARNINGID];
-                    message = "温度报警" + msg.split("温度报警")[1];
-                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
-                    mWarning = true;
-                }
-                if ( msg.contains("节点宕机") ) {
-                    WARNINGID = 2;
-                    Log.d(TAG, String.valueOf(WARNINGID));
-                    title = WARNINGTITLE[WARNINGID];
-                    message = "节点宕机" + msg.split("节点宕机")[1];
-                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
-                    mWarning = true;
-                }
-                if ( msg.contains("节点故障") ) {
-                    WARNINGID = 2;
-                    Log.d(TAG, String.valueOf(WARNINGID));
-                    title = WARNINGTITLE[WARNINGID];
-                    message = "节点故障" + msg.split("节点故障")[1];
-                    WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
-                    mWarning = true;
-                }
-                if ( mWarning ) qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
+                title = WARNINGTITLE;
+                message = msg.split("]")[1].trim();
+                WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID);
+                qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
                 break;
             default:
                 break;
