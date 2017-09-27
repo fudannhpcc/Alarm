@@ -18,8 +18,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
+
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -32,10 +38,11 @@ import java.util.Random;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
-import cn.fudannhpcc.www.alarm.commonclass.CallbackMQTTClient;
+import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
+import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
 
-public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMessageReceiver {
+public class MQTTService extends Service {
 
     public static final String PREFS_NAME = "AppSettings";
 
@@ -45,7 +52,7 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
-    private int LOOPMAX = 10;
+    private int LOOPMAX = 1;
 
 
     private static MQTTService instance;
@@ -59,8 +66,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private int NOTIFY_ID = 1883;
 
-    CallbackMQTTClient callbackMQTTClient;
-
     private Map<String,Object> SprefsMap;
 
     public MQTTService() {
@@ -70,6 +75,10 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     private Messenger activityMessenger;
     private Messenger activityMessengerReply;
+
+    private static final String TAG = "MqttMessageService";
+    private PahoMqttClient pahoMqttClient;
+    private MqttAndroidClient mqttAndroidClient;
 
     class IncomingHandler extends Handler {
         @Override
@@ -123,13 +132,38 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         return super.onUnbind(intent);
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
 
         SprefsMap = readFromPrefs();
+
+        pahoMqttClient = new PahoMqttClient();
+        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean b, String s) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable throwable) {
+
+            }
+
+            @Override
+            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                setMessageNotification(s, new String(mqttMessage.getPayload()));
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
+            }
+        });
+
 
         new Thread(new Runnable() {
             @Override
@@ -156,6 +190,27 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         }).start();
     }
 
+    private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
+        Log.d(TAG,topic);
+        Log.d(TAG,msg);
+//        NotificationCompat.Builder mBuilder =
+//                new NotificationCompat.Builder(this)
+//                        .setSmallIcon(R.drawable.ic_message_black_24dp)
+//                        .setContentTitle(topic)
+//                        .setContentText(msg);
+//        Intent resultIntent = new Intent(this, MainActivity.class);
+//
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//        stackBuilder.addParentStack(MainActivity.class);
+//        stackBuilder.addNextIntent(resultIntent);
+//        PendingIntent resultPendingIntent =
+//                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+//        mBuilder.setContentIntent(resultPendingIntent);
+//        NotificationManager mNotificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        mNotificationManager.notify(100, mBuilder.build());
+    }
+
     @Override
     public void onDestroy() {
         iService = false;
@@ -177,14 +232,8 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        new Handler(Looper.getMainLooper()).post(
-//                new Runnable() {
-//                    public void run() {
-//                        Toast.makeText(context, "onStartCommand",Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//        );
         SprefsMap = readFromPrefs();
+
         LOOPNUM++;
         if ( LOOPNUM >= LOOPMAX ) {
             new Thread(new Runnable() {
@@ -197,15 +246,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                         String message = "这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一这是测试一\n这是测试二";
                         Uri WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID]);
                         qmtt_notification(NOTIFY_ID, WARNINGID, title, message, WARNINGSOUND);
-//                        new Handler(Looper.getMainLooper()).post(
-//                                new Runnable() {
-//                                    public void run() {
-//                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                        String datestr = sdf.format(new Date());
-//                                        Toast.makeText(context, datestr, Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }
-//                        );
                     }
                 }
             }).start();
@@ -280,14 +320,6 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
         }
         builder.setNumber(pendingNotificationsCount);
 
-        // 设置通知的点击行为：这里启动一个 Activity
-        Intent intent = new Intent(this, MainActivity.class);
-        try {
-            intent.putExtra("NotificationMessage", message);
-            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if(activityMessenger != null) {
             Message NotificationMessage = Message.obtain();
             NotificationMessage.what = SEND_MESSAGE_CODE;
@@ -298,13 +330,12 @@ public class MQTTService extends Service implements CallbackMQTTClient.IMQTTMess
                 activityMessenger.send(NotificationMessage);
             } catch (RemoteException e) {
                 e.printStackTrace();
-//                Log.d("DemoLog-NotificationMessage", "MyService向客户端发送信息失败: " + e.getMessage());
             }
         }
+        Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
 
-        // 发送通知 id 需要在应用内唯一
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());
     }

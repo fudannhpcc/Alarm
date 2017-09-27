@@ -25,6 +25,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.commonclass.Constants;
+import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
 import cn.fudannhpcc.www.alarm.service.CoreService;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
@@ -69,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int WARNINGIMG[] = {R.mipmap.ic_temperature,R.mipmap.ic_error,R.mipmap.ic_shutdown};
 
+    private MqttAndroidClient client;
+    private String TAG = "MainActivity";
+    private PahoMqttClient pahoMqttClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
         isMQTTService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
 
+        pahoMqttClient = new PahoMqttClient();
+
 //        if ( isMQTTService ) mqttBound = true;
 
     }
@@ -110,6 +121,15 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         monStart = true;
         Log.d("onStart()","HELLO:" + String.valueOf(monStart));
+        String topic = Constants.SUBSCRIBE_TOPIC;
+        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+        if (!topic.isEmpty()) {
+            try {
+                pahoMqttClient.subscribe(client, topic, 1);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     boolean monResume = false;
@@ -224,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, Object> objItem = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
-                String result= (String) objItem.get("title");
                 intentListViewActivity = new Intent(MainActivity.this, ListViewActivity.class);
                 intentListViewActivity.putExtra("listviewItem", objItem);
                 startActivity(intentListViewActivity);
