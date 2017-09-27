@@ -41,13 +41,10 @@
 
         <service
             android:name=".service.MQTTService"
-            android:process=":ServiceProcess"
             android:enabled="true"
             android:exported="true"
             android:label="MqttService" >
         </service>
-
-        <!--android:process=":ServiceProcess"-->
 
         <service
             android:name=".service.CoreService"

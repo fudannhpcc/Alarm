@@ -22,11 +22,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,9 +55,7 @@ public class MainActivity extends AppCompatActivity {
     static Activity thisActivity = null;
 
     private boolean isService = false;
-    private boolean isMQTTService = false;
     private String CoreServiceName = "";
-    private String MQTTServiceName = "";
 
     Messenger mqttService = null;
     Messenger mActivityMessenger = null;
@@ -73,10 +68,6 @@ public class MainActivity extends AppCompatActivity {
     Intent intent;
 
     public static final int WARNINGIMG[] = {R.mipmap.ic_temperature,R.mipmap.ic_error,R.mipmap.ic_shutdown};
-
-    private MqttAndroidClient client;
-    private String TAG = "MainActivity";
-    private PahoMqttClient pahoMqttClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
         CoreServiceName = getString(R.string.core_service_name);
-        MQTTServiceName = getString(R.string.mqtt_service_name);
 
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
@@ -105,13 +95,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
-        intent = new Intent(this, MQTTService.class);
-
-        isMQTTService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTServiceName);
-
-        pahoMqttClient = new PahoMqttClient();
-
-//        if ( isMQTTService ) mqttBound = true;
 
     }
 
@@ -121,15 +104,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         monStart = true;
         Log.d("onStart()","HELLO:" + String.valueOf(monStart));
-        String topic = Constants.SUBSCRIBE_TOPIC;
-        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
-        if (!topic.isEmpty()) {
-            try {
-                pahoMqttClient.subscribe(client, topic, 1);
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     boolean monResume = false;

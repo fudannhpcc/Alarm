@@ -25,13 +25,16 @@ import android.widget.Toast;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -53,6 +56,13 @@ public class MQTTService extends Service {
     private int pendingNotificationsCount = 0;
     private int LOOPNUM = 0;
     private int LOOPMAX = 1;
+
+    private static final String TAG = "MqttMessageService";
+    private PahoMqttClient pahoMqttClient;
+    private MqttAndroidClient mqttAndroidClient;
+
+    private static final List<String> mqtttype = new ArrayList(Arrays.asList("fudannhpcc/iot/","fudannhpcc/cluster/","fudannhpcc/alarm/"));
+
 
 
     private static MQTTService instance;
@@ -76,9 +86,6 @@ public class MQTTService extends Service {
     private Messenger activityMessenger;
     private Messenger activityMessengerReply;
 
-    private static final String TAG = "MqttMessageService";
-    private PahoMqttClient pahoMqttClient;
-    private MqttAndroidClient mqttAndroidClient;
 
     class IncomingHandler extends Handler {
         @Override
@@ -137,34 +144,6 @@ public class MQTTService extends Service {
         super.onCreate();
         context = getApplicationContext();
 
-        SprefsMap = readFromPrefs();
-
-        pahoMqttClient = new PahoMqttClient();
-        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
-
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean b, String s) {
-
-            }
-
-            @Override
-            public void connectionLost(Throwable throwable) {
-
-            }
-
-            @Override
-            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                setMessageNotification(s, new String(mqttMessage.getPayload()));
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-            }
-        });
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -188,27 +167,30 @@ public class MQTTService extends Service {
                 );
             }
         }).start();
-    }
+        pahoMqttClient = new PahoMqttClient();
+        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
-    private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
-        Log.d(TAG,topic);
-        Log.d(TAG,msg);
-//        NotificationCompat.Builder mBuilder =
-//                new NotificationCompat.Builder(this)
-//                        .setSmallIcon(R.drawable.ic_message_black_24dp)
-//                        .setContentTitle(topic)
-//                        .setContentText(msg);
-//        Intent resultIntent = new Intent(this, MainActivity.class);
-//
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-//        stackBuilder.addParentStack(MainActivity.class);
-//        stackBuilder.addNextIntent(resultIntent);
-//        PendingIntent resultPendingIntent =
-//                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//        mBuilder.setContentIntent(resultPendingIntent);
-//        NotificationManager mNotificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        mNotificationManager.notify(100, mBuilder.build());
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean b, String s) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable throwable) {
+                android.util.Log.d(TAG, "connectionLost");
+            }
+
+            @Override
+            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                setMessageNotification(s, new String(mqttMessage.getPayload()));
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
+            }
+        });
     }
 
     @Override
@@ -338,5 +320,36 @@ public class MQTTService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());
+    }
+
+    private String warning;
+
+    private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
+        int itype = 0;
+        for(Iterator it = mqtttype.iterator(); it.hasNext(); itype++) {
+            if (topic.toLowerCase().contains(((String) it.next()).toLowerCase())) break;
+        }
+
+        switch ( itype ) {
+//            case 0:
+//                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+//                break;
+//            case 1:
+//                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+//                break;
+            case 2:
+                android.util.Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+                warning = msg;
+                new Handler(Looper.getMainLooper()).post(
+                        new Runnable() {
+                            public void run() {
+                                Toast.makeText(context, warning, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+                break;
+            default:
+                break;
+        }
     }
 }

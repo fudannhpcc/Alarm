@@ -90,7 +90,6 @@ public class PahoMqttClient {
             @Override
             public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
                 Log.e(TAG, "Subscribe Failed " + topic);
-
             }
         });
     }
