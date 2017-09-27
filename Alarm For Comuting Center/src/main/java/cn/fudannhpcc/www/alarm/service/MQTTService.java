@@ -173,22 +173,23 @@ public class MQTTService extends Service {
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-
+                Log.d(TAG, "connectComplete");
             }
 
             @Override
             public void connectionLost(Throwable throwable) {
-                android.util.Log.d(TAG, "connectionLost");
+                Log.d(TAG, "connectionLost");
             }
 
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                Log.d(TAG, "messageArrived");
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
+                Log.d(TAG, "deliveryComplete");
             }
         });
     }
