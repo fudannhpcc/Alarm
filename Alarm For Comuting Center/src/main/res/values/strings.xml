@@ -43,6 +43,7 @@
         <string name="keep_alive">服务保活间隔（秒）</string>
             <string name="editText_keep_alive_hint">60</string>
 
+
     <string name="listview_activity_name">中心集群报警</string>
         <string name="listview_activity_lbltitle">报警类型</string>
             <string name="listview_activity_title"></string>

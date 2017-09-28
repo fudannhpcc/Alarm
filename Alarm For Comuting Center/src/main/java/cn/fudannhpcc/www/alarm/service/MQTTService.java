@@ -141,6 +141,7 @@ public class MQTTService extends Service {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+        SprefsMap = readFromPrefs();
 
         new Thread(new Runnable() {
             @Override
@@ -170,9 +171,7 @@ public class MQTTService extends Service {
 
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
-            public void connectComplete(boolean b, String s) {
-                Log.d(TAG, "connectComplete");
-            }
+            public void connectComplete(boolean b, String s) { Log.d(TAG, "connectComplete"); }
 
             @Override
             public void connectionLost(Throwable throwable) {
@@ -195,7 +194,7 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
-        stopForeground(true);
+//        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -217,6 +216,7 @@ public class MQTTService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+//        writeToConstants();
         SprefsMap = readFromPrefs();
         return START_STICKY;
     }
@@ -234,18 +234,29 @@ public class MQTTService extends Service {
         sprefsMap.put("connection_password",sprefs.getString(getString(R.string.connection_password), ""));
         sprefsMap.put("connection_push_notifications_subscribe_topic",sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), ""));
         sprefsMap.put("connection_server_topic",sprefs.getString(getString(R.string.connection_server_topic), ""));
-        sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
-        sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
         sprefsMap.put("connection_in_background",sprefs.getBoolean(getString(R.string.connection_in_background), false));
         sprefsMap.put("connection_server_mode",sprefs.getBoolean(getString(R.string.connection_server_mode), false));
+        sprefsMap.put("connection_mqtt_server",sprefs.getString(getString(R.string.connection_mqtt_server), ""));
         if (sprefsMap.get("connection_hostname").equals("")) {
             sprefsMap.put("connection_hostname","fudannhpcc.cn");
-            sprefsMap.put("connection_port","1883");
+            sprefsMap.put("connection_port","18883");
             sprefsMap.put("connection_username","nhpcc");
             sprefsMap.put("connection_password","rtfu2002");
-            sprefsMap.put("connection_push_notifications_subscribe_topic","fudannhpcc/warning/#");
+            sprefsMap.put("connection_push_notifications_subscribe_topic","fudannhpcc/warning/");
             sprefsMap.put("connection_server_topic","fudannhpcc/cluster/#");
         }
+//        Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/warning/");
+//        Constants.USERNAME = sprefs.getString(getString(R.string.connection_username), "nhpcc");
+//        Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password), "rtfu2002");
+//        String port = sprefs.getString(getString(R.string.connection_password), "18883");
+//        String hostname = sprefs.getString(getString(R.string.connection_hostname), "fudannhpcc.cn");
+//        String protocol = new String();
+//        if ( sprefs.getBoolean(getString(R.string.connection_protocol_tcp), false) ) protocol = "tcp://";
+//        else if ( sprefs.getBoolean(getString(R.string.connection_protocol_ssl), false) ) protocol = "ssl://";
+//        else if ( sprefs.getBoolean(getString(R.string.connection_protocol_xyz), false) ) protocol = "xyz://";
+//        else protocol="tcp://";
+//        Constants.MQTT_BROKER_URL = protocol + hostname + ":" + port;
+//        Log.d(TAG,Constants.MQTT_BROKER_URL);
         return sprefsMap;
     }
 
@@ -304,25 +315,16 @@ public class MQTTService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());
+//        startForeground(NOTIFY_ID,builder.build());
     }
 
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
-        int itype = 0;
-        for(Iterator it = mqtttype.iterator(); it.hasNext(); itype++) {
-            if (topic.toLowerCase().contains(((String) it.next()).toLowerCase())) break;
-        }
-
-        switch ( itype ) {
-            case 2:
-                Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
-                String title = null, message = null; Uri WARNINGSOUND = null;
-                title = WARNINGTITLE;
-                message = msg.split("]")[1].trim();
-                WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID);
-                qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
-                break;
-            default:
-                break;
+        if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
+            String title = null, message = null; Uri WARNINGSOUND = null;
+            title = WARNINGTITLE;
+            message = msg.split("]")[1].trim();
+            WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID);
+            qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
         }
     }
 }

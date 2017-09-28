@@ -71,18 +71,12 @@ public class MainActivity extends AppCompatActivity {
     String notificationMessage = null;
     Intent intent;
 
-//    private MqttAndroidClient client;
-//    private String TAG = "MainActivity";
-//    private PahoMqttClient pahoMqttClient;
-
     public static final int WARNINGIMG = R.mipmap.ic_notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        pahoMqttClient = new PahoMqttClient();
-//        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
         init();
 

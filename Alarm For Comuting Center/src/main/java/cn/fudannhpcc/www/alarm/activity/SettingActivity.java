@@ -75,7 +75,7 @@ public class SettingActivity extends AppCompatActivity {
             port.setText("1883");
             username.setText("nhpcc");
             password.setText("odhSFqxSDACF");
-            push_notifications_subscribe_topic.setText("fudannhpcc/warning/#");
+            push_notifications_subscribe_topic.setText("fudannhpcc/warning/");
             server_topic.setText("fudannhpcc/cluster/#");
         }
 
@@ -150,7 +150,6 @@ public class SettingActivity extends AppCompatActivity {
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();
                     break;
                 }
-                Editor.putString(getString(R.string.connection_mqtt_server), mqtt_protocol + hostname.getText().toString().replace(" ", ""));
                 if (!Editor.commit()) {
                     Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
                     break;
