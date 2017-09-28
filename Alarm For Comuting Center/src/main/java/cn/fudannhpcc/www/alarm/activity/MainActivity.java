@@ -25,10 +25,6 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.android.service.MqttService;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
