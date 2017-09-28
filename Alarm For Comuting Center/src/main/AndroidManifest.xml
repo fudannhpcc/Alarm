@@ -42,7 +42,7 @@
         <service
             android:name=".service.MQTTService"
             android:enabled="true"
-            android:exported="false"
+            android:exported="true"
             android:label="MqttService" >
         </service>
 

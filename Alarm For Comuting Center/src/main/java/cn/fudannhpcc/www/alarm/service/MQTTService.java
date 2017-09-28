@@ -215,6 +215,7 @@ public class MQTTService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        SprefsMap = readFromPrefs();
         return START_STICKY;
     }
 

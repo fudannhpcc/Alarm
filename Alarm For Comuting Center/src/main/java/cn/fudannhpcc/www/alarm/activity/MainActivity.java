@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.lang.reflect.Method;
@@ -106,9 +107,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
-
-//        Intent intent = new Intent(MainActivity.this, MQTTService.class);
-//        startService(intent);
 
     }
 
@@ -274,20 +272,12 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
+//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
+//                    mqttservice_intent.setAction(MqttServiceName);
+//                    startService(mqttservice_intent);
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
-//                    Intent mqttservice_intent = new Intent(this, MQTTService.class);
-//                    mqttservice_intent.setAction(MqttServiceName);
-//                    startService(mqttservice_intent);
-//                    String topic = Constants.SUBSCRIBE_TOPIC;
-//                    if (!topic.isEmpty()) {
-//                        try {
-//                            pahoMqttClient.subscribe(client, topic, 1);
-//                        } catch (MqttException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
 //                    finish();
 //                    Intent intent = new Intent(this, MainActivity.class);
 //                    startActivity(intent);
