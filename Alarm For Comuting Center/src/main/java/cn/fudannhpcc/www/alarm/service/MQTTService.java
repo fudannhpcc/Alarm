@@ -55,7 +55,7 @@ public class MQTTService extends Service {
 
     private int pendingNotificationsCount = 0;
 
-    private static final String TAG = "MqttMessageService";
+    private static final String TAG = "MqttService";
     private PahoMqttClient pahoMqttClient;
     private MqttAndroidClient mqttAndroidClient;
 
@@ -181,7 +181,7 @@ public class MQTTService extends Service {
 
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-//                Log.d(TAG, "messageArrived");
+                Log.d(TAG, new String(mqttMessage.getPayload()));
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
@@ -195,6 +195,7 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
+        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {

@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.fudannhpcc.www.alarm.R;
-import cn.fudannhpcc.www.alarm.commonclass.Constants;
-import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
+import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
+import cn.fudannhpcc.www.alarm.receiver.PowerKeyObserver;
 import cn.fudannhpcc.www.alarm.service.CoreService;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private Intent intentSettingActivity;
     private Intent intentListViewActivity;
     private BroadcastReceiver mNetworkReceiver;
+
+    boolean POWERKEY = false;
+    boolean HOMEKEY = false;
 
     static Activity thisActivity = null;
 
@@ -74,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init();
+
         thisActivity = this;
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
@@ -96,6 +101,38 @@ public class MainActivity extends AppCompatActivity {
 
         mActivityMessenger = new Messenger(mMessengerHandler);
 
+    }
+
+    private HomeKeyObserver mHomeKeyObserver;
+    private PowerKeyObserver mPowerKeyObserver;
+    private void init() {
+        mHomeKeyObserver = new HomeKeyObserver(this);
+        mHomeKeyObserver.setHomeKeyListener(new HomeKeyObserver.OnHomeKeyListener() {
+            @Override
+            public void onHomeKeyPressed() {
+                System.out.println("----> 按下Home键");
+                HOMEKEY = true;
+            }
+
+            @Override
+            public void onHomeKeyLongPressed() {
+                System.out.println("----> 长按Home键");
+                HOMEKEY = true;
+            }
+        });
+        mHomeKeyObserver.startListen();
+
+        //////////////////////////////////////////
+
+        mPowerKeyObserver = new PowerKeyObserver(this);
+        mPowerKeyObserver.setHomeKeyListener(new PowerKeyObserver.OnPowerKeyListener() {
+            @Override
+            public void onPowerKeyPressed() {
+                System.out.println("----> 按下电源键");
+                POWERKEY = true;
+            }
+        });
+        mPowerKeyObserver.startListen();
     }
 
     boolean monStart = false;
@@ -131,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
         monStop = true;
         Log.d("onStop()","HELLO:" + String.valueOf(monStop));
         // Unbind from the service
+        if ( POWERKEY || HOMEKEY ) mqttBound = false;
+        Log.d("onStop()","HELLO:" + String.valueOf(mqttBound));
         if (mqttBound) {
             unbindService(mqttConnection);
             mqttBound = false;
@@ -229,6 +268,8 @@ public class MainActivity extends AppCompatActivity {
 //            mqttBound = false;
 //        }
         unregisterNetworkChanges();
+        mHomeKeyObserver.stopListen();
+        mPowerKeyObserver.stopListen();
     }
 
     @Override
