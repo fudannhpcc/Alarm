@@ -59,10 +59,6 @@ public class MQTTService extends Service {
     private PahoMqttClient pahoMqttClient;
     private MqttAndroidClient mqttAndroidClient;
 
-//    private static final List<String> mqtttype = new ArrayList(Arrays.asList("fudannhpcc/iot/","fudannhpcc/cluster/","fudannhpcc/alarm/"));
-
-
-
     private static MQTTService instance;
     static public MQTTService getInstance() {
         return instance;
@@ -146,17 +142,6 @@ public class MQTTService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                try {
-//                    Thread.sleep(10000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                Iterator it = SprefsMap.keySet().iterator();
-//                while(it.hasNext()) {
-//                    String key = (String)it.next();
-//                    System.out.println("key:" + key);
-//                    System.out.println("value:" + SprefsMap.get(key));
-//                }
                 new Handler(Looper.getMainLooper()).post(
                         new Runnable() {
                             public void run() {
@@ -216,7 +201,6 @@ public class MQTTService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        writeToConstants();
         SprefsMap = readFromPrefs();
         return START_STICKY;
     }
@@ -242,21 +226,13 @@ public class MQTTService extends Service {
             sprefsMap.put("connection_port","18883");
             sprefsMap.put("connection_username","nhpcc");
             sprefsMap.put("connection_password","rtfu2002");
-            sprefsMap.put("connection_push_notifications_subscribe_topic","fudannhpcc/warning/");
+            sprefsMap.put("connection_push_notifications_subscribe_topic","fudannhpcc/alarm/");
             sprefsMap.put("connection_server_topic","fudannhpcc/cluster/#");
         }
-//        Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/warning/");
-//        Constants.USERNAME = sprefs.getString(getString(R.string.connection_username), "nhpcc");
-//        Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password), "rtfu2002");
-//        String port = sprefs.getString(getString(R.string.connection_password), "18883");
-//        String hostname = sprefs.getString(getString(R.string.connection_hostname), "fudannhpcc.cn");
-//        String protocol = new String();
-//        if ( sprefs.getBoolean(getString(R.string.connection_protocol_tcp), false) ) protocol = "tcp://";
-//        else if ( sprefs.getBoolean(getString(R.string.connection_protocol_ssl), false) ) protocol = "ssl://";
-//        else if ( sprefs.getBoolean(getString(R.string.connection_protocol_xyz), false) ) protocol = "xyz://";
-//        else protocol="tcp://";
-//        Constants.MQTT_BROKER_URL = protocol + hostname + ":" + port;
-//        Log.d(TAG,Constants.MQTT_BROKER_URL);
+        Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/alarm/");
+        Constants.USERNAME = sprefs.getString(getString(R.string.connection_username), "nhpcc");
+        Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password), "rtfu2002");
+        Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
         return sprefsMap;
     }
 

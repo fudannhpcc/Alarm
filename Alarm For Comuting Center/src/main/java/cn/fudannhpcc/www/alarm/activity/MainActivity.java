@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
 import cn.fudannhpcc.www.alarm.receiver.PowerKeyObserver;
 import cn.fudannhpcc.www.alarm.service.CoreService;
@@ -73,10 +75,60 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int WARNINGIMG = R.mipmap.ic_notification;
 
+
+    public static final String PREFS_NAME = "AppSettings";
+
+    /**
+     * 判断程序是不是第一次启动
+     */
+    private boolean isFirstStart() {
+        SharedPreferences sprefs = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean isFirstRun = sprefs.getBoolean("First_Start", true);
+        SharedPreferences.Editor Editor = sprefs.edit();
+        if (isFirstRun) {
+            Editor.putBoolean("First_Start", false);
+            Editor.putString(getString(R.string.connection_hostname), "fudannhpcc.cn");
+            Editor.putBoolean(getString(R.string.connection_protocol_tcp), true);
+            Editor.putBoolean(getString(R.string.connection_protocol_ssl), false);
+            Editor.putBoolean(getString(R.string.connection_protocol_xyz), false);
+            Editor.putString(getString(R.string.connection_port), "18883");
+            Editor.putString(getString(R.string.connection_username), "nhpcc");
+            Editor.putString(getString(R.string.connection_password), "rtfu2002");
+            Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/alarm/");
+            Editor.putBoolean(getString(R.string.connection_in_background), true);
+            Editor.putBoolean(getString(R.string.connection_server_mode), true);
+            Editor.putString(getString(R.string.connection_server_topic), "");
+            Editor.putInt(getString(R.string.connection_keep_alive), 30);
+            Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
+            if (!Editor.commit()) {
+                Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
+            }
+            Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
+            Constants.USERNAME = "nhpcc";
+            Constants.PASSWORD = "rtfu2002";
+            Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
+        }
+        else {
+            Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
+            Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
+            Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
+            Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
+        }
+        return isFirstRun;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (isFirstStart()) {
+            Log.d(PREFS_NAME, "程序是第一次运行");
+        } else {
+            Log.d(PREFS_NAME, "程序非第一次运行");
+        }
+
+        Log.d(PREFS_NAME,Constants.MQTT_BROKER_URL);
 
         init();
 

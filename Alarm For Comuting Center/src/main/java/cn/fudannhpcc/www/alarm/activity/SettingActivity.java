@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.commonclass.Constants;
 
 public class SettingActivity extends AppCompatActivity {
 
@@ -72,11 +73,10 @@ public class SettingActivity extends AppCompatActivity {
 
         if (hostname.getText().toString().equals("")) {
             hostname.setText("fudannhpcc.cn");
-            port.setText("1883");
+            port.setText("18883");
             username.setText("nhpcc");
-            password.setText("odhSFqxSDACF");
-            push_notifications_subscribe_topic.setText("fudannhpcc/warning/");
-            server_topic.setText("fudannhpcc/cluster/#");
+            password.setText("rtfu2002");
+            push_notifications_subscribe_topic.setText("fudannhpcc/alarm/");
         }
 
         protocol_tcp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -145,11 +145,24 @@ public class SettingActivity extends AppCompatActivity {
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();
                     break;
                 }
+                String hostnamestr = hostname.getText().toString().replace(" ", "");
                 if (port.getText().toString().replace(" ", "").equals("")) {
                     String errmsg = "通讯端口不能为空或全为空格";
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();
                     break;
                 }
+                String portstr = port.getText().toString().replace(" ", "");
+                String protocolstr = new String();
+                if ( protocol_tcp.isChecked() ) protocolstr = "tcp://";
+                if ( protocol_ssl.isChecked() ) protocolstr = "ssl://";
+                if ( protocol_xyz.isChecked() ) protocolstr = "xyz://";
+                String connection_mqtt_server = new String();
+                connection_mqtt_server = protocolstr + hostnamestr + ":" + portstr;
+                Editor.putString(getString(R.string.connection_mqtt_server), connection_mqtt_server);
+                Constants.SUBSCRIBE_TOPIC = push_notifications_subscribe_topic.getText().toString().replace(" ", "");
+                Constants.USERNAME = username.getText().toString().replace(" ", "");
+                Constants.PASSWORD = password.getText().toString().replace(" ", "");
+                Constants.MQTT_BROKER_URL = connection_mqtt_server;
                 if (!Editor.commit()) {
                     Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
                     break;

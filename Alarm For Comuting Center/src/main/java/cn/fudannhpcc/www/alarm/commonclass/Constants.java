@@ -7,4 +7,3 @@ public class Constants {
     public static String USERNAME = "nhpcc";
     public static String PASSWORD = "rtfu2002";
 }
-
