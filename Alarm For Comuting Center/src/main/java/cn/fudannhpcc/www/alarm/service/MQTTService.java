@@ -59,7 +59,7 @@ public class MQTTService extends Service {
     private PahoMqttClient pahoMqttClient;
     private MqttAndroidClient mqttAndroidClient;
 
-    private static final List<String> mqtttype = new ArrayList(Arrays.asList("fudannhpcc/iot/","fudannhpcc/cluster/","fudannhpcc/alarm/"));
+//    private static final List<String> mqtttype = new ArrayList(Arrays.asList("fudannhpcc/iot/","fudannhpcc/cluster/","fudannhpcc/alarm/"));
 
 
 
