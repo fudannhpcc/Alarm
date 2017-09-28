@@ -25,6 +25,10 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.android.service.MqttService;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isService = false;
     private String CoreServiceName = "";
+    private String MqttServiceName = "";
 
     Messenger mqttService = null;
     Messenger mActivityMessenger = null;
@@ -70,12 +75,18 @@ public class MainActivity extends AppCompatActivity {
     String notificationMessage = null;
     Intent intent;
 
+//    private MqttAndroidClient client;
+//    private String TAG = "MainActivity";
+//    private PahoMqttClient pahoMqttClient;
+
     public static final int WARNINGIMG = R.mipmap.ic_notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        pahoMqttClient = new PahoMqttClient();
+//        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
         init();
 
@@ -87,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
         CoreServiceName = getString(R.string.core_service_name);
+        MqttServiceName = getString(R.string.mqtt_service_name);
 
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
@@ -301,6 +313,9 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
+//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
+//                    mqttservice_intent.setAction(MqttServiceName);
+//                    startService(mqttservice_intent);
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
