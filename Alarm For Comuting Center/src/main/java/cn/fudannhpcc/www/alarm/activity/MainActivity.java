@@ -25,6 +25,9 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isService = false;
     private String CoreServiceName = "";
+    private String MqttServiceName = "";
 
     Messenger mqttService = null;
     Messenger mActivityMessenger = null;
@@ -67,12 +71,18 @@ public class MainActivity extends AppCompatActivity {
     String notificationMessage = null;
     Intent intent;
 
+//    private MqttAndroidClient client;
+//    private String TAG = "MainActivity";
+//    private PahoMqttClient pahoMqttClient;
+
     public static final int WARNINGIMG = R.mipmap.ic_notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        pahoMqttClient = new PahoMqttClient();
+//        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
         thisActivity = this;
         mNetworkReceiver = new NetworkChangeReceiver();
@@ -82,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
         CoreServiceName = getString(R.string.core_service_name);
+        MqttServiceName = getString(R.string.mqtt_service_name);
 
         isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
@@ -95,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
+
+//        Intent intent = new Intent(MainActivity.this, MQTTService.class);
+//        startService(intent);
 
     }
 
@@ -263,6 +277,17 @@ public class MainActivity extends AppCompatActivity {
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
+//                    Intent mqttservice_intent = new Intent(this, MQTTService.class);
+//                    mqttservice_intent.setAction(MqttServiceName);
+//                    startService(mqttservice_intent);
+//                    String topic = Constants.SUBSCRIBE_TOPIC;
+//                    if (!topic.isEmpty()) {
+//                        try {
+//                            pahoMqttClient.subscribe(client, topic, 1);
+//                        } catch (MqttException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
 //                    finish();
 //                    Intent intent = new Intent(this, MainActivity.class);
 //                    startActivity(intent);

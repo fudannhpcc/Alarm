@@ -142,6 +142,8 @@ public class MQTTService extends Service {
         super.onCreate();
         context = getApplicationContext();
 
+        SprefsMap = readFromPrefs();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -181,7 +183,7 @@ public class MQTTService extends Service {
 
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-//                Log.d(TAG, "messageArrived");
+                Log.d(TAG, "messageArrived");
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
@@ -195,6 +197,7 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
+        stopForeground(false);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -202,12 +205,8 @@ public class MQTTService extends Service {
                     }
                 }
         );
-        try {
-            iService = (boolean) SprefsMap.get("connection_server_mode");
-        } catch ( Exception e ) {
-
-        }
-        if ( iService ) {
+        boolean iservice = (boolean) SprefsMap.get("connection_server_mode");
+        if ( iservice ) {
             Intent broadcastIntent = new Intent(String.valueOf(R.string.mqtt_restart_name));
             sendBroadcast(broadcastIntent);
         }
@@ -216,7 +215,6 @@ public class MQTTService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SprefsMap = readFromPrefs();
         return START_STICKY;
     }
 
@@ -312,6 +310,12 @@ public class MQTTService extends Service {
         }
 
         switch ( itype ) {
+            case 0:
+                Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+                break;
+            case 1:
+                Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
+                break;
             case 2:
                 Log.d(TAG, "MQTTService --- " + mqtttype.get(itype) + ": " + msg);
                 String title = null, message = null; Uri WARNINGSOUND = null;

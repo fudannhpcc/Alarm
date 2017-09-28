@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.fudannhpcc.www.alarm.R;
+import cn.fudannhpcc.www.alarm.commonclass.Log;
+import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 
 public class CoreService extends Service {
 
@@ -51,17 +53,17 @@ public class CoreService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-//        String MQTTerviceName = getString(R.string.mqtt_service_name);
-//        boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
-//        Log.d("MQTTerviceName",String.valueOf(isService));
-//        if ( !isService ) this.startService(new Intent(this,MQTTService.class));
-//        new Handler(Looper.getMainLooper()).post(
-//                new Runnable() {
-//                    public void run() {
-//                        Toast.makeText(getApplicationContext(), "CoreService onStartCommand()",Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//        );
+        String MQTTerviceName = getString(R.string.mqtt_service_name);
+        boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
+        Log.d("MQTTerviceName",String.valueOf(isService));
+        if ( !isService ) this.startService(new Intent(this,MQTTService.class));
+        new Handler(Looper.getMainLooper()).post(
+                new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "CoreService onStartCommand()",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
         return START_STICKY;
     }
 
