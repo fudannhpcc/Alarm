@@ -156,11 +156,13 @@ public class MQTTService extends Service {
 
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
-            public void connectComplete(boolean b, String s) { Log.d(TAG, "connectComplete"); }
+            public void connectComplete(boolean b, String s) {
+//                Log.d(TAG, "connectComplete");
+            }
 
             @Override
             public void connectionLost(Throwable throwable) {
-                Log.d(TAG, "connectionLost");
+//                Log.d(TAG, "connectionLost");
             }
 
             @Override
@@ -171,7 +173,7 @@ public class MQTTService extends Service {
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-                Log.d(TAG, "deliveryComplete");
+//                Log.d(TAG, "deliveryComplete");
             }
         });
     }
@@ -179,7 +181,7 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
-//        stopForeground(true);
+        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -291,7 +293,7 @@ public class MQTTService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());
-//        startForeground(NOTIFY_ID,builder.build());
+        startForeground(NOTIFY_ID,builder.build());
     }
 
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
