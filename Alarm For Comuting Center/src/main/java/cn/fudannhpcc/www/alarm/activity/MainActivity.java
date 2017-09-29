@@ -316,11 +316,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        Log.d("onDestroy","HELLO");
-//        if (mqttBound) {
-//            unbindService(mqttConnection);
-//            mqttBound = false;
-//        }
+        Log.d("onDestroy","HELLO");
+        if (mqttBound) {
+            unbindService(mqttConnection);
+            mqttBound = false;
+        }
         unregisterNetworkChanges();
         mHomeKeyObserver.stopListen();
         mPowerKeyObserver.stopListen();
