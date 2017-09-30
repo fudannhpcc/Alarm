@@ -157,12 +157,12 @@ public class MQTTService extends Service {
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-//                Log.d(TAG, "connectComplete");
+                Log.d(TAG, "connectComplete");
             }
 
             @Override
             public void connectionLost(Throwable throwable) {
-//                Log.d(TAG, "connectionLost");
+                Log.d(TAG, "connectionLost");
             }
 
             @Override
@@ -173,7 +173,7 @@ public class MQTTService extends Service {
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-//                Log.d(TAG, "deliveryComplete");
+                Log.d(TAG, "deliveryComplete");
             }
         });
     }
@@ -181,7 +181,7 @@ public class MQTTService extends Service {
     @Override
     public void onDestroy() {
         iService = false;
-        stopForeground(true);
+//        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -257,7 +257,8 @@ public class MQTTService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 // 设置通知的基本信息：icon、标题、内容
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
-        builder.setSmallIcon(context.getResources().getIdentifier("ic_notification_smallicon", "mipmap", context.getPackageName()));
+//        builder.setSmallIcon(context.getResources().getIdentifier("ic_notification_smallicon", "mipmap", context.getPackageName()));
+        builder.setSmallIcon(R.drawable.ic_stat_name);
         builder.setLargeIcon(bitmap);
         builder.setWhen(System.currentTimeMillis());
         builder.setContentTitle(title);
@@ -291,9 +292,9 @@ public class MQTTService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
 
-//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.notify(NOTIFY_ID, builder.build());
-        startForeground(NOTIFY_ID,builder.build());
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, builder.build());
+//        startForeground(NOTIFY_ID,builder.build());
     }
 
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {

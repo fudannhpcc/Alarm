@@ -200,8 +200,13 @@ public class MainActivity extends AppCompatActivity {
     boolean monResume = false;
     @Override
     protected void onResume() {
-        Intent intent = new Intent(this, MQTTService.class);
-        bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
+        try {
+            Intent intent = new Intent(this, MQTTService.class);
+            bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
+            monResume = true;
+        }catch (Exception e) {
+        }
+
         monResume = true;
         Log.d("onResume()","HELLO:" + String.valueOf(monResume));
         super.onResume();
@@ -220,8 +225,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         monStop = true;
-        Log.d("onStop()","HELLO:" + String.valueOf(monStop));
-        // Unbind from the service
+//        Log.d("onStop()","HELLO:" + String.valueOf(monStop));
+//        // Unbind from the service
         if ( POWERKEY || HOMEKEY ) mqttBound = false;
         Log.d("onStop()","HELLO:" + String.valueOf(mqttBound));
         if (mqttBound) {
@@ -414,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         CustomDialog.setYesOnclickListener("确定", new CustomDialog.onYesOnclickListener() {
             @Override
             public void onYesClick() {
-                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
                 CustomDialog.dismiss();
                 finish();
             }
@@ -422,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
             @Override
             public void onNoClick() {
-                Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
                 CustomDialog.dismiss();
             }
         });
