@@ -227,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
         monStop = true;
 //        Log.d("onStop()","HELLO:" + String.valueOf(monStop));
 //        // Unbind from the service
-//        if ( POWERKEY || HOMEKEY ) mqttBound = false;
-//        Log.d("onStop()","HELLO:" + String.valueOf(mqttBound));
+        if ( POWERKEY || HOMEKEY ) mqttBound = false;
+        Log.d("onStop()","HELLO:" + String.valueOf(mqttBound));
         if (mqttBound) {
             unbindService(mqttConnection);
             mqttBound = false;
