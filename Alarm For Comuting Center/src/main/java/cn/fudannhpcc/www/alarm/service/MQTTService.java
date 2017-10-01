@@ -20,6 +20,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -258,6 +259,7 @@ public class MQTTService extends Service {
 // 设置通知的基本信息：icon、标题、内容
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 //        builder.setSmallIcon(context.getResources().getIdentifier("ic_notification_smallicon", "mipmap", context.getPackageName()));
+        builder.setColor(ContextCompat.getColor(context, R.color.transparent));
         builder.setSmallIcon(R.drawable.ic_stat_name);
         builder.setLargeIcon(bitmap);
         builder.setWhen(System.currentTimeMillis());
