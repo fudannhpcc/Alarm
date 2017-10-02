@@ -60,8 +60,8 @@ public class PahoMqttClient {
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setUserName(Constants.USERNAME);
         mqttConnectOptions.setPassword(Constants.PASSWORD.toCharArray());
-        mqttConnectOptions.setKeepAliveInterval(Constants.KEEPALIVEINTERVAL);
-        mqttConnectOptions.setConnectionTimeout(Constants.CONNECTIONTIMEOUT);
+        //mqttConnectOptions.setKeepAliveInterval(Constants.KEEPALIVEINTERVAL);
+        //mqttConnectOptions.setConnectionTimeout(Constants.CONNECTIONTIMEOUT);
         return mqttConnectOptions;
     }
 }
