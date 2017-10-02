@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
             Editor.putBoolean(getString(R.string.connection_server_mode), true);
             Editor.putString(getString(R.string.connection_server_topic), "");
             Editor.putInt(getString(R.string.connection_keep_alive), 30);
-            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 200);
-            Editor.putInt(getString(R.string.connection_tcp_timeout), 200);
+            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 2000);
+            Editor.putInt(getString(R.string.connection_tcp_timeout), 2000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
             if (!Editor.commit()) {
                 Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
@@ -108,16 +108,16 @@ public class MainActivity extends AppCompatActivity {
             Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
             Constants.USERNAME = "nhpcc";
             Constants.PASSWORD = "rtfu2002";
-            Constants.KEEPALIVEINTERVAL = 200;
-            Constants.CONNECTIONTIMEOUT = 200;
+            Constants.KEEPALIVEINTERVAL = 2000;
+            Constants.CONNECTIONTIMEOUT = 5000;
             Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
         }
         else {
             Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
             Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
             Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
-            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 200);
-            Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 200);
+            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 2000);
+            Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
         }
         return isFirstRun;
