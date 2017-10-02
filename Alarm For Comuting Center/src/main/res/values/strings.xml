@@ -42,6 +42,10 @@
             <string name="editText_server_topic_hint">fudannhpcc/cluster/#</string>
         <string name="keep_alive">服务保活间隔（秒）</string>
             <string name="editText_keep_alive_hint">60</string>
+        <string name="tcp_keep_alive">连接保活间隔（毫秒）</string>
+            <string name="editText_tcp_keep_alive_hint">200</string>
+        <string name="tcp_timeout">连接超时（毫秒）</string>
+            <string name="editText_tcp_timeout_hint">200</string>
 
 
     <string name="listview_activity_name">中心集群报警</string>
@@ -74,6 +78,8 @@
     <string name="connection_password">connection_password</string>
     <string name="connection_push_notifications_subscribe_topic">connection_push_notifications_subscribe_topic</string>
     <string name="connection_keep_alive">connection_keep_alive</string>
+    <string name="connection_tcp_keep_alive">connection_tcp_keep_alive</string>
+    <string name="connection_tcp_timeout">connection_tcp_timeout</string>
     <string name="connection_in_background">connection_in_background</string>
     <string name="connection_server_mode">connection_server_mode</string>
     <string name="connection_server_topic">connection_server_topic</string>

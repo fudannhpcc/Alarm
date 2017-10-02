@@ -43,21 +43,6 @@ public class PahoMqttClient {
         return mqttAndroidClient;
     }
 
-    public void disconnect(@NonNull MqttAndroidClient client) throws MqttException {
-        IMqttToken mqttToken = client.disconnect();
-        mqttToken.setActionCallback(new IMqttActionListener() {
-            @Override
-            public void onSuccess(IMqttToken iMqttToken) {
-                Log.d(TAG, "Successfully disconnected");
-            }
-
-            @Override
-            public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-                Log.d(TAG, "Failed to disconnected " + throwable.toString());
-            }
-        });
-    }
-
     @NonNull
     private DisconnectedBufferOptions getDisconnectedBufferOptions() {
         DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
@@ -75,22 +60,8 @@ public class PahoMqttClient {
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setUserName(Constants.USERNAME);
         mqttConnectOptions.setPassword(Constants.PASSWORD.toCharArray());
+        mqttConnectOptions.setKeepAliveInterval(Constants.KEEPALIVEINTERVAL);
+        mqttConnectOptions.setConnectionTimeout(Constants.CONNECTIONTIMEOUT);
         return mqttConnectOptions;
     }
-
-    public void subscribe(@NonNull MqttAndroidClient client, @NonNull final String topic, int qos) throws MqttException {
-        IMqttToken token = client.subscribe(topic, qos);
-        token.setActionCallback(new IMqttActionListener() {
-            @Override
-            public void onSuccess(IMqttToken iMqttToken) {
-                Log.d(TAG, "Subscribe Successfully " + topic);
-            }
-
-            @Override
-            public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-                Log.e(TAG, "Subscribe Failed " + topic);
-            }
-        });
-    }
-
 }
