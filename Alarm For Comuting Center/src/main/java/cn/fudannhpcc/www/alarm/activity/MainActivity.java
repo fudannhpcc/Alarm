@@ -134,8 +134,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(PREFS_NAME, "程序非第一次运行");
         }
 
-        Log.d(PREFS_NAME,Constants.MQTT_BROKER_URL);
-
         init();
 
         thisActivity = this;
