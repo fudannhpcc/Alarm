@@ -147,11 +147,6 @@ public class MainActivity extends AppCompatActivity {
         return isFirstRun;
     }
 
-    private String ServerApkUrl;
-    private String ServerVerName;
-    private int ServerVerCode;
-    private String ServerUpdateMessage;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -511,9 +506,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 获取当前应用版本号
-     */
+    private String ServerApkUrl;
+    private String ServerVerName;
+    private int ServerVerCode;
+    private String ServerUpdateMessage;
+
     private PackageInfo getVersionCode() {
         try {
             PackageManager packageManager = getPackageManager();
@@ -530,8 +527,6 @@ public class MainActivity extends AppCompatActivity {
         if ( packageInfo == null ) return;
 
         int localversionCode = packageInfo.versionCode;
-
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
         boolean iupdate = false;
         if ( localversionCode < ServerVerCode ) iupdate = true;
         else {
@@ -541,15 +536,15 @@ public class MainActivity extends AppCompatActivity {
         else {
             makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
         }
-//        } else {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    == PackageManager.PERMISSION_GRANTED) {
-//                realUpdate();
-//            } else {//申请权限
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//            }
-//        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                realUpdate();
+            } else {//申请权限
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+        }
     }
 
 
