@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,7 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,6 +20,10 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +34,17 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
+import cn.fudannhpcc.www.alarm.R;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.fudannhpcc.www.alarm.R;
+import feature.Callback;
+
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
 import cn.fudannhpcc.www.alarm.receiver.PowerKeyObserver;
@@ -46,6 +66,10 @@ import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.receiver.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
+import customview.ConfirmDialog;
+import util.UpdateAppUtils;
+
+import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -103,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             Editor.putInt(getString(R.string.connection_tcp_timeout), 2000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
             if (!Editor.commit()) {
-                Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
+                makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
             }
             Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
             Constants.USERNAME = "nhpcc";
@@ -122,6 +146,11 @@ public class MainActivity extends AppCompatActivity {
         }
         return isFirstRun;
     }
+
+    private String ServerApkUrl;
+    private String ServerVerName;
+    private int ServerVerCode;
+    private String ServerUpdateMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -360,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.start:
                 if ( item.getTitle() == getString(R.string.start) ) {
-                    Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
+                    makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
@@ -376,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 else {
-                    Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
+                    makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
                     Intent coreservice_intent = new Intent(this, CoreService.class);
@@ -386,12 +415,39 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.setting:
-                Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
+                makeText(this, "设置", Toast.LENGTH_SHORT).show();
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
                 return true;
+            case R.id.update:
+                RequestQueue queue = Volley.newRequestQueue(this);
+                JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
+                        "http://www.fudannhpcc.cn/apkupdate/updatecheck.json",
+                        null,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    ServerApkUrl = response.getString("url");
+                                    ServerVerCode = response.getInt("verCode");
+                                    ServerVerName = response.getString("verName");
+                                    ServerUpdateMessage = response.getString("updateMessage");
+                                    Log.d("UPDATE",ServerApkUrl);
+                                    checkAndUpdate();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("TAG", error.getMessage());
+                    }
+                });
+                queue.add(mJsonObjectRequest);
+                return true;
             case R.id.exit:
-                Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
+                makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
                 return true;
             default:
@@ -454,5 +510,86 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 获取当前应用版本号
+     */
+    private PackageInfo getVersionCode() {
+        try {
+            PackageManager packageManager = getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
+            return packageInfo;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void checkAndUpdate() {
+        PackageInfo packageInfo = getVersionCode();
+        if ( packageInfo == null ) return;
+
+        int localversionCode = packageInfo.versionCode;
+
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        boolean iupdate = false;
+        if ( localversionCode < ServerVerCode ) iupdate = true;
+        else {
+            if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) iupdate = true;
+        }
+        if ( iupdate ) realUpdate();
+        else {
+            makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
+        }
+//        } else {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    == PackageManager.PERMISSION_GRANTED) {
+//                realUpdate();
+//            } else {//申请权限
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//            }
+//        }
+    }
+
+
+    private void realUpdate() {
+        UpdateAppUtils.from(MainActivity.this)
+                .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
+                .serverVersionName(ServerVerName)
+                .serverVersionCode(ServerVerCode)
+                .updateInfo(ServerUpdateMessage)
+                .apkPath(ServerApkUrl)
+                .downloadBy(UpdateAppUtils.DOWNLOAD_BY_BROWSER)
+                .isForce(false)
+                .update();
+    }
+
+    //权限请求结果
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    realUpdate();
+                } else {
+                    new ConfirmDialog(this, new Callback() {
+                        @Override
+                        public void callback(int position) {
+                            if (position==1){
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.parse("package:" + getPackageName())); // 根据包名打开对应的设置界面
+                                startActivity(intent);
+                            }
+                        }
+                    }).setContent("暂无读写SD卡权限\n是否前往设置？").show();
+                }
+                break;
+        }
+
+    }
+
 
 }

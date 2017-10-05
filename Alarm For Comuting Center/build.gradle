@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName '1.01'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -37,12 +37,12 @@ android {
         }
     }
 
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-
-    }
+//    packagingOptions {
+//        exclude 'META-INF/DEPENDENCIES'
+//        exclude 'META-INF/NOTICE'
+//        exclude 'META-INF/LICENSE'
+//
+//    }
 }
 
 repositories {
@@ -60,6 +60,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
     compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.teprinciple:updateapputils:1.3.1'
+    compile 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
     compile files('libs/org.eclipse.paho.android.service-1.1.1.jar')
     compile files('libs/org.eclipse.paho.client.mqttv3-1.1.1.jar')
 }
