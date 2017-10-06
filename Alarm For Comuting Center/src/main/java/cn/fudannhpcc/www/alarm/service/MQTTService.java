@@ -260,7 +260,6 @@ public class MQTTService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 // 设置通知的基本信息：icon、标题、内容
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
-//        builder.setSmallIcon(context.getResources().getIdentifier("ic_notification_smallicon", "mipmap", context.getPackageName()));
         builder.setColor(ContextCompat.getColor(context, R.color.transparent));
         builder.setSmallIcon(R.drawable.ic_stat_name);
         builder.setLargeIcon(bitmap);
@@ -306,6 +305,7 @@ public class MQTTService extends Service {
             String title = null, message = null; Uri WARNINGSOUND = null;
             title = WARNINGTITLE;
             message = msg.split("]")[1].trim();
+            WARNINGID = 0;
             if ( message.contains("温控报警") ) {
                 title += "温控 "; WARNINGID+=1;
             }

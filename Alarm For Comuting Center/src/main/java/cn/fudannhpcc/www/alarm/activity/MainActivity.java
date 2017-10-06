@@ -285,11 +285,11 @@ public class MainActivity extends AppCompatActivity {
             message.setData(data);
             message.replyTo = mActivityMessenger;
             try {
-//                Log.d("DemoLog-Client", "客户端向service发送信息");
+                Log.d("DemoLog-Client", "客户端向service发送信息");
                 mqttService.send(message);
             } catch (RemoteException e) {
                 e.printStackTrace();
-//                Log.d("DemoLog", "客户端向service发送消息失败: " + e.getMessage());
+                Log.d("DemoLog", "客户端向service发送消息失败: " + e.getMessage());
             }
         }
 
@@ -433,7 +433,6 @@ public class MainActivity extends AppCompatActivity {
                                     ServerVerCode = response.getInt("verCode");
                                     ServerVerName = response.getString("verName");
                                     ServerUpdateMessage = response.getString("updateMessage");
-                                    Log.d("UPDATE",ServerApkUrl);
                                     checkAndUpdate();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
