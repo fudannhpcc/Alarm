@@ -47,7 +47,8 @@
             <string name="editText_tcp_keep_alive_hint">200</string>
         <string name="tcp_timeout">连接超时（毫秒）</string>
             <string name="editText_tcp_timeout_hint">200</string>
-
+        <string name="updateurl">更新站点</string>
+            <string name="editText_updateurl_hint">http://www.fudannhpcc.cn/apkupdate</string>
 
     <string name="listview_activity_name">中心集群报警</string>
         <string name="listview_activity_lbltitle">报警类型</string>
@@ -85,6 +86,7 @@
     <string name="connection_server_mode">connection_server_mode</string>
     <string name="connection_server_topic">connection_server_topic</string>
     <string name="connection_mqtt_server">connection_mqtt_server</string>
+    <string name="connection_update_url">connection_update_url</string>
 
 
 </resources>

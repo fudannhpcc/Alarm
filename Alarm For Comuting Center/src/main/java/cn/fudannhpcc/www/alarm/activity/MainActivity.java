@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     String notificationMessage = null;
     Intent intent;
 
-    public static final int WARNINGIMG = R.mipmap.ic_notification;
+    public static final int WARNINGIMG[] = {R.mipmap.ic_warning0,R.mipmap.ic_warning1,R.mipmap.ic_warning2};
 
 
     public static final String PREFS_NAME = "AppSettings";
@@ -123,26 +123,29 @@ public class MainActivity extends AppCompatActivity {
             Editor.putBoolean(getString(R.string.connection_server_mode), true);
             Editor.putString(getString(R.string.connection_server_topic), "");
             Editor.putInt(getString(R.string.connection_keep_alive), 30);
-            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 2000);
-            Editor.putInt(getString(R.string.connection_tcp_timeout), 2000);
+            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 60000);
+            Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
+            Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
             if (!Editor.commit()) {
                 makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
             }
             Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
             Constants.USERNAME = "nhpcc";
             Constants.PASSWORD = "rtfu2002";
-            Constants.KEEPALIVEINTERVAL = 2000;
+            Constants.KEEPALIVEINTERVAL = 60000;
             Constants.CONNECTIONTIMEOUT = 5000;
             Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
+            Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
         }
         else {
             Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
             Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
             Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
-            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 2000);
+            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 60000);
             Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
+            Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
         }
         return isFirstRun;
     }
@@ -321,10 +324,13 @@ public class MainActivity extends AppCompatActivity {
         for (HashMap<String, Object> tempMap : mNotificationList) {
             Map<String, Object> map = new HashMap<String, Object>();
             Set<String> set = tempMap.keySet();
+            int WARNINGID = 0;
             for (String s : set) {
-                map.put(s, String.valueOf(tempMap.get(s)));
+                if ( s == "warningid") WARNINGID = (int)tempMap.get(s);
+                else map.put(s, String.valueOf(tempMap.get(s)));
             }
-            map.put("img", WARNINGIMG);
+            if ( WARNINGID > 0 ) map.put("img", WARNINGIMG[WARNINGID-1]);
+            else map.put("img", WARNINGIMG[0]);
             list.add(map);
         }
         Collections.reverse(list);
@@ -417,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.update:
                 RequestQueue queue = Volley.newRequestQueue(this);
                 JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
-                        "http://www.fudannhpcc.cn/apkupdate/updatecheck.json",
+                        Constants.UPDATE_URL + "/updatecheck.json",
                         null,
                         new Response.Listener<JSONObject>() {
                             @Override

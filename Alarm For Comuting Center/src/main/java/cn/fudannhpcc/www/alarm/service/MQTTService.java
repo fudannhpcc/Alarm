@@ -50,8 +50,9 @@ public class MQTTService extends Service {
 
     public static final String PREFS_NAME = "AppSettings";
 
-    public static final String WARNINGTITLE = "中心集群故障";
+    public static final String WARNINGTITLE = "集群故障: ";
     public static final int WARNINGSOUNDID = R.raw.warning;
+    public static int WARNINGID = 0;
 
 
     private int pendingNotificationsCount = 0;
@@ -249,6 +250,7 @@ public class MQTTService extends Service {
         mNotificationMap.put("title", title);
         mNotificationMap.put("message", message);
         mNotificationMap.put("Count", pendingNotificationsCount);
+        mNotificationMap.put("warningid", WARNINGID);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String datestr = sdf.format(new Date());
         mNotificationMap.put("datetime", datestr);
@@ -304,6 +306,16 @@ public class MQTTService extends Service {
             String title = null, message = null; Uri WARNINGSOUND = null;
             title = WARNINGTITLE;
             message = msg.split("]")[1].trim();
+            if ( message.contains("温控报警") ) {
+                title += "温控 "; WARNINGID+=1;
+            }
+            if ( message.contains("节点故障") ) {
+                title += "运行 ";WARNINGID+=1;
+            }
+            if ( message.contains("宕机节点") ) {
+                title += "宕机 ";WARNINGID+=1;
+            }
+            message = message.trim();
             WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID);
             qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
         }

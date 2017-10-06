@@ -34,6 +34,7 @@ public class SettingActivity extends AppCompatActivity {
     private EditText keep_alive;
     private EditText tcp_keep_alive;
     private EditText tcp_timeout;
+    private EditText updateurl;
 
     private String mqtt_protocol = "";
 
@@ -56,6 +57,7 @@ public class SettingActivity extends AppCompatActivity {
         keep_alive = (EditText) findViewById(R.id.editText_keep_alive);
         tcp_keep_alive = (EditText) findViewById(R.id.editText_tcp_keep_alive);
         tcp_timeout = (EditText) findViewById(R.id.editText_tcp_timeout);
+        updateurl = (EditText) findViewById(R.id.editText_updateurl);
 
         SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         hostname.setText(sprefs.getString(getString(R.string.connection_hostname),""));
@@ -70,8 +72,9 @@ public class SettingActivity extends AppCompatActivity {
         server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
         keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),30)));
-        tcp_keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_tcp_keep_alive),2000)));
+        tcp_keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_tcp_keep_alive),60000)));
         tcp_timeout.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_tcp_timeout),5000)));
+        updateurl.setText(sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate"));
 
         if (protocol_tcp.isChecked()) mqtt_protocol = "tcp://";
         if (protocol_ssl.isChecked()) mqtt_protocol = "ssl://";
@@ -83,6 +86,7 @@ public class SettingActivity extends AppCompatActivity {
             username.setText("nhpcc");
             password.setText("rtfu2002");
             push_notifications_subscribe_topic.setText("fudannhpcc/alarm/");
+            updateurl.setText("http://www.fudannhpcc.cn/apkupdate");
         }
 
         protocol_tcp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -143,6 +147,7 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putInt(getString(R.string.connection_keep_alive), Integer.parseInt(keep_alive.getText().toString().replace(" ", "")));
                 Editor.putInt(getString(R.string.connection_tcp_keep_alive), Integer.parseInt(tcp_keep_alive.getText().toString().replace(" ", "")));
                 Editor.putInt(getString(R.string.connection_tcp_timeout), Integer.parseInt(tcp_timeout.getText().toString().replace(" ", "")));
+                Editor.putString(getString(R.string.connection_update_url), updateurl.getText().toString().replace(" ", ""));
                 if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_xyz.isChecked() ) {
                     String errmsg = "网络协议必须选择一个";
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();
@@ -173,6 +178,7 @@ public class SettingActivity extends AppCompatActivity {
                 Constants.KEEPALIVEINTERVAL = Integer.parseInt(tcp_keep_alive.getText().toString().replace(" ", ""));
                 Constants.CONNECTIONTIMEOUT = Integer.parseInt(tcp_timeout.getText().toString().replace(" ", ""));
                 Constants.MQTT_BROKER_URL = connection_mqtt_server;
+                Constants.UPDATE_URL = updateurl.getText().toString().replace(" ", "");
                 if (!Editor.commit()) {
                     Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
                     break;
