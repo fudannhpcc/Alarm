@@ -397,10 +397,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.start);
-        item.setTitle(getString(R.string.start));
-        item.setIcon(R.drawable.ic_start);
-        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+        if (isService) {
+            item.setTitle(getString(R.string.stop));
+            item.setIcon(R.drawable.ic_stop);
+            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
+        }
+        else {
+            item.setTitle(getString(R.string.start));
+            item.setIcon(R.drawable.ic_start);
+            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+        }
         return true;
     }
 
@@ -414,9 +422,16 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
+//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
+//                    mqttservice_intent.setAction(MqttServiceName);
+//                    startService(mqttservice_intent);
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
+//                    finish();
+//                    Intent intent = new Intent(this, MainActivity.class);
+//                    startActivity(intent);
+//                    Log.d("First_Start_Client",String.valueOf(First_Start_Client));
                     String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
                     if (!topic.isEmpty()) {
                         try {

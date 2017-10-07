@@ -275,7 +275,6 @@ public class MQTTService extends Service {
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
         builder.setSound(WARNINGSOUND);
-        builder.setOnlyAlertOnce(true);
         builder.setCategory(Notification.CATEGORY_MESSAGE);
         builder.setColor(0xff0000);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
