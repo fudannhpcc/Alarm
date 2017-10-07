@@ -267,12 +267,16 @@ public class MQTTService extends Service {
         builder.setContentTitle(title);
         builder.setContentText(message);
         builder.setContentInfo(pendingNotificationsCount + " 条新消息");
+        builder.setSubText(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
         builder.setVibrate(new long[] {0,300,500,700});
         builder.setLights(0xff0000ff, 300, 0);
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
         builder.setSound(WARNINGSOUND);
+        builder.setOnlyAlertOnce(true);
+        builder.setCategory(Notification.CATEGORY_MESSAGE);
+        builder.setColor(0xff0000);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
