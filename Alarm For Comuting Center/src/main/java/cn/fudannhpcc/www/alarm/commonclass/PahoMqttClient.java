@@ -64,4 +64,20 @@ public class PahoMqttClient {
         mqttConnectOptions.setConnectionTimeout(Constants.CONNECTIONTIMEOUT);
         return mqttConnectOptions;
     }
+
+    public void subscribe(@NonNull MqttAndroidClient client, @NonNull final String topic, int qos) throws MqttException {
+        IMqttToken token = client.subscribe(topic, qos);
+        token.setActionCallback(new IMqttActionListener() {
+            @Override
+            public void onSuccess(IMqttToken iMqttToken) {
+                Log.d(TAG, "Subscribe Successfully " + topic);
+            }
+
+            @Override
+            public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
+                Log.e(TAG, "Subscribe Failed " + topic);
+
+            }
+        });
+    }
 }

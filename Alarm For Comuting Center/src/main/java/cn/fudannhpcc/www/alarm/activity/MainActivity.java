@@ -25,10 +25,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -42,6 +44,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,8 +55,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
+import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
 import feature.Callback;
 
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
@@ -102,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String PREFS_NAME = "AppSettings";
 
+    private MqttAndroidClient client;
+    private PahoMqttClient pahoMqttClient;
+
     /**
      * 判断程序是不是第一次启动
      */
@@ -127,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
             Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
+            String connection_client_id = getRandomString(8);
+            Log.d("CLIENT_ID1",connection_client_id);
+            Editor.putString(getString(R.string.connection_client_id), connection_client_id);
             if (!Editor.commit()) {
                 makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
             }
@@ -137,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             Constants.CONNECTIONTIMEOUT = 5000;
             Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
             Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
+            Constants.CLIENT_ID =  connection_client_id;
         }
         else {
             Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
@@ -146,8 +159,20 @@ public class MainActivity extends AppCompatActivity {
             Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
             Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
+            Constants.CLIENT_ID = sprefs.getString(getString(R.string.connection_client_id),getRandomString(8));
         }
         return isFirstRun;
+    }
+
+    public static String getRandomString(int length){
+        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random=new Random();
+        StringBuffer sb=new StringBuffer();
+        for(int i=0;i<length;i++){
+            int number=random.nextInt(52);
+            sb.append(str.charAt(number));
+        }
+        return sb.toString();
     }
 
     @Override
@@ -162,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         init();
+
+        pahoMqttClient = new PahoMqttClient();
+        client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
         thisActivity = this;
         mNetworkReceiver = new NetworkChangeReceiver();
@@ -369,18 +397,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.start);
-        if (isService) {
-            item.setTitle(getString(R.string.stop));
-            item.setIcon(R.drawable.ic_stop);
-            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
-        }
-        else {
-            item.setTitle(getString(R.string.start));
-            item.setIcon(R.drawable.ic_start);
-            RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-            mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
-        }
+        item.setTitle(getString(R.string.start));
+        item.setIcon(R.drawable.ic_start);
+        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
         return true;
     }
 
@@ -394,15 +414,17 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.ic_stop);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
-//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
-//                    mqttservice_intent.setAction(MqttServiceName);
-//                    startService(mqttservice_intent);
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
-//                    finish();
-//                    Intent intent = new Intent(this, MainActivity.class);
-//                    startActivity(intent);
+                    String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
+                    if (!topic.isEmpty()) {
+                        try {
+                            pahoMqttClient.subscribe(client, topic, 1);
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     return true;
                 }
                 else {

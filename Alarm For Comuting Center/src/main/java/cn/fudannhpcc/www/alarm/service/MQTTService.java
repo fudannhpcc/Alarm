@@ -153,6 +153,7 @@ public class MQTTService extends Service {
                 );
             }
         }).start();
+        Log.d("CLIENT_ID",Constants.CLIENT_ID);
         pahoMqttClient = new PahoMqttClient();
         mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 

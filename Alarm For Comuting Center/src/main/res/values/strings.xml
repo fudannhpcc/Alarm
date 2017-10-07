@@ -87,6 +87,7 @@
     <string name="connection_server_topic">connection_server_topic</string>
     <string name="connection_mqtt_server">connection_mqtt_server</string>
     <string name="connection_update_url">connection_update_url</string>
+    <string name="connection_client_id">connection_client_id</string>
 
 
 </resources>
