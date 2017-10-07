@@ -44,6 +44,22 @@ public class PahoMqttClient {
     }
 
     @NonNull
+    public void disconnect(@NonNull MqttAndroidClient client) throws MqttException {
+        IMqttToken mqttToken = client.disconnect();
+        mqttToken.setActionCallback(new IMqttActionListener() {
+            @Override
+            public void onSuccess(IMqttToken iMqttToken) {
+                Log.d(TAG, "Successfully disconnected");
+            }
+
+            @Override
+            public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
+                Log.d(TAG, "Failed to disconnected " + throwable.toString());
+            }
+        });
+    }
+
+    @NonNull
     private DisconnectedBufferOptions getDisconnectedBufferOptions() {
         DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
         disconnectedBufferOptions.setBufferEnabled(true);

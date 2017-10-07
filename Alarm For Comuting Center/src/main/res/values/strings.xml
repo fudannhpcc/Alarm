@@ -4,11 +4,14 @@
     <string name="app_name">集群管理</string>
 
     <!--   系统设置菜单  -->
-    <string name="start">开始</string>
-    <string name="stop">停止</string>
+    <string name="start">开始MQTT连接</string>
+    <string name="stop">断开MQTT连接</string>
 
     <string name="exittitle">退出程序</string>
     <string name="exitmessage">确定要退出吗？</string>
+
+    <string name="startservice">开启后台服务</string>
+    <string name="stopservice">停止后台服务</string>
 
     <string name="setting">设置</string>
         <string name="save">保存</string>

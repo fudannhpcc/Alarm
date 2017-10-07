@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("CLIENT_ID1",connection_client_id);
             Editor.putString(getString(R.string.connection_client_id), connection_client_id);
             if (!Editor.commit()) {
-                makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
             }
             Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
             Constants.USERNAME = "nhpcc";
@@ -418,20 +418,9 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.start:
                 if ( item.getTitle() == getString(R.string.start) ) {
-                    makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "开始MQTT连接", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_stop);
-                    mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stop));
-//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
-//                    mqttservice_intent.setAction(MqttServiceName);
-//                    startService(mqttservice_intent);
-                    Intent coreservice_intent = new Intent(this, CoreService.class);
-                    coreservice_intent.setAction(CoreServiceName);
-                    startService(coreservice_intent);
-//                    finish();
-//                    Intent intent = new Intent(this, MainActivity.class);
-//                    startActivity(intent);
-//                    Log.d("First_Start_Client",String.valueOf(First_Start_Client));
                     String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
                     if (!topic.isEmpty()) {
                         try {
@@ -443,17 +432,41 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 else {
-                    makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "断开MQTT连接", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.drawable.ic_start);
+                    item.setTitle(getString(R.string.start));
+                }
+                break;
+            case R.id.service:
+                if ( item.getTitle() == getString(R.string.startservice) ) {
+                    Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.mipmap.ic_stopservice);
+                    mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
+                    item.setTitle(getString(R.string.stopservice));
+//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
+//                    mqttservice_intent.setAction(MqttServiceName);
+//                    startService(mqttservice_intent);
+                    Intent coreservice_intent = new Intent(this, CoreService.class);
+                    coreservice_intent.setAction(CoreServiceName);
+                    startService(coreservice_intent);
+//                    finish();
+//                    Intent intent = new Intent(this, MainActivity.class);
+//                    startActivity(intent);
+//                    Log.d("First_Start_Client",String.valueOf(First_Start_Client));
+                    return true;
+                }
+                else {
+                    Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.mipmap.ic_startservice);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     stopService(coreservice_intent);
-                    item.setTitle(getString(R.string.start));
+                    item.setTitle(getString(R.string.startservice));
                 }
                 break;
             case R.id.setting:
-                makeText(this, "设置", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
                 return true;
@@ -474,6 +487,7 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                Toast.makeText(MainActivity.this, "点击确认后将在后台下载更新！", Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -484,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
                 queue.add(mJsonObjectRequest);
                 return true;
             case R.id.exit:
-                makeText(this, "退出", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
                 return true;
             default:
@@ -576,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if ( iupdate ) realUpdate();
         else {
-            makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
         }
 //        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
