@@ -51,7 +51,7 @@ public class MQTTService extends Service {
     public static final String PREFS_NAME = "AppSettings";
 
     public static final String WARNINGTITLE = "集群故障: ";
-    public static final int WARNINGSOUNDID = R.raw.warning;
+    public static final int WARNINGSOUNDID[] = { R.raw.warning0,R.raw.warning1, R.raw.warning2 };
     public static int WARNINGID = 0;
 
 
@@ -320,7 +320,7 @@ public class MQTTService extends Service {
                 title += "宕机 ";WARNINGID+=1;
             }
             message = message.trim();
-            WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID);
+            WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID-1]);
             qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
         }
     }
