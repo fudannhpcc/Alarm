@@ -396,16 +396,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.start);
+        MenuItem item = menu.findItem(R.id.service);
         if (isService) {
-            item.setTitle(getString(R.string.stop));
-            item.setIcon(R.drawable.ic_stop);
+            item.setTitle(getString(R.string.stopservice));
+            item.setIcon(R.mipmap.ic_stopservice);
             RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
         }
         else {
-            item.setTitle(getString(R.string.start));
-            item.setIcon(R.drawable.ic_start);
+            item.setTitle(getString(R.string.startservice));
+            item.setIcon(R.mipmap.ic_startservice);
             RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
         }
@@ -487,7 +487,6 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                Toast.makeText(MainActivity.this, "点击确认后将在后台下载更新！", Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -588,7 +587,10 @@ public class MainActivity extends AppCompatActivity {
         else {
             if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) iupdate = true;
         }
-        if ( iupdate ) realUpdate();
+        if ( iupdate ) {
+            realUpdate();
+            Toast.makeText(this, "点击确认后将在后台下载更新！", Toast.LENGTH_SHORT).show();
+        }
         else {
             Toast.makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
         }

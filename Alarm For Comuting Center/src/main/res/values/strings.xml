@@ -10,8 +10,8 @@
     <string name="exittitle">退出程序</string>
     <string name="exitmessage">确定要退出吗？</string>
 
-    <string name="startservice">开启后台服务</string>
-    <string name="stopservice">停止后台服务</string>
+    <string name="startservice">开启后台服务保护</string>
+    <string name="stopservice">停止后台服务保护</string>
 
     <string name="setting">设置</string>
         <string name="save">保存</string>
