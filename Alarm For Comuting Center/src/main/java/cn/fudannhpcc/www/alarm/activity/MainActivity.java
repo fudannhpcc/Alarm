@@ -2,9 +2,12 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -136,9 +139,6 @@ public class MainActivity extends AppCompatActivity {
             Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
             Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
-            String connection_client_id = getRandomString(8);
-            Log.d("CLIENT_ID1",connection_client_id);
-            Editor.putString(getString(R.string.connection_client_id), connection_client_id);
             if (!Editor.commit()) {
                 Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
             }
@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
             Constants.CONNECTIONTIMEOUT = 5000;
             Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
             Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
-            Constants.CLIENT_ID =  connection_client_id;
         }
         else {
             Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
@@ -159,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
             Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
             Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
-            Constants.CLIENT_ID = sprefs.getString(getString(R.string.connection_client_id),getRandomString(8));
         }
+        Constants.CLIENT_ID = getRandomString(8);
         return isFirstRun;
     }
 
@@ -185,6 +184,31 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(PREFS_NAME, "程序非第一次运行");
         }
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
+                Constants.UPDATE_URL + "/updatecheck.json",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            ServerApkUrl = response.getString("url");
+                            ServerVerCode = response.getInt("verCode");
+                            ServerVerName = response.getString("verName");
+                            ServerUpdateMessage = response.getString("updateMessage");
+                            checkAndUpdate(true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("TAG", error.getMessage());
+            }
+        });
+        queue.add(mJsonObjectRequest);
 
         init();
 
@@ -483,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
                                     ServerVerCode = response.getInt("verCode");
                                     ServerVerName = response.getString("verName");
                                     ServerUpdateMessage = response.getString("updateMessage");
-                                    checkAndUpdate();
+                                    checkAndUpdate(false);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -526,14 +550,14 @@ public class MainActivity extends AppCompatActivity {
         CustomDialog = new CustomDialog(MainActivity.this);
         CustomDialog.setTitle(title);
         CustomDialog.setMessage(message);
-        CustomDialog.setYesOnclickListener("确定", new CustomDialog.onYesOnclickListener() {
-            @Override
-            public void onYesClick() {
+            CustomDialog.setYesOnclickListener("确定", new CustomDialog.onYesOnclickListener() {
+                @Override
+                public void onYesClick() {
 //                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
-                CustomDialog.dismiss();
-                finish();
-            }
-        });
+                    CustomDialog.dismiss();
+                    finish();
+                }
+            });
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
             @Override
             public void onNoClick() {
@@ -577,7 +601,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkAndUpdate() {
+    private void checkAndUpdate(boolean only) {
         PackageInfo packageInfo = getVersionCode();
         if ( packageInfo == null ) return;
 
@@ -588,11 +612,28 @@ public class MainActivity extends AppCompatActivity {
             if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) iupdate = true;
         }
         if ( iupdate ) {
-            realUpdate();
-            Toast.makeText(this, "点击确认后将在后台下载更新！", Toast.LENGTH_SHORT).show();
+            if ( only ) {
+                Dialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("应用版本检查")
+                        .setMessage("\t\t有新版本 " + ServerVerName + " 更新！\n\t\t目前版本号：" + packageInfo.versionName )
+                        .setIcon(R.mipmap.ic_launcher)
+                        .setNegativeButton("知道啦", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).
+                        create();
+                alertDialog.show();
+                return;
+            }
+            else {
+                realUpdate();
+                Toast.makeText(this, "点击确认后将在后台下载更新！", Toast.LENGTH_SHORT).show();
+            }
         }
         else {
-            Toast.makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
+            if ( ! only ) Toast.makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
         }
 //        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
