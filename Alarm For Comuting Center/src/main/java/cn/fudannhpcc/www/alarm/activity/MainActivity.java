@@ -48,6 +48,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -113,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MqttAndroidClient client;
     private PahoMqttClient pahoMqttClient;
+
+    private MenuItem serviceItem;
 
     /**
      * 判断程序是不是第一次启动
@@ -421,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.service);
+        serviceItem = item;
         if (isService) {
             item.setTitle(getString(R.string.stopservice));
             item.setIcon(R.mipmap.ic_stopservice);
@@ -648,6 +652,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void realUpdate() {
+        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+        Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
+        serviceItem.setIcon(R.mipmap.ic_startservice);
+        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+        Intent coreservice_intent = new Intent(this, CoreService.class);
+        coreservice_intent.setAction(CoreServiceName);
+        stopService(coreservice_intent);
+        serviceItem.setTitle(getString(R.string.startservice));
+        Intent mqttservice_intent = new Intent(this, MqttService.class);
+        mqttservice_intent.setAction(MqttServiceName);
+        stopService(mqttservice_intent);
+
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
                 .serverVersionName(ServerVerName)
