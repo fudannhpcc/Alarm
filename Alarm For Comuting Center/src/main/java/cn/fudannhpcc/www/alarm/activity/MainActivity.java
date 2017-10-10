@@ -662,17 +662,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void realUpdate() {
-        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-        Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
-        serviceItem.setIcon(R.mipmap.ic_startservice);
-        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
-        Intent coreservice_intent = new Intent(this, CoreService.class);
-        coreservice_intent.setAction(CoreServiceName);
-        stopService(coreservice_intent);
-        serviceItem.setTitle(getString(R.string.startservice));
-        Intent mqttservice_intent = new Intent(this, MqttService.class);
-        mqttservice_intent.setAction(MqttServiceName);
-        stopService(mqttservice_intent);
+//        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
+//        Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
+//        serviceItem.setIcon(R.mipmap.ic_startservice);
+//        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
+//        Intent coreservice_intent = new Intent(this, CoreService.class);
+//        coreservice_intent.setAction(CoreServiceName);
+//        stopService(coreservice_intent);
+//        serviceItem.setTitle(getString(R.string.startservice));
+//        Intent mqttservice_intent = new Intent(this, MqttService.class);
+//        mqttservice_intent.setAction(MqttServiceName);
+//        stopService(mqttservice_intent);
 
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
