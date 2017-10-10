@@ -1,6 +1,5 @@
 package cn.fudannhpcc.www.alarm.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,15 +24,11 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -48,7 +43,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
 import feature.Callback;
@@ -78,8 +74,6 @@ import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 import customview.ConfirmDialog;
 import util.UpdateAppUtils;
-
-import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -114,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
     private MqttAndroidClient client;
     private PahoMqttClient pahoMqttClient;
-
-    private MenuItem serviceItem;
 
     /**
      * 判断程序是不是第一次启动
@@ -187,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(PREFS_NAME, "程序非第一次运行");
         }
+
+        MqttClientTimer.schedule(task, 0, 2000);
 
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
@@ -295,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
         monResume = true;
         Log.d("onResume()","HELLO:" + String.valueOf(monResume));
+
         super.onResume();
     }
 
@@ -330,6 +325,8 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mqttService = new Messenger(service);
             mqttBound = true;
+
+            String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
 
             Message message = Message.obtain();
             message.what = SEND_MESSAGE_CODE;
@@ -424,7 +421,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.service);
-        serviceItem = item;
         if (isService) {
             item.setTitle(getString(R.string.stopservice));
             item.setIcon(R.mipmap.ic_stopservice);
@@ -444,43 +440,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
         switch (item.getItemId()) {
-            case R.id.start:
-                if ( item.getTitle() == getString(R.string.start) ) {
-                    Toast.makeText(this, "开始MQTT连接", Toast.LENGTH_SHORT).show();
-                    item.setIcon(R.drawable.ic_stop);
-                    item.setTitle(getString(R.string.stop));
-                    String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
-                    if (!topic.isEmpty()) {
-                        try {
-                            pahoMqttClient.subscribe(client, topic, 1);
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return true;
-                }
-                else {
-                    Toast.makeText(this, "断开MQTT连接", Toast.LENGTH_SHORT).show();
-                    item.setIcon(R.drawable.ic_start);
-                    item.setTitle(getString(R.string.start));
-                }
-                break;
             case R.id.service:
                 if ( item.getTitle() == getString(R.string.startservice) ) {
                     Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
                     item.setIcon(R.mipmap.ic_stopservice);
                     mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
                     item.setTitle(getString(R.string.stopservice));
-//                    Intent mqttservice_intent = new Intent(this, MqttService.class);
-//                    mqttservice_intent.setAction(MqttServiceName);
-//                    startService(mqttservice_intent);
                     Intent coreservice_intent = new Intent(this, CoreService.class);
                     coreservice_intent.setAction(CoreServiceName);
                     startService(coreservice_intent);
-//                    finish();
-//                    Intent intent = new Intent(this, MainActivity.class);
-//                    startActivity(intent);
-//                    Log.d("First_Start_Client",String.valueOf(First_Start_Client));
                     return true;
                 }
                 else {
@@ -620,6 +588,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 999) {
+                MqttClientTimer.cancel();
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    Timer MqttClientTimer = new Timer();
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            if ( mqttBound ) {
+                String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
+                Log.d("MqttService", topic);
+                if (!topic.isEmpty()) {
+                    try {
+                        pahoMqttClient.subscribe(client, topic, 1);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("MqttService", String.valueOf(Constants.SUBSCRIBE_STATUS));
+                    Message message = new Message();
+                    if ( Constants.SUBSCRIBE_STATUS ) message.what = 999;
+                    else message.what = -999;
+                    mHandler.sendMessage(message);
+                }
+            }
+        }
+    };
+
     private String ServerApkUrl;
     private String ServerVerName;
     private int ServerVerCode;
@@ -683,18 +683,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void realUpdate() {
-//        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
-//        Toast.makeText(this, "关闭服务", Toast.LENGTH_SHORT).show();
-//        serviceItem.setIcon(R.mipmap.ic_startservice);
-//        mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
-//        Intent coreservice_intent = new Intent(this, CoreService.class);
-//        coreservice_intent.setAction(CoreServiceName);
-//        stopService(coreservice_intent);
-//        serviceItem.setTitle(getString(R.string.startservice));
-//        Intent mqttservice_intent = new Intent(this, MqttService.class);
-//        mqttservice_intent.setAction(MqttServiceName);
-//        stopService(mqttservice_intent);
-
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
                 .serverVersionName(ServerVerName)

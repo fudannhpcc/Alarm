@@ -6,17 +6,6 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/start"
-        android:checkable="false"
-        android:enabled="true"
-        android:icon="@drawable/ic_start"
-        android:orderInCategory="100"
-        android:title="@string/start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/setting"
         android:checkable="false"
         android:enabled="true"
