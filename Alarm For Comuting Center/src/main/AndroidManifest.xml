@@ -40,6 +40,7 @@
             android:name=".service.MQTTService"
             android:enabled="true"
             android:exported="true"
+            android:stopWithTask="true"
             android:label="MqttService" >
         </service>
 
@@ -48,6 +49,7 @@
             android:process=":ServiceProcess"
             android:enabled="true"
             android:label="CoreService"
+            android:stopWithTask="true"
             android:exported="true" >
         </service>
 

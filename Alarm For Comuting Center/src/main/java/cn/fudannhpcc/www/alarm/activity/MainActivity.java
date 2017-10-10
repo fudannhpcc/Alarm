@@ -559,7 +559,17 @@ public class MainActivity extends AppCompatActivity {
                 public void onYesClick() {
 //                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
                     CustomDialog.dismiss();
-                    finish();
+                    unbindService(mqttConnection);
+                    mqttBound = false;
+                    Intent coreservice_intent = new Intent(MainActivity.this, CoreService.class);
+                    coreservice_intent.setAction(CoreServiceName);
+                    stopService(coreservice_intent);
+                    Intent mqttservice_intent = new Intent(MainActivity.this, MQTTService.class);
+                    mqttservice_intent.setAction(MqttServiceName);
+                    stopService(mqttservice_intent);
+                    moveTaskToBack(true);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
                 }
             });
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
