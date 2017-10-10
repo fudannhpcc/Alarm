@@ -524,6 +524,27 @@ public class MainActivity extends AppCompatActivity {
                 });
                 queue.add(mJsonObjectRequest);
                 return true;
+            case R.id.restart:
+                Toast.makeText(this, "重启程序", Toast.LENGTH_SHORT).show();
+                unbindService(mqttConnection);
+                mqttBound = false;
+                try {
+                    pahoMqttClient.disconnect(client);
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+                Intent coreservice_intent = new Intent(MainActivity.this, CoreService.class);
+                coreservice_intent.setAction(CoreServiceName);
+                stopService(coreservice_intent);
+                Intent mqttservice_intent = new Intent(MainActivity.this, MQTTService.class);
+                mqttservice_intent.setAction(MqttServiceName);
+                stopService(mqttservice_intent);
+                Intent intent = getBaseContext()
+                               .getPackageManager()
+                               .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
             case R.id.exit:
                 Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));

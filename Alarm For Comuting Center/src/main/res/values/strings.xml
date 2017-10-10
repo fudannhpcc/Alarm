@@ -10,15 +10,16 @@
     <string name="exittitle">退出程序</string>
     <string name="exitmessage">确定要退出吗？</string>
 
-    <string name="startservice">开启后台服务保护</string>
-    <string name="stopservice">停止后台服务保护</string>
+    <string name="startservice">开启服务保护</string>
+    <string name="stopservice">停止服务保护</string>
 
     <string name="setting">设置</string>
         <string name="save">保存</string>
         <string name="back">返回</string>
         <string name="title_activity_setting">设置</string>
     <string name="update">检查更新</string>
-    <string name="exit">退出</string>
+    <string name="restart">重启程序</string>
+    <string name="exit">残忍退出</string>
 
     <string name="listview">设置</string>
         <string name="title_activity_listview">集群报警详情</string>

@@ -50,6 +50,17 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/restart"
+        android:checkable="false"
+        android:enabled="true"
+        android:orderInCategory="200"
+        android:title="@string/restart"
+        android:icon="@mipmap/ic_restart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/exit"
         android:checkable="false"
         android:enabled="true"
