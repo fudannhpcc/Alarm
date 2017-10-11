@@ -1,8 +1,12 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -14,14 +18,18 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
 
+import cn.fudannhpcc.www.alarm.activity.MainActivity;
+
 public class PahoMqttClient {
 
     private static final String TAG = "PahoMqttClient";
     private MqttAndroidClient mqttAndroidClient;
+    Context thiscontext;
 
     public MqttAndroidClient getMqttClient(Context context, String brokerUrl, String clientId) {
 
         mqttAndroidClient = new MqttAndroidClient(context, brokerUrl, clientId);
+        thiscontext = context;
         try {
             IMqttToken token = mqttAndroidClient.connect(getMqttConnectionOption());
             token.setActionCallback(new IMqttActionListener() {
@@ -88,6 +96,7 @@ public class PahoMqttClient {
             public void onSuccess(IMqttToken iMqttToken) {
                 Log.d(TAG, "Subscribe Successfully " + topic);
                 Constants.SUBSCRIBE_STATUS = true;
+                Toast.makeText(thiscontext,"MQTT客户端连接成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override

@@ -79,11 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
-    private Intent intentListViewActivity;
-    private BroadcastReceiver mNetworkReceiver;
-
-    boolean POWERKEY = false;
-    boolean HOMEKEY = false;
 
     static Activity thisActivity = null;
 
@@ -92,120 +87,20 @@ public class MainActivity extends AppCompatActivity {
     private String MqttServiceName = "";
 
     Messenger mqttService = null;
-    Messenger mActivityMessenger = null;
     boolean mqttBound = false;
 
-    ListView mqtt_message_echo;
-    SimpleAdapter mqtt_message_adapter;
-
     String notificationMessage = null;
-    Intent intent;
 
     public static final int WARNINGIMG[] = {R.mipmap.ic_warning0,R.mipmap.ic_warning1,R.mipmap.ic_warning2};
-
 
     public static final String PREFS_NAME = "AppSettings";
 
     private MqttAndroidClient client;
     private PahoMqttClient pahoMqttClient;
-
-    /**
-     * 判断程序是不是第一次启动
-     */
-    private boolean isFirstStart() {
-        SharedPreferences sprefs = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean isFirstRun = sprefs.getBoolean("First_Start", true);
-        SharedPreferences.Editor Editor = sprefs.edit();
-        if (isFirstRun) {
-            Editor.putBoolean("First_Start", false);
-            Editor.putString(getString(R.string.connection_hostname), "fudannhpcc.cn");
-            Editor.putBoolean(getString(R.string.connection_protocol_tcp), true);
-            Editor.putBoolean(getString(R.string.connection_protocol_ssl), false);
-            Editor.putBoolean(getString(R.string.connection_protocol_xyz), false);
-            Editor.putString(getString(R.string.connection_port), "18883");
-            Editor.putString(getString(R.string.connection_username), "nhpcc");
-            Editor.putString(getString(R.string.connection_password), "rtfu2002");
-            Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/alarm/");
-            Editor.putBoolean(getString(R.string.connection_in_background), true);
-            Editor.putBoolean(getString(R.string.connection_server_mode), true);
-            Editor.putString(getString(R.string.connection_server_topic), "");
-            Editor.putInt(getString(R.string.connection_keep_alive), 30);
-            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 60000);
-            Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
-            Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
-            Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
-            if (!Editor.commit()) {
-                Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
-            }
-            Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
-            Constants.USERNAME = "nhpcc";
-            Constants.PASSWORD = "rtfu2002";
-            Constants.KEEPALIVEINTERVAL = 60000;
-            Constants.CONNECTIONTIMEOUT = 5000;
-            Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
-            Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
-        }
-        else {
-            Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
-            Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
-            Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
-            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 60000);
-            Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
-            Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
-            Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
-        }
-        Constants.CLIENT_ID = getRandomString(8);
-        return isFirstRun;
-    }
-
-    public static String getRandomString(int length){
-        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random random=new Random();
-        StringBuffer sb=new StringBuffer();
-        for(int i=0;i<length;i++){
-            int number=random.nextInt(52);
-            sb.append(str.charAt(number));
-        }
-        return sb.toString();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if (isFirstStart()) {
-            Log.d(PREFS_NAME, "程序是第一次运行");
-        } else {
-            Log.d(PREFS_NAME, "程序非第一次运行");
-        }
-
-        MqttClientTimer.schedule(task, 0, 2000);
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
-                Constants.UPDATE_URL + "/updatecheck.json",
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            ServerApkUrl = response.getString("url");
-                            ServerVerCode = response.getInt("verCode");
-                            ServerVerName = response.getString("verName");
-                            ServerUpdateMessage = response.getString("updateMessage");
-                            checkAndUpdate(true);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("TAG", error.getMessage());
-            }
-        });
-        queue.add(mJsonObjectRequest);
 
         init();
 
@@ -226,47 +121,13 @@ public class MainActivity extends AppCompatActivity {
 
         mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
 
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             notificationMessage = extras.getString("NotificationMessage");
-//            mqtt_message_echo.setText(notificationMessage);
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
 
-    }
-
-    private HomeKeyObserver mHomeKeyObserver;
-    private PowerKeyObserver mPowerKeyObserver;
-    private void init() {
-        mHomeKeyObserver = new HomeKeyObserver(this);
-        mHomeKeyObserver.setHomeKeyListener(new HomeKeyObserver.OnHomeKeyListener() {
-            @Override
-            public void onHomeKeyPressed() {
-                System.out.println("----> 按下Home键");
-                HOMEKEY = true;
-            }
-
-            @Override
-            public void onHomeKeyLongPressed() {
-                System.out.println("----> 长按Home键");
-                HOMEKEY = true;
-            }
-        });
-        mHomeKeyObserver.startListen();
-
-        //////////////////////////////////////////
-
-        mPowerKeyObserver = new PowerKeyObserver(this);
-        mPowerKeyObserver.setHomeKeyListener(new PowerKeyObserver.OnPowerKeyListener() {
-            @Override
-            public void onPowerKeyPressed() {
-                System.out.println("----> 按下电源键");
-                POWERKEY = true;
-            }
-        });
-        mPowerKeyObserver.startListen();
     }
 
     boolean monStart = false;
@@ -274,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         monStart = true;
-        Log.d("onStart()","HELLO:" + String.valueOf(monStart));
     }
 
     boolean monResume = false;
@@ -286,10 +146,7 @@ public class MainActivity extends AppCompatActivity {
             monResume = true;
         }catch (Exception e) {
         }
-
         monResume = true;
-        Log.d("onResume()","HELLO:" + String.valueOf(monResume));
-
         super.onResume();
     }
 
@@ -297,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         monPause = true;
-        Log.d("onPause()","HELLO:" + String.valueOf(monPause));
         super.onPause();
     }
 
@@ -306,108 +162,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         monStop = true;
-//        Log.d("onStop()","HELLO:" + String.valueOf(monStop));
-//        // Unbind from the service
         if ( POWERKEY || HOMEKEY ) mqttBound = false;
-        Log.d("onStop()","HELLO:" + String.valueOf(mqttBound));
         if (mqttBound) {
             unbindService(mqttConnection);
             mqttBound = false;
         }
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
-    private static final int SEND_MESSAGE_CODE = 0x0001;
-    private static final int RECEIVE_MESSAGE_CODE = 0x0002;
-
-    private ServiceConnection mqttConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mqttService = new Messenger(service);
-            mqttBound = true;
-
-            String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
-
-            Message message = Message.obtain();
-            message.what = SEND_MESSAGE_CODE;
-            Bundle data = new Bundle();
-            int clickNotification = -999;
-            if (!monPause) clickNotification = 0;
-            data.putInt("pendingNotificationsCount", clickNotification);
-            message.setData(data);
-            message.replyTo = mActivityMessenger;
-            try {
-                Log.d("DemoLog-Client", "客户端向service发送信息");
-                mqttService.send(message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-                Log.d("DemoLog", "客户端向service发送消息失败: " + e.getMessage());
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-//            Log.d("onServiceDisconnected","HELLO");
-            mqttService = null;
-            mqttBound = false;
-        }
-    };
-
-
-    private Handler mMessengerHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-//            Log.d("DemoLog-Client", "ClientHandler -> handleMessage");
-            if(msg.what == RECEIVE_MESSAGE_CODE){
-                Bundle data = msg.getData();
-                if(data != null){
-                    ArrayList<HashMap<String, Object>> mNotificationList =
-                            (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
-                    UpdateListView(mNotificationList);
-                }
-            }
-            super.handleMessage(msg);
-        }
-    };
-
-    private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        assert mNotificationList != null;
-        for (HashMap<String, Object> tempMap : mNotificationList) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            Set<String> set = tempMap.keySet();
-            int WARNINGID = 0;
-            for (String s : set) {
-                if ( s == "warningid") WARNINGID = (int)tempMap.get(s);
-                else map.put(s, String.valueOf(tempMap.get(s)));
-            }
-            if ( WARNINGID > 0 ) map.put("img", WARNINGIMG[WARNINGID-1]);
-            else map.put("img", WARNINGIMG[0]);
-            list.add(map);
-        }
-        Collections.reverse(list);
-        mqtt_message_adapter = new SimpleAdapter(this, list,
-                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "message" },
-                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
-        mqtt_message_adapter.notifyDataSetChanged();
-        mqtt_message_echo.setAdapter(mqtt_message_adapter);
-
-        mqtt_message_echo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, Object> objItem = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
-                intentListViewActivity = new Intent(MainActivity.this, ListViewActivity.class);
-                intentListViewActivity.putExtra("listviewItem", objItem);
-                startActivity(intentListViewActivity);
-            }
-        });
-
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("onDestroy","HELLO");
         if (mqttBound) {
             unbindService(mqttConnection);
             mqttBound = false;
@@ -487,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("TAG", error.getMessage());
                     }
                 });
                 queue.add(mJsonObjectRequest);
@@ -508,8 +271,8 @@ public class MainActivity extends AppCompatActivity {
                 mqttservice_intent.setAction(MqttServiceName);
                 stopService(mqttservice_intent);
                 Intent intent = getBaseContext()
-                               .getPackageManager()
-                               .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                        .getPackageManager()
+                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
@@ -539,6 +302,255 @@ public class MainActivity extends AppCompatActivity {
         return super.onMenuOpened(featureId, menu);
     }
 
+    private HomeKeyObserver mHomeKeyObserver;
+    private PowerKeyObserver mPowerKeyObserver;
+    Timer MqttClientTimer = new Timer();
+    boolean HOMEKEY = false;
+    boolean POWERKEY = false;
+
+    private void init() {
+        /*  判断是否第一次启动程序 */
+        if (isFirstStart()) {
+        } else {
+        }
+
+        /*  启动MQTT客户端连接 */
+        MqttClientTimer.schedule(task, 0, 10000);
+
+        /*  检查是否有新版本出来 */
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
+                Constants.UPDATE_URL + "/updatecheck.json",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            ServerApkUrl = response.getString("url");
+                            ServerVerCode = response.getInt("verCode");
+                            ServerVerName = response.getString("verName");
+                            ServerUpdateMessage = response.getString("updateMessage");
+                            checkAndUpdate(true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        queue.add(mJsonObjectRequest);
+
+
+        /*  锁定 Home 键 */
+        mHomeKeyObserver = new HomeKeyObserver(this);
+        mHomeKeyObserver.setHomeKeyListener(new HomeKeyObserver.OnHomeKeyListener() {
+            @Override
+            public void onHomeKeyPressed() {
+                System.out.println("----> 按下Home键");
+                HOMEKEY = true;
+            }
+
+            @Override
+            public void onHomeKeyLongPressed() {
+                System.out.println("----> 长按Home键");
+                HOMEKEY = true;
+            }
+        });
+        mHomeKeyObserver.startListen();
+
+        /*  锁定 Power 键 */
+        mPowerKeyObserver = new PowerKeyObserver(this);
+        mPowerKeyObserver.setHomeKeyListener(new PowerKeyObserver.OnPowerKeyListener() {
+            @Override
+            public void onPowerKeyPressed() {
+                System.out.println("----> 按下电源键");
+                POWERKEY = true;
+            }
+        });
+        mPowerKeyObserver.startListen();
+    }
+
+    /* 开始： 判断程序是不是第一次启动 */
+    private boolean isFirstStart() {
+        SharedPreferences sprefs = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean isFirstRun = sprefs.getBoolean("First_Start", true);
+        SharedPreferences.Editor Editor = sprefs.edit();
+        if (isFirstRun) {
+            Editor.putBoolean("First_Start", false);
+            Editor.putString(getString(R.string.connection_hostname), "fudannhpcc.cn");
+            Editor.putBoolean(getString(R.string.connection_protocol_tcp), true);
+            Editor.putBoolean(getString(R.string.connection_protocol_ssl), false);
+            Editor.putBoolean(getString(R.string.connection_protocol_xyz), false);
+            Editor.putString(getString(R.string.connection_port), "18883");
+            Editor.putString(getString(R.string.connection_username), "nhpcc");
+            Editor.putString(getString(R.string.connection_password), "rtfu2002");
+            Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/alarm/");
+            Editor.putBoolean(getString(R.string.connection_in_background), true);
+            Editor.putBoolean(getString(R.string.connection_server_mode), true);
+            Editor.putString(getString(R.string.connection_server_topic), "");
+            Editor.putInt(getString(R.string.connection_keep_alive), 30);
+            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 60000);
+            Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
+            Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
+            Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
+            if (!Editor.commit()) {
+                Toast.makeText(this, "commit failure!!!", Toast.LENGTH_SHORT).show();
+            }
+            Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
+            Constants.USERNAME = "nhpcc";
+            Constants.PASSWORD = "rtfu2002";
+            Constants.KEEPALIVEINTERVAL = 60000;
+            Constants.CONNECTIONTIMEOUT = 5000;
+            Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
+            Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
+        }
+        else {
+            Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
+            Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
+            Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
+            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 60000);
+            Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
+            Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
+            Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
+        }
+        Constants.CLIENT_ID = getRandomString(8);
+        return isFirstRun;
+    }
+
+    public static String getRandomString(int length){
+        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random=new Random();
+        StringBuffer sb=new StringBuffer();
+        for(int i=0;i<length;i++){
+            int number=random.nextInt(52);
+            sb.append(str.charAt(number));
+        }
+        return sb.toString();
+    }
+    /* 结束： 判断程序是不是第一次启动 */
+
+    /* 开始： MQTT客户端连接认证 */
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            if ( mqttBound ) {
+                String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
+                if (!topic.isEmpty()) {
+                    try {
+                        pahoMqttClient.subscribe(client, topic, 1);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                    Message message = new Message();
+                    if ( Constants.SUBSCRIBE_STATUS ) message.what = 999;
+                    else message.what = -999;
+                    mHandler.sendMessage(message);
+                }
+            }
+        }
+    };
+    Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 999) {
+                MqttClientTimer.cancel();
+            }
+            super.handleMessage(msg);
+        }
+    };
+    /* 结束： MQTT客户端连接认证 */
+
+    /*  开始： 绑定服务通讯 */
+    Messenger mActivityMessenger = null;
+    private static final int SEND_MESSAGE_CODE = 0x0001;
+    private static final int RECEIVE_MESSAGE_CODE = 0x0002;
+
+    private ServiceConnection mqttConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mqttService = new Messenger(service);
+            mqttBound = true;
+
+            String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
+
+            Message message = Message.obtain();
+            message.what = SEND_MESSAGE_CODE;
+            Bundle data = new Bundle();
+            int clickNotification = -999;
+            if (!monPause) clickNotification = 0;
+            data.putInt("pendingNotificationsCount", clickNotification);
+            message.setData(data);
+            message.replyTo = mActivityMessenger;
+            try {
+                mqttService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mqttService = null;
+            mqttBound = false;
+        }
+    };
+
+
+    private Handler mMessengerHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == RECEIVE_MESSAGE_CODE){
+                Bundle data = msg.getData();
+                if(data != null){
+                    ArrayList<HashMap<String, Object>> mNotificationList =
+                            (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                    UpdateListView(mNotificationList);
+                }
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    ListView mqtt_message_echo;
+    SimpleAdapter mqtt_message_adapter;
+    private Intent intentListViewActivity;
+    private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        assert mNotificationList != null;
+        for (HashMap<String, Object> tempMap : mNotificationList) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            Set<String> set = tempMap.keySet();
+            int WARNINGID = 0;
+            for (String s : set) {
+                if ( s == "warningid") WARNINGID = (int)tempMap.get(s);
+                else map.put(s, String.valueOf(tempMap.get(s)));
+            }
+            if ( WARNINGID > 0 ) map.put("img", WARNINGIMG[WARNINGID-1]);
+            else map.put("img", WARNINGIMG[0]);
+            list.add(map);
+        }
+        Collections.reverse(list);
+        mqtt_message_adapter = new SimpleAdapter(this, list,
+                R.layout.activity_list_item, new String[] { "img", "title", "datetime", "message" },
+                new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
+        mqtt_message_adapter.notifyDataSetChanged();
+        mqtt_message_echo.setAdapter(mqtt_message_adapter);
+
+        mqtt_message_echo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String, Object> objItem = (HashMap<String, Object>) mqtt_message_adapter.getItem(position);
+                intentListViewActivity = new Intent(MainActivity.this, ListViewActivity.class);
+                intentListViewActivity.putExtra("listviewItem", objItem);
+                startActivity(intentListViewActivity);
+            }
+        });
+
+    }
+    /*  结束： 绑定服务通讯 */
+
+    /* 开始： 退出对话框 */
     public void showChangeLangDialog(String title, String message) {
         CustomDialog = new CustomDialog(MainActivity.this);
         CustomDialog.setTitle(title);
@@ -546,7 +558,6 @@ public class MainActivity extends AppCompatActivity {
             CustomDialog.setYesOnclickListener("确定", new CustomDialog.onYesOnclickListener() {
                 @Override
                 public void onYesClick() {
-//                Toast.makeText(MainActivity.this,"点击了--确定--按钮",Toast.LENGTH_LONG).show();
                     CustomDialog.dismiss();
                     unbindService(mqttConnection);
                     mqttBound = false;
@@ -564,13 +575,15 @@ public class MainActivity extends AppCompatActivity {
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
             @Override
             public void onNoClick() {
-//                Toast.makeText(MainActivity.this,"点击了--取消--按钮",Toast.LENGTH_LONG).show();
                 CustomDialog.dismiss();
             }
         });
         CustomDialog.show();
     }
+    /* 结束： 退出对话框 */
 
+    /* 开始： 监控网络状况 */
+    private BroadcastReceiver mNetworkReceiver;
     private void registerNetworkBroadcastForNougat() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -587,39 +600,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    /* 结束： 监控网络状况 */
 
-    Handler mHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            if (msg.what == 999) {
-                MqttClientTimer.cancel();
-            }
-            super.handleMessage(msg);
-        }
-    };
 
-    Timer MqttClientTimer = new Timer();
-    TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-            if ( mqttBound ) {
-                String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
-                Log.d("MqttService", topic);
-                if (!topic.isEmpty()) {
-                    try {
-                        pahoMqttClient.subscribe(client, topic, 1);
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("MqttService", String.valueOf(Constants.SUBSCRIBE_STATUS));
-                    Message message = new Message();
-                    if ( Constants.SUBSCRIBE_STATUS ) message.what = 999;
-                    else message.what = -999;
-                    mHandler.sendMessage(message);
-                }
-            }
-        }
-    };
-
+    /* 开始： 程序更新 */
     private String ServerApkUrl;
     private String ServerVerName;
     private int ServerVerCode;
@@ -720,6 +704,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+    /* 结束： 程序更新 */
 
 }
