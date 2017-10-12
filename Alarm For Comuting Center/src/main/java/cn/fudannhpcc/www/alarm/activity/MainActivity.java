@@ -255,27 +255,6 @@ public class MainActivity extends AppCompatActivity {
                 });
                 queue.add(mJsonObjectRequest);
                 return true;
-            case R.id.restart:
-                Toast.makeText(this, "重启程序", Toast.LENGTH_SHORT).show();
-                unbindService(mqttConnection);
-                mqttBound = false;
-                try {
-                    pahoMqttClient.disconnect(client);
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                }
-                Intent coreservice_intent = new Intent(MainActivity.this, CoreService.class);
-                coreservice_intent.setAction(CoreServiceName);
-                stopService(coreservice_intent);
-                Intent mqttservice_intent = new Intent(MainActivity.this, MQTTService.class);
-                mqttservice_intent.setAction(MqttServiceName);
-                stopService(mqttservice_intent);
-                Intent intent = getBaseContext()
-                        .getPackageManager()
-                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
             case R.id.exit:
                 Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
@@ -382,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
             Editor.putString(getString(R.string.connection_hostname), "fudannhpcc.cn");
             Editor.putBoolean(getString(R.string.connection_protocol_tcp), true);
             Editor.putBoolean(getString(R.string.connection_protocol_ssl), false);
-            Editor.putBoolean(getString(R.string.connection_protocol_xyz), false);
+            Editor.putBoolean(getString(R.string.connection_protocol_tls), false);
             Editor.putString(getString(R.string.connection_port), "18883");
             Editor.putString(getString(R.string.connection_username), "nhpcc");
             Editor.putString(getString(R.string.connection_password), "rtfu2002");
@@ -391,8 +370,6 @@ public class MainActivity extends AppCompatActivity {
             Editor.putBoolean(getString(R.string.connection_server_mode), true);
             Editor.putString(getString(R.string.connection_server_topic), "");
             Editor.putInt(getString(R.string.connection_keep_alive), 30);
-            Editor.putInt(getString(R.string.connection_tcp_keep_alive), 60000);
-            Editor.putInt(getString(R.string.connection_tcp_timeout), 5000);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");
             Editor.putString(getString(R.string.connection_update_url), "http://www.fudannhpcc.cn/apkupdate");
             if (!Editor.commit()) {
@@ -401,8 +378,6 @@ public class MainActivity extends AppCompatActivity {
             Constants.SUBSCRIBE_TOPIC = "fudannhpcc/alarm/";
             Constants.USERNAME = "nhpcc";
             Constants.PASSWORD = "rtfu2002";
-            Constants.KEEPALIVEINTERVAL = 60000;
-            Constants.CONNECTIONTIMEOUT = 5000;
             Constants.MQTT_BROKER_URL = "tcp://fudannhpcc.cn:18883";
             Constants.UPDATE_URL = "http://www.fudannhpcc.cn/apkupdate";
         }
@@ -410,8 +385,6 @@ public class MainActivity extends AppCompatActivity {
             Constants.SUBSCRIBE_TOPIC = sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),"fudannhpcc/alarm/");
             Constants.USERNAME = sprefs.getString(getString(R.string.connection_username),"nhpcc");
             Constants.PASSWORD = sprefs.getString(getString(R.string.connection_password),"rtfu2002");
-            Constants.KEEPALIVEINTERVAL = sprefs.getInt(getString(R.string.connection_tcp_keep_alive), 60000);
-            Constants.CONNECTIONTIMEOUT = sprefs.getInt(getString(R.string.connection_tcp_timeout), 5000);
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
             Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
         }

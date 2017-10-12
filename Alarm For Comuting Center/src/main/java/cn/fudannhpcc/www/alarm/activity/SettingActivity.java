@@ -32,8 +32,6 @@ public class SettingActivity extends AppCompatActivity {
     private CheckBox server_mode;
     private EditText server_topic;
     private EditText keep_alive;
-    private EditText tcp_keep_alive;
-    private EditText tcp_timeout;
     private EditText updateurl;
 
     private String mqtt_protocol = "";
@@ -46,7 +44,7 @@ public class SettingActivity extends AppCompatActivity {
         hostname = (EditText) findViewById(R.id.editText_hostname);
         protocol_tcp = (CheckBox) findViewById(R.id.checkBox_tcp_protocol);
         protocol_ssl = (CheckBox) findViewById(R.id.checkBox_ssl_protocol);
-        protocol_xyz = (CheckBox) findViewById(R.id.checkBox_xyz_protocol);
+        protocol_xyz = (CheckBox) findViewById(R.id.checkBox_tls_protocol);
         port = (EditText) findViewById(R.id.editText_port);
         username = (EditText) findViewById(R.id.editText_username);
         password = (EditText) findViewById(R.id.editText_password);
@@ -55,15 +53,13 @@ public class SettingActivity extends AppCompatActivity {
         server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
         server_topic = (EditText) findViewById(R.id.editText_server_topic);
         keep_alive = (EditText) findViewById(R.id.editText_keep_alive);
-        tcp_keep_alive = (EditText) findViewById(R.id.editText_tcp_keep_alive);
-        tcp_timeout = (EditText) findViewById(R.id.editText_tcp_timeout);
         updateurl = (EditText) findViewById(R.id.editText_updateurl);
 
         SharedPreferences sprefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         hostname.setText(sprefs.getString(getString(R.string.connection_hostname),""));
         protocol_tcp.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_tcp),false));
         protocol_ssl.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_ssl),false));
-        protocol_xyz.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_xyz),false));
+        protocol_xyz.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_tls),false));
         port.setText(sprefs.getString(getString(R.string.connection_port),""));
         username.setText(sprefs.getString(getString(R.string.connection_username),""));
         password.setText(sprefs.getString(getString(R.string.connection_password),""));
@@ -72,8 +68,6 @@ public class SettingActivity extends AppCompatActivity {
         server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
         keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),30)));
-        tcp_keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_tcp_keep_alive),60000)));
-        tcp_timeout.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_tcp_timeout),5000)));
         updateurl.setText(sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate"));
 
         if (protocol_tcp.isChecked()) mqtt_protocol = "tcp://";
@@ -136,7 +130,7 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_hostname), hostname.getText().toString().replace(" ", ""));
                 Editor.putBoolean(getString(R.string.connection_protocol_tcp), protocol_tcp.isChecked());
                 Editor.putBoolean(getString(R.string.connection_protocol_ssl), protocol_ssl.isChecked());
-                Editor.putBoolean(getString(R.string.connection_protocol_xyz), protocol_xyz.isChecked());
+                Editor.putBoolean(getString(R.string.connection_protocol_tls), protocol_xyz.isChecked());
                 Editor.putString(getString(R.string.connection_port), port.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_username), username.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_password), password.getText().toString().replace(" ", ""));
@@ -145,8 +139,6 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putBoolean(getString(R.string.connection_server_mode), server_mode.isChecked());
                 Editor.putString(getString(R.string.connection_server_topic), server_topic.getText().toString().replace(" ", ""));
                 Editor.putInt(getString(R.string.connection_keep_alive), Integer.parseInt(keep_alive.getText().toString().replace(" ", "")));
-                Editor.putInt(getString(R.string.connection_tcp_keep_alive), Integer.parseInt(tcp_keep_alive.getText().toString().replace(" ", "")));
-                Editor.putInt(getString(R.string.connection_tcp_timeout), Integer.parseInt(tcp_timeout.getText().toString().replace(" ", "")));
                 Editor.putString(getString(R.string.connection_update_url), updateurl.getText().toString().replace(" ", ""));
                 if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_xyz.isChecked() ) {
                     String errmsg = "网络协议必须选择一个";
@@ -175,8 +167,6 @@ public class SettingActivity extends AppCompatActivity {
                 Constants.SUBSCRIBE_TOPIC = push_notifications_subscribe_topic.getText().toString().replace(" ", "");
                 Constants.USERNAME = username.getText().toString().replace(" ", "");
                 Constants.PASSWORD = password.getText().toString().replace(" ", "");
-                Constants.KEEPALIVEINTERVAL = Integer.parseInt(tcp_keep_alive.getText().toString().replace(" ", ""));
-                Constants.CONNECTIONTIMEOUT = Integer.parseInt(tcp_timeout.getText().toString().replace(" ", ""));
                 Constants.MQTT_BROKER_URL = connection_mqtt_server;
                 Constants.UPDATE_URL = updateurl.getText().toString().replace(" ", "");
                 if (!Editor.commit()) {

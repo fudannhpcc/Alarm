@@ -217,7 +217,7 @@ public class MQTTService extends Service {
         sprefsMap.put("connection_hostname",sprefs.getString(getString(R.string.connection_hostname), ""));
         sprefsMap.put("connection_protocol_tcp",sprefs.getBoolean(getString(R.string.connection_protocol_tcp), false));
         sprefsMap.put("connection_protocol_ssl",sprefs.getBoolean(getString(R.string.connection_protocol_ssl), false));
-        sprefsMap.put("connection_protocol_xyz",sprefs.getBoolean(getString(R.string.connection_protocol_xyz), false));
+        sprefsMap.put("connection_protocol_xyz",sprefs.getBoolean(getString(R.string.connection_protocol_tls), false));
         sprefsMap.put("connection_port",sprefs.getString(getString(R.string.connection_port), ""));
         sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
         sprefsMap.put("connection_password",sprefs.getString(getString(R.string.connection_password), ""));
