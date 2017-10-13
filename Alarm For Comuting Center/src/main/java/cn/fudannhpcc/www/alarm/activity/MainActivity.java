@@ -47,6 +47,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -290,7 +291,9 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
+            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
         } else {
+            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
 
         /*  启动MQTT客户端连接 */
@@ -637,7 +640,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static void trimCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            if (dir != null && dir.isDirectory()) {
+                deleteDir(dir);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
     private void realUpdate() {
+        SharedPreferences sprefs = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sprefs.edit();
+        editor.clear();
+        editor.commit();
+        trimCache(MainActivity.this);
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
                 .serverVersionName(ServerVerName)
