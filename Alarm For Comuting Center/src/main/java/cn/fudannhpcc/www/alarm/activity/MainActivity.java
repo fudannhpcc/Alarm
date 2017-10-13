@@ -24,6 +24,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -119,10 +120,13 @@ public class MainActivity extends AppCompatActivity {
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
+        Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
+        Intent coreservice_intent = new Intent(this, CoreService.class);
+        coreservice_intent.setAction(CoreServiceName);
+        startService(coreservice_intent);
+
         CoreServiceName = getString(R.string.core_service_name);
         MqttServiceName = getString(R.string.mqtt_service_name);
-
-        isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
 
         mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
 
@@ -203,6 +207,11 @@ public class MainActivity extends AppCompatActivity {
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
         }
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -415,6 +424,8 @@ public class MainActivity extends AppCompatActivity {
     TimerTask task = new TimerTask() {
         @Override
         public void run() {
+            isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
+            invalidateOptionsMenu();
             if ( mqttBound ) {
                 String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
                 if (!topic.isEmpty()) {

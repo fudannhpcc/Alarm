@@ -96,14 +96,14 @@ public class PahoMqttClient {
             public void onSuccess(IMqttToken iMqttToken) {
                 Log.d(TAG, "Subscribe Successfully " + topic);
                 Constants.SUBSCRIBE_STATUS = true;
-                Toast.makeText(thiscontext,"MQTT客户端连接成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(thiscontext,"MQTT客户端连接成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
                 Log.e(TAG, "MQTT客户端连接失败 " + topic);
                 Constants.SUBSCRIBE_STATUS = false;
-                Toast.makeText(thiscontext,"MQTT客户端连接失败", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(thiscontext,"MQTT客户端连接失败", Toast.LENGTH_SHORT).show();
             }
         });
     }
