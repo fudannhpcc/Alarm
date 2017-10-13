@@ -28,8 +28,6 @@ public class SettingActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private EditText push_notifications_subscribe_topic;
-    private CheckBox in_background;
-    private CheckBox server_mode;
     private EditText server_topic;
     private EditText keep_alive;
     private EditText updateurl;
@@ -49,8 +47,6 @@ public class SettingActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.editText_username);
         password = (EditText) findViewById(R.id.editText_password);
         push_notifications_subscribe_topic = (EditText) findViewById(R.id.editText_push_notifications_subscribe_topic);
-        in_background = (CheckBox) findViewById(R.id.checkBox_connection_in_background);
-        server_mode = (CheckBox) findViewById(R.id.checkBox_server_mode);
         server_topic = (EditText) findViewById(R.id.editText_server_topic);
         keep_alive = (EditText) findViewById(R.id.editText_keep_alive);
         updateurl = (EditText) findViewById(R.id.editText_updateurl);
@@ -64,8 +60,6 @@ public class SettingActivity extends AppCompatActivity {
         username.setText(sprefs.getString(getString(R.string.connection_username),""));
         password.setText(sprefs.getString(getString(R.string.connection_password),""));
         push_notifications_subscribe_topic.setText(sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic),""));
-        in_background.setChecked(sprefs.getBoolean(getString(R.string.connection_in_background),false));
-        server_mode.setChecked(sprefs.getBoolean(getString(R.string.connection_server_mode),false));
         server_topic.setText(sprefs.getString(getString(R.string.connection_server_topic),""));
         keep_alive.setText(String.valueOf(sprefs.getInt(getString(R.string.connection_keep_alive),30)));
         updateurl.setText(sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate"));
@@ -135,8 +129,6 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_username), username.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_password), password.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), push_notifications_subscribe_topic.getText().toString().replace(" ", ""));
-                Editor.putBoolean(getString(R.string.connection_in_background), in_background.isChecked());
-                Editor.putBoolean(getString(R.string.connection_server_mode), server_mode.isChecked());
                 Editor.putString(getString(R.string.connection_server_topic), server_topic.getText().toString().replace(" ", ""));
                 Editor.putInt(getString(R.string.connection_keep_alive), Integer.parseInt(keep_alive.getText().toString().replace(" ", "")));
                 Editor.putString(getString(R.string.connection_update_url), updateurl.getText().toString().replace(" ", ""));

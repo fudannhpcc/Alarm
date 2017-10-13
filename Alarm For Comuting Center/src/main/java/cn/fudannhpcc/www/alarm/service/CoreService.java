@@ -92,8 +92,6 @@ public class CoreService extends Service {
         sprefsMap.put("connection_server_topic",sprefs.getString(getString(R.string.connection_server_topic), ""));
         sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
         sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
-        sprefsMap.put("connection_in_background",sprefs.getBoolean(getString(R.string.connection_in_background), false));
-        sprefsMap.put("connection_server_mode",sprefs.getBoolean(getString(R.string.connection_server_mode), false));
         sprefsMap.put("connection_keep_alive",sprefs.getInt(getString(R.string.connection_keep_alive), 60));
         if (sprefsMap.get("connection_hostname").equals("")) {
             sprefsMap.put("connection_hostname","fudannhpcc.cn");

@@ -42,8 +42,8 @@
         <string name="server_mode">系统服务模式</string>
         <string name="server_topic">发布主题</string>
             <string name="editText_server_topic_hint">fudannhpcc/cluster/#</string>
-        <string name="keep_alive">服务保活间隔（秒）</string>
-            <string name="editText_keep_alive_hint">60</string>
+        <string name="keep_alive">服务保活间隔</string>
+            <string name="editText_keep_alive_hint">30</string>
         <string name="updateurl">更新站点</string>
             <string name="editText_updateurl_hint">http://www.fudannhpcc.cn/apkupdate</string>
 
@@ -77,10 +77,6 @@
     <string name="connection_password">connection_password</string>
     <string name="connection_push_notifications_subscribe_topic">connection_push_notifications_subscribe_topic</string>
     <string name="connection_keep_alive">connection_keep_alive</string>
-    <string name="connection_tcp_keep_alive">connection_tcp_keep_alive</string>
-    <string name="connection_tcp_timeout">connection_tcp_timeout</string>
-    <string name="connection_in_background">connection_in_background</string>
-    <string name="connection_server_mode">connection_server_mode</string>
     <string name="connection_server_topic">connection_server_topic</string>
     <string name="connection_mqtt_server">connection_mqtt_server</string>
     <string name="connection_update_url">connection_update_url</string>

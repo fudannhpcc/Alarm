@@ -366,8 +366,6 @@ public class MainActivity extends AppCompatActivity {
             Editor.putString(getString(R.string.connection_username), "nhpcc");
             Editor.putString(getString(R.string.connection_password), "rtfu2002");
             Editor.putString(getString(R.string.connection_push_notifications_subscribe_topic), "fudannhpcc/alarm/");
-            Editor.putBoolean(getString(R.string.connection_in_background), true);
-            Editor.putBoolean(getString(R.string.connection_server_mode), true);
             Editor.putString(getString(R.string.connection_server_topic), "");
             Editor.putInt(getString(R.string.connection_keep_alive), 30);
             Editor.putString(getString(R.string.connection_mqtt_server), "tcp://fudannhpcc.cn:18883");

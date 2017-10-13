@@ -33,7 +33,7 @@
                 android:orientation="horizontal">
                 <TextView
                     android:id="@+id/textView_hostname"
-                    android:layout_width="96dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:text="@string/hostname"
@@ -55,7 +55,7 @@
                 android:orientation="horizontal">
                 <TextView
                     android:id="@+id/textView_server"
-                    android:layout_width="96dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:text="@string/protocol"
@@ -96,7 +96,7 @@
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/textView_port"
-                android:layout_width="96dp"
+                android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:text="@string/port"
@@ -118,7 +118,7 @@
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/textView_username"
-                android:layout_width="96dp"
+                android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:text="@string/username"
@@ -140,7 +140,7 @@
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/textView_password"
-                android:layout_width="96dp"
+                android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:text="@string/password"
@@ -162,7 +162,7 @@
             android:layout_height="match_parent">
             <TextView
                 android:id="@+id/textView_push_notifications_subscribe_topic"
-                android:layout_width="96dp"
+                android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:text="@string/sub_topic"
@@ -178,32 +178,12 @@
                 android:textSize="14sp" />
         </LinearLayout>
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical|center_horizontal"
-                android:orientation="horizontal">
-                <CheckBox
-                    android:id="@+id/checkBox_connection_in_background"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="false"
-                    android:text="@string/keep_connection_in_the_background_for_receiving_push_notifications"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <CheckBox
-                    android:id="@+id/checkBox_server_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="false"
-                    android:text="@string/server_mode"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-            <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/textView_server_topic"
-                    android:layout_width="96dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:text="@string/server_topic"
@@ -224,7 +204,7 @@
                 android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/textView_keep_alive"
-                    android:layout_width="96dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:text="@string/keep_alive"
@@ -245,7 +225,7 @@
                 android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/textView_updateurl"
-                    android:layout_width="96dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:text="@string/updateurl"

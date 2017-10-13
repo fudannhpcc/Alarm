@@ -223,8 +223,6 @@ public class MQTTService extends Service {
         sprefsMap.put("connection_password",sprefs.getString(getString(R.string.connection_password), ""));
         sprefsMap.put("connection_push_notifications_subscribe_topic",sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), ""));
         sprefsMap.put("connection_server_topic",sprefs.getString(getString(R.string.connection_server_topic), ""));
-        sprefsMap.put("connection_in_background",sprefs.getBoolean(getString(R.string.connection_in_background), false));
-        sprefsMap.put("connection_server_mode",sprefs.getBoolean(getString(R.string.connection_server_mode), false));
         sprefsMap.put("connection_mqtt_server",sprefs.getString(getString(R.string.connection_mqtt_server), ""));
         if (sprefsMap.get("connection_hostname").equals("")) {
             sprefsMap.put("connection_hostname","fudannhpcc.cn");
