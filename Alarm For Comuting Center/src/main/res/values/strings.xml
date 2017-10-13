@@ -38,8 +38,6 @@
             <string name="textEdit_password_hint">rtfu2002</string>
         <string name="sub_topic">订阅主题</string>
             <string name="textEdit_sub_topic_hint">fudannhpcc/warning/#</string>
-        <string name="keep_connection_in_the_background_for_receiving_push_notifications">后台保持连接接收通知</string>
-        <string name="server_mode">系统服务模式</string>
         <string name="server_topic">发布主题</string>
             <string name="editText_server_topic_hint">fudannhpcc/cluster/#</string>
         <string name="keep_alive">服务保活间隔</string>

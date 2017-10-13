@@ -43,7 +43,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -291,9 +295,9 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
-            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
 
         /*  启动MQTT客户端连接 */
@@ -406,6 +410,8 @@ public class MainActivity extends AppCompatActivity {
     /* 结束： 判断程序是不是第一次启动 */
 
     /* 开始： MQTT客户端连接认证 */
+
+
     TimerTask task = new TimerTask() {
         @Override
         public void run() {
@@ -414,6 +420,32 @@ public class MainActivity extends AppCompatActivity {
                 if (!topic.isEmpty()) {
                     try {
                         pahoMqttClient.subscribe(client, topic, 1);
+                        client.setCallback(new MqttCallbackExtended() {
+                            @Override
+                            public void connectComplete(boolean reconnect, String serverURI) {
+                                if (reconnect) {
+                                    String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
+                                    try {
+                                        pahoMqttClient.subscribe(client, topic, 1);
+                                    } catch (MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                }
+                            }
+
+                            @Override
+                            public void connectionLost(Throwable cause) {
+                            }
+
+                            @Override
+                            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                            }
+
+                            @Override
+                            public void deliveryComplete(IMqttDeliveryToken token) {
+                            }
+                        });
                     } catch (MqttException e) {
                         e.printStackTrace();
                     }

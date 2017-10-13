@@ -23,7 +23,7 @@ public class SettingActivity extends AppCompatActivity {
     private EditText hostname;
     private CheckBox protocol_tcp;
     private CheckBox protocol_ssl;
-    private CheckBox protocol_xyz;
+    private CheckBox protocol_tls;
     private EditText port;
     private EditText username;
     private EditText password;
@@ -42,7 +42,7 @@ public class SettingActivity extends AppCompatActivity {
         hostname = (EditText) findViewById(R.id.editText_hostname);
         protocol_tcp = (CheckBox) findViewById(R.id.checkBox_tcp_protocol);
         protocol_ssl = (CheckBox) findViewById(R.id.checkBox_ssl_protocol);
-        protocol_xyz = (CheckBox) findViewById(R.id.checkBox_tls_protocol);
+        protocol_tls = (CheckBox) findViewById(R.id.checkBox_tls_protocol);
         port = (EditText) findViewById(R.id.editText_port);
         username = (EditText) findViewById(R.id.editText_username);
         password = (EditText) findViewById(R.id.editText_password);
@@ -55,7 +55,7 @@ public class SettingActivity extends AppCompatActivity {
         hostname.setText(sprefs.getString(getString(R.string.connection_hostname),""));
         protocol_tcp.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_tcp),false));
         protocol_ssl.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_ssl),false));
-        protocol_xyz.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_tls),false));
+        protocol_tls.setChecked(sprefs.getBoolean(getString(R.string.connection_protocol_tls),false));
         port.setText(sprefs.getString(getString(R.string.connection_port),""));
         username.setText(sprefs.getString(getString(R.string.connection_username),""));
         password.setText(sprefs.getString(getString(R.string.connection_password),""));
@@ -66,7 +66,7 @@ public class SettingActivity extends AppCompatActivity {
 
         if (protocol_tcp.isChecked()) mqtt_protocol = "tcp://";
         if (protocol_ssl.isChecked()) mqtt_protocol = "ssl://";
-        if (protocol_xyz.isChecked()) mqtt_protocol = "xyz://";
+        if (protocol_tls.isChecked()) mqtt_protocol = "tls://";
 
         if (hostname.getText().toString().equals("")) {
             hostname.setText("fudannhpcc.cn");
@@ -82,7 +82,7 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (protocol_tcp.isChecked()) {
                     protocol_ssl.setChecked(false);
-                    protocol_xyz.setChecked(false);
+                    protocol_tls.setChecked(false);
                     mqtt_protocol = "tcp://";
                 }
             }
@@ -92,18 +92,18 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (protocol_ssl.isChecked()) {
                     protocol_tcp.setChecked(false);
-                    protocol_xyz.setChecked(false);
+                    protocol_tls.setChecked(false);
                     mqtt_protocol = "ssl://";
                 }
             }
         });
-        protocol_xyz.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        protocol_tls.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (protocol_xyz.isChecked()) {
+                if (protocol_tls.isChecked()) {
                     protocol_tcp.setChecked(false);
                     protocol_ssl.setChecked(false);
-                    mqtt_protocol = "xyz://";
+                    mqtt_protocol = "tls://";
                 }
             }
         });
@@ -124,7 +124,7 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_hostname), hostname.getText().toString().replace(" ", ""));
                 Editor.putBoolean(getString(R.string.connection_protocol_tcp), protocol_tcp.isChecked());
                 Editor.putBoolean(getString(R.string.connection_protocol_ssl), protocol_ssl.isChecked());
-                Editor.putBoolean(getString(R.string.connection_protocol_tls), protocol_xyz.isChecked());
+                Editor.putBoolean(getString(R.string.connection_protocol_tls), protocol_tls.isChecked());
                 Editor.putString(getString(R.string.connection_port), port.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_username), username.getText().toString().replace(" ", ""));
                 Editor.putString(getString(R.string.connection_password), password.getText().toString().replace(" ", ""));
@@ -132,7 +132,7 @@ public class SettingActivity extends AppCompatActivity {
                 Editor.putString(getString(R.string.connection_server_topic), server_topic.getText().toString().replace(" ", ""));
                 Editor.putInt(getString(R.string.connection_keep_alive), Integer.parseInt(keep_alive.getText().toString().replace(" ", "")));
                 Editor.putString(getString(R.string.connection_update_url), updateurl.getText().toString().replace(" ", ""));
-                if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_xyz.isChecked() ) {
+                if ( !protocol_tcp.isChecked() && !protocol_ssl.isChecked() && !protocol_tls.isChecked() ) {
                     String errmsg = "网络协议必须选择一个";
                     Toast.makeText(this, errmsg, Toast.LENGTH_SHORT).show();
                     break;
@@ -152,7 +152,7 @@ public class SettingActivity extends AppCompatActivity {
                 String protocolstr = new String();
                 if ( protocol_tcp.isChecked() ) protocolstr = "tcp://";
                 if ( protocol_ssl.isChecked() ) protocolstr = "ssl://";
-                if ( protocol_xyz.isChecked() ) protocolstr = "xyz://";
+                if ( protocol_tls.isChecked() ) protocolstr = "tls://";
                 String connection_mqtt_server = new String();
                 connection_mqtt_server = protocolstr + hostnamestr + ":" + portstr;
                 Editor.putString(getString(R.string.connection_mqtt_server), connection_mqtt_server);
