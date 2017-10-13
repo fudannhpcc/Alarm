@@ -698,10 +698,10 @@ public class MainActivity extends AppCompatActivity {
         return dir.delete();
     }
     private void realUpdate() {
-        SharedPreferences sprefs = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sprefs.edit();
-        editor.clear();
-        editor.commit();
+//        SharedPreferences sprefs = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sprefs.edit();
+//        editor.clear();
+//        editor.commit();
         trimCache(MainActivity.this);
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
