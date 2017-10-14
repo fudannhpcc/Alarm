@@ -11,6 +11,7 @@
     <string name="startservice">开启服务保护</string>
     <string name="stopservice">停止服务保护</string>
 
+    <string name="silent">静音</string>
     <string name="setting">设置</string>
         <string name="save">保存</string>
         <string name="back">返回</string>

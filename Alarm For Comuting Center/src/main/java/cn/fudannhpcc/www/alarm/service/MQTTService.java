@@ -26,19 +26,15 @@ import android.widget.Toast;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
@@ -268,11 +264,21 @@ public class MQTTService extends Service {
         builder.setContentInfo(pendingNotificationsCount + " 条新消息");
         builder.setSubText(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
-        builder.setVibrate(new long[] {0,300,500,700});
-        builder.setLights(0xff0000ff, 300, 0);
+        Log.d("silent",String.valueOf(Constants.SILENT_SWITCH ));
+        if ( Constants.SILENT_SWITCH ) {
+            builder.setVibrate(new long[]{0,0,0,0});
+            builder.setSound(null);
+            builder.setLights(0,0,0);
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+        else {
+            builder.setVibrate(new long[]{0, 300, 500, 700});
+            builder.setSound(WARNINGSOUND);
+            builder.setLights(0xff0000ff, 300, 0);
+            builder.setVisibility(Notification.VISIBILITY_PRIVATE);
+        }
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
-        builder.setSound(WARNINGSOUND);
         builder.setCategory(Notification.CATEGORY_MESSAGE);
         builder.setColor(0xff0000);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
@@ -296,6 +302,9 @@ public class MQTTService extends Service {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
+
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());

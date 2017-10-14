@@ -24,11 +24,11 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -46,7 +46,6 @@ import com.android.volley.toolbox.Volley;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
@@ -106,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
         init();
@@ -216,8 +216,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if ( ! init_finish ) return super.onOptionsItemSelected(item);
         RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
         switch (item.getItemId()) {
+            case R.id.silent:
+                if ( Constants.SILENT_SWITCH ) {
+                    item.setIcon(R.mipmap.ic_silent_on);
+                    Constants.SILENT_SWITCH = false;
+                    Toast.makeText(this, "关闭静音", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(this, "打开静音", Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.mipmap.ic_silent_off);
+                    Constants.SILENT_SWITCH = true;
+                }
+                Log.d("silent",String.valueOf(Constants.SILENT_SWITCH ));
+                break;
             case R.id.service:
                 if ( item.getTitle() == getString(R.string.startservice) ) {
                     Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
@@ -301,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
     boolean HOMEKEY = false;
     boolean POWERKEY = false;
 
+    boolean init_finish = false;
     private void init() {
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
@@ -310,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /*  启动MQTT客户端连接 */
-        MqttClientTimer.schedule(task, 0, 10000);
+        MqttClientTimer.schedule(task, 0, 3000);
 
         /*  检查是否有新版本出来 */
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -471,6 +486,7 @@ public class MainActivity extends AppCompatActivity {
     Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == 999) {
+                init_finish = true;
                 MqttClientTimer.cancel();
             }
             super.handleMessage(msg);

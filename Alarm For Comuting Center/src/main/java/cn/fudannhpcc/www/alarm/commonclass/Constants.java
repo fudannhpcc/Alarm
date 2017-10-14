@@ -9,4 +9,5 @@ public class Constants {
     public static String UPDATE_URL = "";
     public static String SUBSCRIBE_TOPIC_CLIENT = "fudannhpcc/#";
     public static boolean SUBSCRIBE_STATUS = false;
+    public static boolean SILENT_SWITCH = false;
 }
