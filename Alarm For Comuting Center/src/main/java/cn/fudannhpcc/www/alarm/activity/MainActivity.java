@@ -3,6 +3,7 @@ package cn.fudannhpcc.www.alarm.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -154,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e) {
         }
         monResume = true;
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        Constants.PENDINGNOTIFICATIONCCOUNT = true;
         super.onResume();
     }
 
@@ -502,8 +506,6 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mqttService = new Messenger(service);
             mqttBound = true;
-
-            String topic = Constants.SUBSCRIBE_TOPIC_CLIENT;
 
             Message message = Message.obtain();
             message.what = SEND_MESSAGE_CODE;

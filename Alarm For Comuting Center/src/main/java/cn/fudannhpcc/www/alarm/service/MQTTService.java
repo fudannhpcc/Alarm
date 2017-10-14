@@ -249,7 +249,13 @@ public class MQTTService extends Service {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String datestr = sdf.format(new Date());
         mNotificationMap.put("datetime", datestr);
-        if (pendingNotificationsCount==1) mNotificationList.clear();
+        if ( Constants.PENDINGNOTIFICATIONCCOUNT ) {
+            Constants.PENDINGNOTIFICATIONCCOUNT = false;
+            pendingNotificationsCount = 1;
+        }
+        else {
+            if (pendingNotificationsCount == 1) mNotificationList.clear();
+        }
         mNotificationList.add(mNotificationMap);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -262,7 +268,7 @@ public class MQTTService extends Service {
         builder.setContentTitle(title);
         builder.setContentText(message);
         builder.setContentInfo(pendingNotificationsCount + " 条新消息");
-        builder.setSubText(pendingNotificationsCount + " 条新消息");
+//        builder.setSubText(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
         Log.d("silent",String.valueOf(Constants.SILENT_SWITCH ));
         if ( Constants.SILENT_SWITCH ) {
