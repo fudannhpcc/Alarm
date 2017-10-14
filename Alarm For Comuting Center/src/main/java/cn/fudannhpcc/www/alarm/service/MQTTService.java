@@ -269,22 +269,23 @@ public class MQTTService extends Service {
             builder.setVibrate(new long[]{0,0,0,0});
             builder.setSound(null);
             builder.setLights(0,0,0);
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setVisibility(Notification.VISIBILITY_SECRET);
+            }
         }
         else {
             builder.setVibrate(new long[]{0, 300, 500, 700});
             builder.setSound(WARNINGSOUND);
             builder.setLights(0xff0000ff, 300, 0);
-            builder.setVisibility(Notification.VISIBILITY_PRIVATE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            }
         }
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
         builder.setCategory(Notification.CATEGORY_MESSAGE);
         builder.setColor(0xff0000);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-        }
         builder.setNumber(pendingNotificationsCount);
 
         if(activityMessenger != null) {
