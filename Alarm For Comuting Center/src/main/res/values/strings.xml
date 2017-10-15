@@ -17,7 +17,8 @@
         <string name="save">保存</string>
         <string name="back">返回</string>
         <string name="title_activity_setting">设置</string>
-    <string name="update">检查更新</string>
+    <string name="update">已是最新版本</string>
+    <string name="newupdate">出现新版本</string>
     <string name="exit">残忍退出</string>
 
     <string name="listview">设置</string>

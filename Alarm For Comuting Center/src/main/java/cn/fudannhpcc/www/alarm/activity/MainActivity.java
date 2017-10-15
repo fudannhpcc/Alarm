@@ -195,25 +195,41 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.service);
+        MenuItem serviceitem = menu.findItem(R.id.service);
         if (isService) {
-            item.setTitle(getString(R.string.stopservice));
-            item.setIcon(R.mipmap.ic_stopservice);
+            serviceitem.setTitle(getString(R.string.stopservice));
+            serviceitem.setIcon(R.mipmap.ic_stopservice);
             RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
         }
         else {
-            item.setTitle(getString(R.string.startservice));
-            item.setIcon(R.mipmap.ic_startservice);
+            serviceitem.setTitle(getString(R.string.startservice));
+            serviceitem.setIcon(R.mipmap.ic_startservice);
             RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
         }
+        MenuItem newversionitem = menu.findItem(R.id.update);
+        if (newversion) {
+            newversionitem.setTitle(getString(R.string.newupdate));
+        }
+        else {
+            newversionitem.setTitle(getString(R.string.update));
+        }
+
         return true;
     }
 
+//    @Override
+//    public boolean onPrepareOptionsMenu (Menu menu) {
+//        return super.onPrepareOptionsMenu(menu);
+//    }
+
     @Override
-    public boolean onPrepareOptionsMenu (Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if ( newversion ) menu.findItem(R.id.update).setVisible(true);
+        else menu.findItem(R.id.update).setVisible(false);
+        return true;
     }
 
     @Override
@@ -274,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.cancelAll();
                 return true;
             case R.id.update:
+                if ( ! newversion ) return true;
                 RequestQueue queue = Volley.newRequestQueue(this);
                 JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
                         Constants.UPDATE_URL + "/updatecheck.json",
@@ -366,7 +383,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         queue.add(mJsonObjectRequest);
-
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
@@ -666,30 +682,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    boolean newversion = false;
     private void checkAndUpdate(boolean only) {
         PackageInfo packageInfo = getVersionCode();
         if ( packageInfo == null ) return;
 
         int localversionCode = packageInfo.versionCode;
-        boolean iupdate = false;
-        if ( localversionCode < ServerVerCode ) iupdate = true;
+        if ( localversionCode < ServerVerCode ) newversion = true;
         else {
-            if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) iupdate = true;
+            if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) newversion = true;
         }
-        if ( iupdate ) {
+        if ( newversion ) {
             if ( only ) {
-                Dialog alertDialog = new AlertDialog.Builder(this)
-                        .setTitle("应用版本检查")
-                        .setMessage("\t\t有新版本 " + ServerVerName + " 更新！\n\t\t目前版本号：" + packageInfo.versionName )
-                        .setIcon(R.mipmap.ic_launcher)
-                        .setNegativeButton("知道啦", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).
-                        create();
-                alertDialog.show();
                 return;
             }
             else {
