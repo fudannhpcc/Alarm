@@ -260,6 +260,17 @@ public class MainActivity extends AppCompatActivity {
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
                 return true;
+            case R.id.deletemag:
+                Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
+                Constants.PENDINGNOTIFICATIONCCOUNT = false;
+                Constants.MESSAGECLEAR = true;
+                List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+                mqtt_message_adapter = new SimpleAdapter(this, list,
+                        R.layout.activity_list_item, new String[] { "img", "title", "datetime", "message" },
+                        new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
+                mqtt_message_adapter.notifyDataSetChanged();
+                mqtt_message_echo.setAdapter(mqtt_message_adapter);
+                return true;
             case R.id.update:
                 RequestQueue queue = Volley.newRequestQueue(this);
                 JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(

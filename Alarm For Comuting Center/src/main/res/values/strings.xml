@@ -10,6 +10,7 @@
 
     <string name="startservice">开启服务保护</string>
     <string name="stopservice">停止服务保护</string>
+    <string name="deletemsg">删除信息</string>
 
     <string name="silent">静音</string>
     <string name="setting">设置</string>

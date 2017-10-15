@@ -255,6 +255,11 @@ public class MQTTService extends Service {
         }
         else {
             if (pendingNotificationsCount == 1) mNotificationList.clear();
+            if ( Constants.MESSAGECLEAR ) {
+                pendingNotificationsCount = 1;
+                mNotificationList.clear();
+                Constants.MESSAGECLEAR = false;
+            }
         }
         mNotificationList.add(mNotificationMap);
 
