@@ -270,6 +270,8 @@ public class MainActivity extends AppCompatActivity {
                         new int[] { R.id.img, R.id.title, R.id.datetime, R.id.message });
                 mqtt_message_adapter.notifyDataSetChanged();
                 mqtt_message_echo.setAdapter(mqtt_message_adapter);
+                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancelAll();
                 return true;
             case R.id.update:
                 RequestQueue queue = Volley.newRequestQueue(this);
