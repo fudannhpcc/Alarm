@@ -208,28 +208,15 @@ public class MainActivity extends AppCompatActivity {
             RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) findViewById(R.id.mqtt_broker_status_RGBLed);
             mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
         }
-        MenuItem newversionitem = menu.findItem(R.id.update);
-        if (newversion) {
-            newversionitem.setTitle(getString(R.string.newupdate));
-        }
-        else {
-            newversionitem.setTitle(getString(R.string.update));
-        }
-
         return true;
     }
-
-//    @Override
-//    public boolean onPrepareOptionsMenu (Menu menu) {
-//        return super.onPrepareOptionsMenu(menu);
-//    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if ( newversion ) menu.findItem(R.id.update).setVisible(true);
         else menu.findItem(R.id.update).setVisible(false);
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -344,6 +331,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeKeyObserver mHomeKeyObserver;
     private PowerKeyObserver mPowerKeyObserver;
     Timer MqttClientTimer = new Timer();
+    Timer AppUpdateTimer = new Timer();
     boolean HOMEKEY = false;
     boolean POWERKEY = false;
 
@@ -357,32 +345,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /*  启动MQTT客户端连接 */
-        MqttClientTimer.schedule(task, 0, 3000);
+        MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
-        /*  检查是否有新版本出来 */
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
-                Constants.UPDATE_URL + "/updatecheck.json",
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            ServerApkUrl = response.getString("url");
-                            ServerVerCode = response.getInt("verCode");
-                            ServerVerName = response.getString("verName");
-                            ServerUpdateMessage = response.getString("updateMessage");
-                            checkAndUpdate(true);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        });
-        queue.add(mJsonObjectRequest);
+        /*  检查更新 */
+        AppUpdateTimer.schedule(appupdatetask, 0, 900000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
@@ -464,10 +430,38 @@ public class MainActivity extends AppCompatActivity {
     }
     /* 结束： 判断程序是不是第一次启动 */
 
+    TimerTask appupdatetask = new TimerTask() {
+        @Override
+        public void run() {
+            /*  检查是否有新版本出来 */
+            RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+            JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
+                    Constants.UPDATE_URL + "/updatecheck.json",
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                ServerApkUrl = response.getString("url");
+                                ServerVerCode = response.getInt("verCode");
+                                ServerVerName = response.getString("verName");
+                                ServerUpdateMessage = response.getString("updateMessage");
+                                checkAndUpdate(true);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            });
+            queue.add(mJsonObjectRequest);
+        }
+    };
+
     /* 开始： MQTT客户端连接认证 */
-
-
-    TimerTask task = new TimerTask() {
+    TimerTask mqttclienttask = new TimerTask() {
         @Override
         public void run() {
             isService = ServiceUtils.isServiceRunning(getApplicationContext(),CoreServiceName);
@@ -687,11 +681,16 @@ public class MainActivity extends AppCompatActivity {
         PackageInfo packageInfo = getVersionCode();
         if ( packageInfo == null ) return;
 
+        boolean tmpversion = false;
         int localversionCode = packageInfo.versionCode;
-        if ( localversionCode < ServerVerCode ) newversion = true;
+        if ( localversionCode < ServerVerCode ) tmpversion = true;
         else {
-            if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) newversion = true;
+            if ( Float.parseFloat(packageInfo.versionName) < Float.parseFloat(ServerVerName)) tmpversion = true;
         }
+
+        newversion = tmpversion;
+        invalidateOptionsMenu();
+
         if ( newversion ) {
             if ( only ) {
                 return;
