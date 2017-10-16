@@ -62,6 +62,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
 import feature.Callback;
 
@@ -78,7 +79,7 @@ import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 import customview.ConfirmDialog;
 import util.UpdateAppUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
@@ -100,10 +101,17 @@ public class MainActivity extends AppCompatActivity {
 
     private MqttAndroidClient client;
     private PahoMqttClient pahoMqttClient;
+
+    private static final int REQ_TTS_STATUS_CHECK = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, REQ_TTS_STATUS_CHECK);
 
         init();
 
@@ -134,6 +142,50 @@ public class MainActivity extends AppCompatActivity {
 
         mActivityMessenger = new Messenger(mMessengerHandler);
 
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_TTS_STATUS_CHECK) {
+            switch (resultCode) {
+                //这个返回结果表明TTS Engine可以用
+                case TextToSpeech.Engine.CHECK_VOICE_DATA_PASS:
+                    tts = new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
+                    break;
+                case TextToSpeech.Engine.CHECK_VOICE_DATA_BAD_DATA:
+                //需要的语音数据已损坏
+                case TextToSpeech.Engine.CHECK_VOICE_DATA_MISSING_DATA:
+                //缺少需要语言的语音数据
+                case TextToSpeech.Engine.CHECK_VOICE_DATA_MISSING_VOLUME:
+                //缺少需要语言的发音数据
+                //这三种情况都表明数据有错,重新下载安装需要的数据
+                    Intent installIntent = new Intent();
+                    installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(installIntent);
+                    break;
+                case TextToSpeech.Engine.CHECK_VOICE_DATA_FAIL:
+                //检查失败
+                default:
+                    Log.d("TTS", "Got a failure. TTS not available");
+            }
+        }
+        else {
+            //其他Intent返回的结果
+        }
+    }
+
+    @Override
+    public void onInit(int status) {
+        // 如果装载TTS引擎成功
+        if (status == TextToSpeech.SUCCESS) {
+            // 设置使用美式英语朗读
+            int result = tts.setLanguage(Locale.CHINESE);
+            Constants.TTS_SUPPORT = true;
+            // 如果不支持所设置的语言
+            if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+                Toast.makeText(MainActivity.this,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+                Constants.TTS_SUPPORT = false;
+            }
+        }
     }
 
     boolean monStart = false;
@@ -348,21 +400,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
 //            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
-
-        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                // 如果装载TTS引擎成功
-                if (status == TextToSpeech.SUCCESS) {
-                    // 设置使用美式英语朗读
-                    int result = tts.setLanguage(Locale.CHINESE);
-                    // 如果不支持所设置的语言
-                    if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-                        Toast.makeText(MainActivity.this,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
 
         /*  启动MQTT客户端连接 */
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
@@ -715,8 +752,10 @@ public class MainActivity extends AppCompatActivity {
         if ( newversion ) {
             if ( only ) {
                 if ( ! Constants.SILENT_SWITCH ) {
-                    String textToConvert = "有新版本出来啦，去更新吧！";
-                    tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                    if ( Constants.TTS_SUPPORT ) {
+                        String textToConvert = "有新版本出来啦，去更新吧！";
+                        tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
                 return;
             }

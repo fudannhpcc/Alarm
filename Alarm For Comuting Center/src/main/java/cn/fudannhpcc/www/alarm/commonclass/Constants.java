@@ -13,4 +13,5 @@ public class Constants {
     public static boolean SILENT_SWITCH = false;
     public static boolean PENDINGNOTIFICATIONCCOUNT = false;
     public static boolean MESSAGECLEAR = false;
+    public static boolean TTS_SUPPORT = false;
 }

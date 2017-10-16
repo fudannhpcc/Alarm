@@ -139,29 +139,6 @@ public class MQTTService extends Service {
         super.onCreate();
         context = getApplicationContext();
         SprefsMap = readFromPrefs();
-
-        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                // 如果装载TTS引擎成功
-                if (status == TextToSpeech.SUCCESS) {
-                    // 设置使用美式英语朗读
-                    int result = tts.setLanguage(Locale.CHINESE);
-                    // 如果不支持所设置的语言
-                    if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-                        Toast.makeText(context,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
-                    }
-                    tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
-                        public void onUtteranceCompleted(String utteranceId) {
-                            Log.d(TAG, "Speech Completed! :" + utteranceId);
-                            WARNINGSOUND = Uri.parse("file://"+ Environment.getExternalStorageDirectory() + "/notification.wav");
-                            qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
-                        }
-                    });
-                }
-            }
-        });
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -231,6 +208,29 @@ public class MQTTService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SprefsMap = readFromPrefs();
+        if ( Constants.TTS_SUPPORT ) {
+            tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    // 如果装载TTS引擎成功
+                    if (status == TextToSpeech.SUCCESS) {
+                        // 设置使用美式英语朗读
+                        int result = tts.setLanguage(Locale.CHINESE);
+                        // 如果不支持所设置的语言
+                        if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+                        }
+                        tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
+                            public void onUtteranceCompleted(String utteranceId) {
+                                Log.d(TAG, "Speech Completed! :" + utteranceId);
+                                WARNINGSOUND = Uri.parse("file://" + Environment.getExternalStorageDirectory() + "/notification.wav");
+                                qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                            }
+                        });
+                    }
+                }
+            });
+        }
         return START_STICKY;
     }
 
@@ -303,7 +303,6 @@ public class MQTTService extends Service {
         builder.setContentInfo(pendingNotificationsCount + " 条新消息");
 //        builder.setSubText(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
-        Log.d("silent",String.valueOf(Constants.SILENT_SWITCH ));
         if ( Constants.SILENT_SWITCH ) {
             builder.setVibrate(new long[]{0,0,0,0});
             builder.setSound(null);
@@ -314,7 +313,8 @@ public class MQTTService extends Service {
         }
         else {
             builder.setVibrate(new long[]{0, 300, 500, 700});
-            builder.setSound(WARNINGSOUND);
+            if ( Constants.TTS_SUPPORT ) builder.setSound(WARNINGSOUND);
+            else builder.setDefaults(Notification.DEFAULT_SOUND);
             builder.setLights(0xff0000ff, 300, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 builder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -381,12 +381,14 @@ public class MQTTService extends Service {
                 }
             }
             message = message.trim();
-            String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + "故障.. 请速速查看";
-            Log.d(TAG, textToConvert);
-            HashMap<String, String> myHashRender = new HashMap();
-            String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
-            myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
-            tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+            if ( Constants.TTS_SUPPORT ) {
+                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + "故障.. 请速速查看";
+                HashMap<String, String> myHashRender = new HashMap();
+                String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
+                myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
+                tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+            }
+            else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
         }
     }
 }
