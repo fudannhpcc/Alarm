@@ -70,7 +70,6 @@ import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
 import cn.fudannhpcc.www.alarm.receiver.PowerKeyObserver;
 import cn.fudannhpcc.www.alarm.service.CoreService;
 import cn.fudannhpcc.www.alarm.commonclass.CustomDialog;
-import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.service.MQTTService;
 import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.receiver.NetworkChangeReceiver;
@@ -218,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
         if ( newversion ) menu.findItem(R.id.update).setVisible(true);
         else menu.findItem(R.id.update).setVisible(false);
+        MenuItem item = menu.findItem(R.id.silent);
+        if ( Constants.SILENT_SWITCH ) item.setIcon(R.mipmap.ic_silent_off);
+        else item.setIcon(R.mipmap.ic_silent_on);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -237,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
                     item.setIcon(R.mipmap.ic_silent_off);
                     Constants.SILENT_SWITCH = true;
                 }
-                Log.d("silent",String.valueOf(Constants.SILENT_SWITCH ));
                 break;
             case R.id.service:
                 if ( item.getTitle() == getString(R.string.startservice) ) {
@@ -367,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
         /*  检查更新 */
-        AppUpdateTimer.schedule(appupdatetask, 0, 60000);
+        AppUpdateTimer.schedule(appupdatetask, 0, 600000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
