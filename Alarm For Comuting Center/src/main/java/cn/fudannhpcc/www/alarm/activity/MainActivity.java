@@ -713,8 +713,10 @@ public class MainActivity extends AppCompatActivity {
 
         if ( newversion ) {
             if ( only ) {
-                String textToConvert="有新版本出来啦，去更新吧！";
-                tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                if ( ! Constants.SILENT_SWITCH ) {
+                    String textToConvert = "有新版本出来啦，去更新吧！";
+                    tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                }
                 return;
             }
             else {

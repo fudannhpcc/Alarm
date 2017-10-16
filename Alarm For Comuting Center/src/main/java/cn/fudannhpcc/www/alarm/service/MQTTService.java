@@ -370,7 +370,7 @@ public class MQTTService extends Service {
                 voicetitle += ".. 节点宕机";
             }
             message = message.trim();
-            String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 故障.. 请速速查看";
+            String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + "故障.. 请速速查看";
             HashMap<String, String> myHashRender = new HashMap();
             String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
             myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
