@@ -363,21 +363,23 @@ public class MQTTService extends Service {
                 if (tmp.contains("温控报警")) {
                     title += "温控 ";
                     WARNINGID += 1;
-                    voicetitle += ".. 温控报警";
+                    String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
+                    int iaa = aa.length;
+                    voicetitle += ".. " + iaa + "个温控报警";
                 }
                 if (tmp.contains("节点故障")) {
                     title += "运行 ";
                     WARNINGID += 1;
-                    String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
-                    int iaa = aa.length;
-                    voicetitle += ".. " + iaa + "个节点运行";
+                    String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
+                    int ibb = bb.length;
+                    voicetitle += ".. " + ibb + "个节点运行";
                 }
                 if (tmp.contains("宕机节点")) {
                     title += "宕机 ";
                     WARNINGID += 1;
-                    String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
-                    int ibb = bb.length;
-                    voicetitle += ".. " + ibb + "个节点宕机";
+                    String[] cc = ((tmp.split("：")[1]).trim()).split(" ");
+                    int icc = cc.length;
+                    voicetitle += ".. " + icc + "个节点宕机";
                 }
             }
             message = message.trim();
