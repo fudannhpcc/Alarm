@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
         /*  检查更新 */
-        AppUpdateTimer.schedule(appupdatetask, 0, 900000);
+        AppUpdateTimer.schedule(appupdatetask, 0, 3600000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
