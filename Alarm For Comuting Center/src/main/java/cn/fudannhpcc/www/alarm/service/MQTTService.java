@@ -356,21 +356,33 @@ public class MQTTService extends Service {
             title = WARNINGTITLE;
             String voicetitle = "";
             message = msg.split("]")[1].trim();
+            String messagelist[] = message.split("\n");
             WARNINGID = 0;
-            if ( message.contains("温控报警") ) {
-                title += "温控 "; WARNINGID+=1;
-                voicetitle += ".. 温控报警";
-            }
-            if ( message.contains("节点故障") ) {
-                title += "运行 ";WARNINGID+=1;
-                voicetitle += ".. 节点运行";
-            }
-            if ( message.contains("宕机节点") ) {
-                title += "宕机 ";WARNINGID+=1;
-                voicetitle += ".. 节点宕机";
+            for(String tmp : messagelist) {
+                tmp = tmp.trim();
+                if (tmp.contains("温控报警")) {
+                    title += "温控 ";
+                    WARNINGID += 1;
+                    voicetitle += ".. 温控报警";
+                }
+                if (tmp.contains("节点故障")) {
+                    title += "运行 ";
+                    WARNINGID += 1;
+                    String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
+                    int iaa = aa.length;
+                    voicetitle += ".. " + iaa + "个节点运行";
+                }
+                if (tmp.contains("宕机节点")) {
+                    title += "宕机 ";
+                    WARNINGID += 1;
+                    String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
+                    int ibb = bb.length;
+                    voicetitle += ".. " + ibb + "个节点宕机";
+                }
             }
             message = message.trim();
             String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + "故障.. 请速速查看";
+            Log.d(TAG, textToConvert);
             HashMap<String, String> myHashRender = new HashMap();
             String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
             myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
