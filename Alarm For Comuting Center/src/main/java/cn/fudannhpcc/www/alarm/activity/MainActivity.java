@@ -1,13 +1,10 @@
 package cn.fudannhpcc.www.alarm.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -24,6 +21,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -57,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -190,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
         unregisterNetworkChanges();
         mHomeKeyObserver.stopListen();
         mPowerKeyObserver.stopListen();
+        if (tts != null) {
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -336,6 +338,8 @@ public class MainActivity extends AppCompatActivity {
     boolean POWERKEY = false;
 
     boolean init_finish = false;
+    private TextToSpeech tts;
+
     private void init() {
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
@@ -344,11 +348,26 @@ public class MainActivity extends AppCompatActivity {
 //            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
 
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                // 如果装载TTS引擎成功
+                if (status == TextToSpeech.SUCCESS) {
+                    // 设置使用美式英语朗读
+                    int result = tts.setLanguage(Locale.CHINESE);
+                    // 如果不支持所设置的语言
+                    if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+                        Toast.makeText(MainActivity.this,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
         /*  启动MQTT客户端连接 */
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
         /*  检查更新 */
-        AppUpdateTimer.schedule(appupdatetask, 0, 3600000);
+        AppUpdateTimer.schedule(appupdatetask, 0, 60000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
@@ -381,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
 
     /* 开始： 判断程序是不是第一次启动 */
     private boolean isFirstStart() {
+        String path=getApplicationContext().getPackageResourcePath();
         SharedPreferences sprefs = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isFirstRun = sprefs.getBoolean("First_Start", true);
         SharedPreferences.Editor Editor = sprefs.edit();
@@ -693,6 +713,8 @@ public class MainActivity extends AppCompatActivity {
 
         if ( newversion ) {
             if ( only ) {
+                String textToConvert="有新版本出来啦，去更新吧！";
+                tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
                 return;
             }
             else {

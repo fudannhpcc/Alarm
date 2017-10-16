@@ -12,12 +12,14 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,13 +31,12 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import cn.fudannhpcc.www.alarm.R;
@@ -49,7 +50,6 @@ public class MQTTService extends Service {
     public static final String PREFS_NAME = "AppSettings";
 
     public static final String WARNINGTITLE = "集群故障: ";
-    public static final int WARNINGSOUNDID[] = { R.raw.warning0,R.raw.warning1, R.raw.warning2 };
     public static int WARNINGID = 0;
 
 
@@ -133,11 +133,34 @@ public class MQTTService extends Service {
         return super.onUnbind(intent);
     }
 
+    private TextToSpeech tts;
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
         SprefsMap = readFromPrefs();
+
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                // 如果装载TTS引擎成功
+                if (status == TextToSpeech.SUCCESS) {
+                    // 设置使用美式英语朗读
+                    int result = tts.setLanguage(Locale.CHINESE);
+                    // 如果不支持所设置的语言
+                    if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+                        Toast.makeText(context,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+                    }
+                    tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
+                        public void onUtteranceCompleted(String utteranceId) {
+                            Log.d(TAG, "Speech Completed! :" + utteranceId);
+                            WARNINGSOUND = Uri.parse("file://"+ Environment.getExternalStorageDirectory() + "/notification.wav");
+                            qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                        }
+                    });
+                }
+            }
+        });
 
         new Thread(new Runnable() {
             @Override
@@ -198,6 +221,9 @@ public class MQTTService extends Service {
         if ( iService ) {
             Intent broadcastIntent = new Intent(String.valueOf(R.string.mqtt_restart_name));
             sendBroadcast(broadcastIntent);
+        }
+        if (tts != null) {
+            tts.shutdown();
         }
         super.onDestroy();
     }
@@ -322,27 +348,33 @@ public class MQTTService extends Service {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFY_ID, builder.build());
-//        startForeground(NOTIFY_ID,builder.build());
     }
 
+    String title = null, message = null; Uri WARNINGSOUND = null;
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
-            String title = null, message = null; Uri WARNINGSOUND = null;
             title = WARNINGTITLE;
+            String voicetitle = "";
             message = msg.split("]")[1].trim();
             WARNINGID = 0;
             if ( message.contains("温控报警") ) {
                 title += "温控 "; WARNINGID+=1;
+                voicetitle += ".. 温控报警";
             }
             if ( message.contains("节点故障") ) {
                 title += "运行 ";WARNINGID+=1;
+                voicetitle += ".. 节点运行";
             }
             if ( message.contains("宕机节点") ) {
                 title += "宕机 ";WARNINGID+=1;
+                voicetitle += ".. 节点宕机";
             }
             message = message.trim();
-            WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + WARNINGSOUNDID[WARNINGID-1]);
-            qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+            String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 故障.. 请速速查看";
+            HashMap<String, String> myHashRender = new HashMap();
+            String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
+            myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
+            tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
         }
     }
 }
