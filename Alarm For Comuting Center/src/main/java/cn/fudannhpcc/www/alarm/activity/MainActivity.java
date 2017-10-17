@@ -208,10 +208,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
         Constants.PENDINGNOTIFICATIONCCOUNT = true;
+        AppUpdateTimer = new Timer("UpdateTimer",true);
+        updateTimerTask = new UpdateTimerTask();
+        AppUpdateTimer.schedule(updateTimerTask, 1000L);
         super.onResume();
     }
 
     boolean monPause = false;
+    UpdateTimerTask updateTimerTask;
     @Override
     protected void onPause() {
         monPause = true;
@@ -267,8 +271,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if ( newversion ) menu.findItem(R.id.update).setVisible(true);
-        else menu.findItem(R.id.update).setVisible(false);
+        if ( newversion ) {
+            menu.findItem(R.id.update).setVisible(true);
+            Constants.UPDATE_VISIBLE = true;
+        }
+        else {
+            menu.findItem(R.id.update).setVisible(false);
+            Constants.UPDATE_VISIBLE = false;
+        }
         MenuItem item = menu.findItem(R.id.silent);
         if ( Constants.SILENT_SWITCH ) item.setIcon(R.mipmap.ic_silent_off);
         else item.setIcon(R.mipmap.ic_silent_on);
@@ -403,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         /*  启动MQTT客户端连接 */
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
-        AppUpdateTimer.schedule(appupdatetask, 1000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
@@ -436,7 +445,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     /* 开始： 判断程序是不是第一次启动 */
     private boolean isFirstStart() {
-        String path=getApplicationContext().getPackageResourcePath();
         SharedPreferences sprefs = this.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isFirstRun = sprefs.getBoolean("First_Start", true);
         SharedPreferences.Editor Editor = sprefs.edit();
@@ -486,9 +494,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
     /* 结束： 判断程序是不是第一次启动 */
 
-    TimerTask appupdatetask = new TimerTask() {
+    private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
+            if ( Constants.UPDATE_VISIBLE ) return;
             /*  检查是否有新版本出来 */
             RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
             JsonObjectRequest mJsonObjectRequest = new JsonObjectRequest(
@@ -512,9 +521,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 public void onErrorResponse(VolleyError error) {
                 }
             });
-            queue.add(mJsonObjectRequest);
-        }
-    };
+            queue.add(mJsonObjectRequest);        }
+    }
 
     /* 开始： MQTT客户端连接认证 */
     TimerTask mqttclienttask = new TimerTask() {
@@ -750,9 +758,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if ( newversion ) {
             if ( only ) {
                 if ( ! Constants.SILENT_SWITCH ) {
-                    if ( Constants.TTS_SUPPORT ) {
-                        String textToConvert = "有新版本出来啦，去更新吧！";
-                        tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                    if ( ! Constants.UPDATE_VISIBLE ) {
+                        if (Constants.TTS_SUPPORT) {
+                            String textToConvert = "有新版本出来... 去更新吧";
+                            tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                        }
                     }
                 }
                 return;
