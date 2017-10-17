@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#87CEEBFF">
+    android:background="#ffFFDEAD">
 
     <LinearLayout
         android:layout_width="260dp"
@@ -15,11 +15,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="15dp"
+            android:layout_margin="18dp"
             android:gravity="center"
             android:text="消息提示"
             android:textColor="#38ADFF"
-            android:textSize="16sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/message"
@@ -27,6 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:textColor="#00FF7F"
+            android:textSize="16sp"
             android:text="提示消息" />
 
         <View

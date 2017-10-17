@@ -218,11 +218,11 @@ public class MQTTService extends Service {
                         int result = tts.setLanguage(Locale.CHINESE);
                         // 如果不支持所设置的语言
                         if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+//                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
                         }
                         tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                             public void onUtteranceCompleted(String utteranceId) {
-                                Log.d(TAG, "Speech Completed! :" + utteranceId);
+//                                Log.d(TAG, "Speech Completed! :" + utteranceId);
                                 WARNINGSOUND = Uri.parse("file://" + Environment.getExternalStorageDirectory() + "/notification.wav");
                                 qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
                             }
@@ -372,7 +372,7 @@ public class MQTTService extends Service {
                     WARNINGID += 1;
                     String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
                     int ibb = bb.length;
-                    voicetitle += ".. " + ibb + "个节点运行";
+                    voicetitle += ".. " + ibb + "个节点故障";
                 }
                 if (tmp.contains("宕机节点")) {
                     title += "宕机 ";
