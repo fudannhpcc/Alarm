@@ -403,9 +403,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         /*  启动MQTT客户端连接 */
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
-
-        /*  检查更新 */
-        AppUpdateTimer.schedule(appupdatetask, 0, 300000);
+        AppUpdateTimer.schedule(appupdatetask, 1000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
