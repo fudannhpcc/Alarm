@@ -169,6 +169,7 @@ public class MQTTService extends Service {
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                 Log.d(TAG, new String(mqttMessage.getPayload()));
+//                Log.d(TAG, String.valueOf(Constants.STORAGE_ACCESS) + " " + String.valueOf(Constants.TTS_SUPPORT));
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
@@ -208,7 +209,7 @@ public class MQTTService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SprefsMap = readFromPrefs();
-        if ( Constants.TTS_SUPPORT ) {
+        if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS ) {
             tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
                 @Override
                 public void onInit(int status) {
@@ -313,7 +314,7 @@ public class MQTTService extends Service {
         }
         else {
             builder.setVibrate(new long[]{0, 300, 500, 700});
-            if ( Constants.TTS_SUPPORT ) builder.setSound(WARNINGSOUND);
+            if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) builder.setSound(WARNINGSOUND);
             else builder.setDefaults(Notification.DEFAULT_SOUND);
             builder.setLights(0xff0000ff, 300, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -372,19 +373,19 @@ public class MQTTService extends Service {
                     WARNINGID += 1;
                     String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
                     int ibb = bb.length;
-                    voicetitle += ".. " + ibb + "个节点故障";
+                    voicetitle += ".. " + ibb + "个节点运行故障";
                 }
                 if (tmp.contains("宕机节点")) {
                     title += "宕机 ";
                     WARNINGID += 1;
                     String[] cc = ((tmp.split("：")[1]).trim()).split(" ");
                     int icc = cc.length;
-                    voicetitle += ".. " + icc + "个节点宕机";
+                    voicetitle += ".. " + icc + "个节点宕机故障";
                 }
             }
             message = message.trim();
-            if ( Constants.TTS_SUPPORT ) {
-                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + "故障.. 请速速查看";
+            if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS ) {
+                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
                 HashMap<String, String> myHashRender = new HashMap();
                 String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
                 myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);

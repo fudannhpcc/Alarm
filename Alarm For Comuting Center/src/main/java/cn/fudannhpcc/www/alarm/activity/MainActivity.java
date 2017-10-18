@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -23,6 +24,7 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,6 +80,9 @@ import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 import customview.ConfirmDialog;
 import util.UpdateAppUtils;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
@@ -403,7 +408,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean init_finish = false;
     private TextToSpeech tts;
 
+
     private void init() {
+
+        checkpermissions(this);
+
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
 //            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
@@ -813,10 +822,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return dir.delete();
     }
     private void realUpdate() {
-//        SharedPreferences sprefs = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sprefs.edit();
-//        editor.clear();
-//        editor.commit();
         trimCache(MainActivity.this);
         UpdateAppUtils.from(MainActivity.this)
                 .checkBy(UpdateAppUtils.CHECK_BY_VERSION_NAME)
@@ -830,31 +835,63 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 .update();
     }
 
-    //权限请求结果
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//    //权限请求结果
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        switch (requestCode) {
+//            case 1:
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    realUpdate();
+//                } else {
+//                    new ConfirmDialog(this, new Callback() {
+//                        @Override
+//                        public void callback(int position) {
+//                            if (position==1){
+//                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                                intent.setData(Uri.parse("package:" + getPackageName())); // 根据包名打开对应的设置界面
+//                                startActivity(intent);
+//                            }
+//                        }
+//                    }).setContent("暂无读写SD卡权限\n是否前往设置？").show();
+//                }
+//                break;
+//        }
+//
+//    }
+    /* 结束： 程序更新 */
 
-        switch (requestCode) {
-            case 1:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    realUpdate();
-                } else {
-                    new ConfirmDialog(this, new Callback() {
-                        @Override
-                        public void callback(int position) {
-                            if (position==1){
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                intent.setData(Uri.parse("package:" + getPackageName())); // 根据包名打开对应的设置界面
-                                startActivity(intent);
-                            }
-                        }
-                    }).setContent("暂无读写SD卡权限\n是否前往设置？").show();
-                }
-                break;
+    public void checkpermissions(Context context) {
+        // Check if we're running on Android 6.0 or higher
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.System.canWrite(context)) {
+                ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2909);
+            } else {
+                // continue with your code
+            }
+        } else {
+            // continue with your code
         }
+        // **check if app has permission 1**//
 
     }
-    /* 结束： 程序更新 */
+
+    // **check if app has permission 2**//
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 2909: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Constants.STORAGE_ACCESS = true;
+                    Log.d("Permission", "Granted");
+                } else {
+                    Constants.STORAGE_ACCESS = false;
+                    Log.d("Permission", "Denied");
+                }
+                return;
+            }
+        }
+    }
 
 }
