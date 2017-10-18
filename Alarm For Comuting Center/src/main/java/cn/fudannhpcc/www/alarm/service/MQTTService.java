@@ -169,7 +169,7 @@ public class MQTTService extends Service {
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                 Log.d(TAG, new String(mqttMessage.getPayload()));
-//                Log.d(TAG, String.valueOf(Constants.STORAGE_ACCESS) + " " + String.valueOf(Constants.TTS_SUPPORT));
+                Log.d(TAG, String.valueOf(Constants.STORAGE_ACCESS) + " " + String.valueOf(Constants.TTS_SUPPORT));
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
