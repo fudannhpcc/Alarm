@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,7 +22,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -66,7 +64,6 @@ import java.util.TimerTask;
 
 import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
-import feature.Callback;
 
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
@@ -78,7 +75,6 @@ import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.receiver.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
-import customview.ConfirmDialog;
 import util.UpdateAppUtils;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -210,12 +206,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }catch (Exception e) {
         }
         monResume = true;
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
-        Constants.PENDINGNOTIFICATIONCCOUNT = true;
-        AppUpdateTimer = new Timer("UpdateTimer",true);
-        updateTimerTask = new UpdateTimerTask();
-        AppUpdateTimer.schedule(updateTimerTask, 1000L);
         super.onResume();
     }
 
@@ -231,6 +221,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     protected void onStop() {
         super.onStop();
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        Constants.PENDINGNOTIFICATIONCCOUNT = true;
+        AppUpdateTimer = new Timer("UpdateTimer",true);
+        updateTimerTask = new UpdateTimerTask();
+        AppUpdateTimer.schedule(updateTimerTask, 1000L);
         monStop = true;
         if ( POWERKEY || HOMEKEY ) mqttBound = false;
         if (mqttBound) {
@@ -407,7 +403,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     boolean init_finish = false;
     private TextToSpeech tts;
-
 
     private void init() {
 
@@ -884,9 +879,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             case 2909: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Constants.STORAGE_ACCESS = true;
+                    Toast.makeText(this, "读写存储已授权", Toast.LENGTH_SHORT).show();
                     Log.d("Permission", "Granted");
                 } else {
                     Constants.STORAGE_ACCESS = false;
+                    Toast.makeText(this, "读写存储未授权", Toast.LENGTH_SHORT).show();
                     Log.d("Permission", "Denied");
                 }
                 return;
