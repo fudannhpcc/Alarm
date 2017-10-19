@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,6 +23,7 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +65,6 @@ import java.util.TimerTask;
 
 import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
-import feature.Callback;
 
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.receiver.HomeKeyObserver;
@@ -205,12 +204,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }catch (Exception e) {
         }
         monResume = true;
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
-        Constants.PENDINGNOTIFICATIONCCOUNT = true;
-        AppUpdateTimer = new Timer("UpdateTimer",true);
-        updateTimerTask = new UpdateTimerTask();
-        AppUpdateTimer.schedule(updateTimerTask, 1000L);
         super.onResume();
     }
 
@@ -226,6 +219,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     protected void onStop() {
         super.onStop();
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        Constants.PENDINGNOTIFICATIONCCOUNT = true;
+        AppUpdateTimer = new Timer("UpdateTimer",true);
+        updateTimerTask = new UpdateTimerTask();
+        AppUpdateTimer.schedule(updateTimerTask, 1000L);
         monStop = true;
         if ( POWERKEY || HOMEKEY ) mqttBound = false;
         if (mqttBound) {
@@ -403,10 +402,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean init_finish = false;
     private TextToSpeech tts;
 
-
     private void init() {
 
-        checkpermissions(this);
+        if (Build.VERSION.SDK_INT >= 23)
+        {
+            if (checkPermission())
+            {
+                // Code for above or equal 23 API Oriented Device
+                // Your Permission granted already .Do next code
+            } else {
+                requestPermission(); // Code for permission
+            }
+        }
+        else
+        {
+
+            // Code for Below 23 API Oriented Device
+            // Do next code
+        }
 
         /*  判断是否第一次启动程序 */
         if (isFirstStart()) {
@@ -857,35 +870,41 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 //    }
     /* 结束： 程序更新 */
 
-    public void checkpermissions(Context context) {
-        // Check if we're running on Android 6.0 or higher
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (!Settings.System.canWrite(context)) {
-                ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2909);
-            } else {
-                // continue with your code
-            }
-        } else {
-            // continue with your code
-        }
-        // **check if app has permission 1**//
+    private static final int PERMISSION_REQUEST_CODE = 2222;
 
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            Constants.STORAGE_ACCESS = true;
+            return true;
+        } else {
+            Constants.STORAGE_ACCESS = false;
+            return false;
+        }
     }
 
-    // **check if app has permission 2**//
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Toast.makeText(MainActivity.this, "存储读写未授权通知声音被关闭", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case 2909: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Constants.STORAGE_ACCESS = true;
-                    Log.d("Permission", "Granted");
+                    Toast.makeText(this, "存储读写已授权", Toast.LENGTH_SHORT).show();
+                    Log.d("Permission", "Permission Granted, Now you can use local drive .");
                 } else {
                     Constants.STORAGE_ACCESS = false;
-                    Log.d("Permission", "Denied");
+                    Toast.makeText(this, "存储读写未授权", Toast.LENGTH_SHORT).show();
+                    Log.d("Permission", "Permission Denied, You cannot use local drive .");
                 }
-                return;
-            }
+                break;
         }
     }
 
