@@ -792,15 +792,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         else {
             if ( ! only ) Toast.makeText(this,"当前版本是最新版",Toast.LENGTH_LONG).show();
         }
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    == PackageManager.PERMISSION_GRANTED) {
-//                realUpdate();
-//            } else {//申请权限
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//            }
-//        }
     }
 
 
@@ -843,31 +834,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 .update();
     }
 
-//    //权限请求结果
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//
-//        switch (requestCode) {
-//            case 1:
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    realUpdate();
-//                } else {
-//                    new ConfirmDialog(this, new Callback() {
-//                        @Override
-//                        public void callback(int position) {
-//                            if (position==1){
-//                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//                                intent.setData(Uri.parse("package:" + getPackageName())); // 根据包名打开对应的设置界面
-//                                startActivity(intent);
-//                            }
-//                        }
-//                    }).setContent("暂无读写SD卡权限\n是否前往设置？").show();
-//                }
-//                break;
-//        }
-//
-//    }
     /* 结束： 程序更新 */
 
     private static final int PERMISSION_REQUEST_CODE = 2222;

@@ -1,1 +1,1 @@
-include ':Alarm For Comuting Center'
+include ':Alarm For Comuting Center', ':UpdateAppUtils'

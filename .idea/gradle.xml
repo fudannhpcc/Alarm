@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Alarm For Comuting Center" />
+            <option value="$PROJECT_DIR$/UpdateAppUtils" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
