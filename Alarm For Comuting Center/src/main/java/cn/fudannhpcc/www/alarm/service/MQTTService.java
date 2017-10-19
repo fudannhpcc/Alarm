@@ -305,9 +305,16 @@ public class MQTTService extends Service {
 //        builder.setSubText(pendingNotificationsCount + " 条新消息");
         builder.setAutoCancel(true);
         if ( Constants.SILENT_SWITCH ) {
-            builder.setVibrate(new long[]{0,0,0,0});
-            builder.setSound(null);
-            builder.setLights(0,0,0);
+            if ( SERIOUS ) {
+                builder.setVibrate(new long[]{0, 300, 500, 700});
+                builder.setSound(WARNINGSOUND);
+                builder.setLights(0xff0000ff, 300, 0);
+            }
+            else {
+                builder.setVibrate(new long[]{0,0,0,0});
+                builder.setSound(null);
+                builder.setLights(0, 0, 0);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 builder.setVisibility(Notification.VISIBILITY_SECRET);
             }
@@ -352,9 +359,10 @@ public class MQTTService extends Service {
     }
 
     String title = null, message = null; Uri WARNINGSOUND = null;
+    private boolean SERIOUS;
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
-            boolean SERIOUS = false;
+            SERIOUS = false;
             title = WARNINGTITLE;
             String voicetitle = "";
             message = msg.split("]")[1].trim();
