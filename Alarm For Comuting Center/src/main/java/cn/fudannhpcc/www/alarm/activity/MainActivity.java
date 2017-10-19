@@ -23,7 +23,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -78,11 +77,7 @@ import cn.fudannhpcc.www.alarm.commonclass.MyColors;
 import cn.fudannhpcc.www.alarm.receiver.NetworkChangeReceiver;
 import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
-import customview.ConfirmDialog;
 import util.UpdateAppUtils;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 

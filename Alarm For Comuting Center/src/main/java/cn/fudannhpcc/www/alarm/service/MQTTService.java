@@ -354,6 +354,7 @@ public class MQTTService extends Service {
     String title = null, message = null; Uri WARNINGSOUND = null;
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
+            boolean SERIOUS = false;
             title = WARNINGTITLE;
             String voicetitle = "";
             message = msg.split("]")[1].trim();
@@ -367,6 +368,7 @@ public class MQTTService extends Service {
                     String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
                     int iaa = aa.length;
                     voicetitle += ".. " + iaa + "个温控报警";
+                    SERIOUS = true;
                 }
                 if (tmp.contains("节点故障")) {
                     title += "运行 ";
@@ -384,14 +386,20 @@ public class MQTTService extends Service {
                 }
             }
             message = message.trim();
-            if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS ) {
-                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
-                HashMap<String, String> myHashRender = new HashMap();
-                String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
-                myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
-                tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+            if ( SERIOUS ) {
+                WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.warning);
+                qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
             }
-            else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+            else {
+                if (Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
+                    String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
+                    HashMap<String, String> myHashRender = new HashMap();
+                    String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
+                    myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
+                    tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+                }
+                else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+            }
         }
     }
 }
