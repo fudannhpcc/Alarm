@@ -23,13 +23,16 @@ import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
+import org.eclipse.paho.android.service.BuildConfig;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +47,8 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
+
+import static java.security.AccessController.getContext;
 
 public class MQTTService extends Service {
 
@@ -169,7 +174,6 @@ public class MQTTService extends Service {
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                 Log.d(TAG, new String(mqttMessage.getPayload()));
-                Log.d(TAG, String.valueOf(Constants.STORAGE_ACCESS) + " " + String.valueOf(Constants.TTS_SUPPORT));
                 setMessageNotification(s, new String(mqttMessage.getPayload()));
             }
 
@@ -209,7 +213,7 @@ public class MQTTService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SprefsMap = readFromPrefs();
-        if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS ) {
+        if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS )
             tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
                 @Override
                 public void onInit(int status) {
@@ -224,14 +228,19 @@ public class MQTTService extends Service {
                         tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                             public void onUtteranceCompleted(String utteranceId) {
 //                                Log.d(TAG, "Speech Completed! :" + utteranceId);
-                                WARNINGSOUND = Uri.parse("file://" + Environment.getExternalStorageDirectory() + "/notification.wav");
+                                String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "notification.wav";
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    WARNINGSOUND = FileProvider.getUriForFile(context,getPackageName()+".fileprovider", new File(path));
+                                    context.grantUriPermission("com.android.systemui", WARNINGSOUND, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                } else {
+                                    WARNINGSOUND = Uri.parse("file://" + path);
+                                }
                                 qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
                             }
                         });
                     }
                 }
             });
-        }
         return START_STICKY;
     }
 
@@ -321,7 +330,9 @@ public class MQTTService extends Service {
         }
         else {
             builder.setVibrate(new long[]{0, 300, 500, 700});
-            if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) builder.setSound(WARNINGSOUND);
+            if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
+                builder.setSound(WARNINGSOUND);
+            }
             else builder.setDefaults(Notification.DEFAULT_SOUND);
             builder.setLights(0xff0000ff, 300, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -402,7 +413,7 @@ public class MQTTService extends Service {
                 if (Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
                     String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
                     HashMap<String, String> myHashRender = new HashMap();
-                    String destinationFileName = Environment.getExternalStorageDirectory() + "/notification.wav";
+                    String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "notification.wav";
                     myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                     tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
                 }
