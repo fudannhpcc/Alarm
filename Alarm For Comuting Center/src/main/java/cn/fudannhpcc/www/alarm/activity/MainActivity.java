@@ -425,6 +425,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (isFirstStart()) {
 //            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
         } else {
+            Bundle extrasInBackground = getIntent().getExtras();
+            if (extrasInBackground != null && extrasInBackground.getBoolean("MainActivityInBackground", false)) {
+                moveTaskToBack(true);
+            }
 //            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
 

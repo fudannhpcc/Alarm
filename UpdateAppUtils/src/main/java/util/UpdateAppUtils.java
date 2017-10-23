@@ -1,22 +1,13 @@
 package util;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import customview.ConfirmDialog;
 import feature.Callback;
@@ -158,13 +149,13 @@ public class UpdateAppUtils {
                     case 1:  //sure
                         if (downloadBy == DOWNLOAD_BY_APP) {
                             if (isWifiConnected(activity)){
-                                DownloadAppUtils.downloadForAutoInstall(activity, apkPath, "demo.apk", serverVersionName);
+                                DownloadAppUtils.downloadForAutoInstall(activity, apkPath, "Alarm.apk", serverVersionName);
                             }else {
                                 new ConfirmDialog(activity, new Callback() {
                                     @Override
                                     public void callback(int position) {
                                         if (position==1){
-                                            DownloadAppUtils.downloadForAutoInstall(activity, apkPath, "demo.apk", serverVersionName);
+                                            DownloadAppUtils.downloadForAutoInstall(activity, apkPath, "Alarm.apk", serverVersionName);
                                         }else {
                                             if (isForce)activity.finish();
                                         }
