@@ -229,10 +229,10 @@ public class MQTTService extends Service {
                         tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                             public void onUtteranceCompleted(String utteranceId) {
 //                                Log.d(TAG, "Speech Completed! :" + utteranceId);
-                                String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "notification.wav";
+                                String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
                                 if ( SERIOUS ) {
-                                    String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "warning.wav";
-                                    String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "special.wav";
+                                    String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav";
+                                    String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
                                     CombineWaveFile(file1, file2, path);
                                 }
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -415,7 +415,7 @@ public class MQTTService extends Service {
             if ( SERIOUS ) {
                 String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
                 HashMap<String, String> myHashRender = new HashMap();
-                String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "special.wav";
+                String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
                 myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                 tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
 
@@ -424,7 +424,7 @@ public class MQTTService extends Service {
                 if (Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
                     String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
                     HashMap<String, String> myHashRender = new HashMap();
-                    String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "notification.wav";
+                    String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
                     myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                     tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
                 }
@@ -472,8 +472,6 @@ public class MQTTService extends Service {
             out.close();
             in1.close();
             in2.close();
-            Log.d("mPAthTemp Combine", file_path.toString());
-            Log.d("mFileSecond Combine", file2);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

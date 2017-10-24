@@ -852,6 +852,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
             Constants.STORAGE_ACCESS = true;
+            makeDirectory();
             onSaveRawtoExternal();
             return true;
         } else {
@@ -874,6 +875,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Constants.STORAGE_ACCESS = true;
+                    makeDirectory();
                     onSaveRawtoExternal();
                     Toast.makeText(this, "存储读写已授权", Toast.LENGTH_SHORT).show();
                     Log.d("Permission", "Permission Granted, Now you can use local drive .");
@@ -886,11 +888,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
+    private void makeDirectory() {
+        String folder = "AlarmSound";
+        File f = new File(Environment.getExternalStorageDirectory(), folder);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+    }
+
     private void onSaveRawtoExternal() {
         InputStream ins = getResources().openRawResource(R.raw.warning);
         OutputStream os = null;
         try {
-            os = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "warning.wav");
+            os = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
