@@ -190,6 +190,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Toast.makeText(MainActivity.this,"TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
                 Constants.TTS_SUPPORT = false;
             }
+            else {
+                Toast.makeText(MainActivity.this,"谷歌文本朗读功能开启！", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -345,6 +348,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 mqtt_message_echo.setAdapter(mqtt_message_adapter);
                 NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancelAll();
+                return true;
+            case R.id.tts:
+                if (Constants.TTS_SUPPORT) {
+                    String textToConvert = "谷歌文本朗读可以正常工作！";
+                    tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                }
+                else {
+                    Toast.makeText(this, "谷歌文本朗读不能正常工作！", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.update:
                 if ( ! newversion ) return true;
