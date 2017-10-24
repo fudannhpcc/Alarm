@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
@@ -51,6 +52,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -846,6 +852,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
             Constants.STORAGE_ACCESS = true;
+            onSaveRawtoExternal();
             return true;
         } else {
             Constants.STORAGE_ACCESS = false;
@@ -867,6 +874,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Constants.STORAGE_ACCESS = true;
+                    onSaveRawtoExternal();
                     Toast.makeText(this, "存储读写已授权", Toast.LENGTH_SHORT).show();
                     Log.d("Permission", "Permission Granted, Now you can use local drive .");
                 } else {
@@ -875,6 +883,39 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Log.d("Permission", "Permission Denied, You cannot use local drive .");
                 }
                 break;
+        }
+    }
+
+    private void onSaveRawtoExternal() {
+        InputStream ins = getResources().openRawResource(R.raw.warning);
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "warning.wav");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try {
+            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+                try {
+                    os.write(buffer, 0, bytesRead);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            ins.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

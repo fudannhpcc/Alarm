@@ -26,13 +26,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
-import org.eclipse.paho.android.service.BuildConfig;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,8 +50,6 @@ import cn.fudannhpcc.www.alarm.activity.MainActivity;
 import cn.fudannhpcc.www.alarm.commonclass.Constants;
 import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.commonclass.PahoMqttClient;
-
-import static java.security.AccessController.getContext;
 
 public class MQTTService extends Service {
 
@@ -156,7 +157,7 @@ public class MQTTService extends Service {
                 );
             }
         }).start();
-        Log.d("CLIENT_ID",Constants.CLIENT_ID);
+
         pahoMqttClient = new PahoMqttClient();
         mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
@@ -229,6 +230,11 @@ public class MQTTService extends Service {
                             public void onUtteranceCompleted(String utteranceId) {
 //                                Log.d(TAG, "Speech Completed! :" + utteranceId);
                                 String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "notification.wav";
+                                if ( SERIOUS ) {
+                                    String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "warning.wav";
+                                    String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "special.wav";
+                                    CombineWaveFile(file1, file2, path);
+                                }
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     WARNINGSOUND = FileProvider.getUriForFile(context,getPackageName()+".fileprovider", new File(path));
                                     context.grantUriPermission("com.android.systemui", WARNINGSOUND, Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -375,7 +381,7 @@ public class MQTTService extends Service {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
             SERIOUS = false;
             title = WARNINGTITLE;
-            String voicetitle = "";
+            String voicetemperature = "", voiceabnormal = "", voicedead = "";
             message = msg.split("]")[1].trim();
             String messagelist[] = message.split("\n");
             WARNINGID = 0;
@@ -386,7 +392,7 @@ public class MQTTService extends Service {
                     WARNINGID += 1;
                     String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
                     int iaa = aa.length;
-                    voicetitle += ".. " + iaa + "个温控报警";
+                    voicetemperature = ".. " + iaa + "个温控报警";
                     SERIOUS = true;
                 }
                 if (tmp.contains("节点故障")) {
@@ -394,20 +400,25 @@ public class MQTTService extends Service {
                     WARNINGID += 1;
                     String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
                     int ibb = bb.length;
-                    voicetitle += ".. " + ibb + "个节点运行故障";
+                    voiceabnormal = ".. " + ibb + "个节点运行故障";
                 }
                 if (tmp.contains("宕机节点")) {
                     title += "宕机 ";
                     WARNINGID += 1;
                     String[] cc = ((tmp.split("：")[1]).trim()).split(" ");
                     int icc = cc.length;
-                    voicetitle += ".. " + icc + "个节点宕机故障";
+                    voicedead = ".. " + icc + "个节点宕机故障";
                 }
             }
             message = message.trim();
+            String voicetitle = voicetemperature + voiceabnormal + voicedead;
             if ( SERIOUS ) {
-                WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.warning);
-                qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
+                HashMap<String, String> myHashRender = new HashMap();
+                String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "special.wav";
+                myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
+                tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+
             }
             else {
                 if (Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
@@ -420,5 +431,108 @@ public class MQTTService extends Service {
                 else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
             }
         }
+    }
+
+    private static final int RECORDER_SAMPLERATE = 11025;
+    private static final int RECORDER_BPP = 16;
+    private void CombineWaveFile(String file1, String file2, String path) {
+        FileInputStream in1 = null, in2 = null;
+        FileOutputStream out = null;
+        long totalAudioLen = 0;
+        long totalDataLen = totalAudioLen + 36;
+        long longSampleRate = RECORDER_SAMPLERATE;
+        int channels = 2;
+        long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
+
+        byte[] data = new byte[8192];
+
+        try {
+            in1 = new FileInputStream(file1);
+            in2 = new FileInputStream(file2);
+            File file_path = new File(path);
+            file_path.setReadable(true);
+            out = new FileOutputStream(file_path);
+
+            totalAudioLen = in1.getChannel().size() + in2.getChannel().size();
+            totalDataLen = totalAudioLen + 36;
+
+            WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
+                    longSampleRate, channels, byteRate);
+
+            while (in1.read(data) != -1) {
+
+                out.write(data);
+
+            }
+            while (in2.read(data) != -1) {
+
+                out.write(data);
+            }
+
+            out.close();
+            in1.close();
+            in2.close();
+            Log.d("mPAthTemp Combine", file_path.toString());
+            Log.d("mFileSecond Combine", file2);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void WriteWaveFileHeader(FileOutputStream out, long totalAudioLen,
+                                     long totalDataLen, long longSampleRate, int channels, long byteRate)
+            throws IOException {
+
+        byte[] header = new byte[44];
+
+        header[0] = 'R';
+        header[1] = 'I';
+        header[2] = 'F';
+        header[3] = 'F';
+        header[4] = (byte) (totalDataLen & 0xff);
+        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+        header[8] = 'W';
+        header[9] = 'A';
+        header[10] = 'V';
+        header[11] = 'E';
+        header[12] = 'f';
+        header[13] = 'm';
+        header[14] = 't';
+        header[15] = ' ';
+        header[16] = 16;
+        header[17] = 0;
+        header[18] = 0;
+        header[19] = 0;
+        header[20] = 1;
+        header[21] = 0;
+        header[22] = (byte) channels;
+        header[23] = 0;
+        header[24] = (byte) (longSampleRate & 0xff);
+        header[25] = (byte) ((longSampleRate >> 8) & 0xff);
+        header[26] = (byte) ((longSampleRate >> 16) & 0xff);
+        header[27] = (byte) ((longSampleRate >> 24) & 0xff);
+        header[28] = (byte) (byteRate & 0xff);
+        header[29] = (byte) ((byteRate >> 8) & 0xff);
+        header[30] = (byte) ((byteRate >> 16) & 0xff);
+        header[31] = (byte) ((byteRate >> 24) & 0xff);
+        header[32] = (byte) (2 * 16 / 8);
+        header[33] = 0;
+        header[34] = RECORDER_BPP;
+        header[35] = 0;
+        header[36] = 'd';
+        header[37] = 'a';
+        header[38] = 't';
+        header[39] = 'a';
+        header[40] = (byte) (totalAudioLen & 0xff);
+        header[41] = (byte) ((totalAudioLen >> 8) & 0xff);
+        header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
+        header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
+
+        out.write(header, 0, 44);
     }
 }
