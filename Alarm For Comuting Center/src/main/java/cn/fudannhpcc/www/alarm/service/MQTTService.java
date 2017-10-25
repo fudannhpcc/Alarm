@@ -431,7 +431,12 @@ public class MQTTService extends Service {
                         String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav";
                         String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notts.wav";
                         CombineWaveFile(file1, file2, path);
-                        WARNINGSOUND = Uri.parse("file://" + path);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            WARNINGSOUND = FileProvider.getUriForFile(context,getPackageName()+".fileprovider", new File(path));
+                            context.grantUriPermission("com.android.systemui", WARNINGSOUND, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } else {
+                            WARNINGSOUND = Uri.parse("file://" + path);
+                        }
                     } else {
                         WARNINGSOUND = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.warning);
                     }
