@@ -865,7 +865,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (result == PackageManager.PERMISSION_GRANTED) {
             Constants.STORAGE_ACCESS = true;
             makeDirectory();
-            onSaveRawtoExternal();
+            onSaveRawtoExternal("warning.wav");
+            onSaveRawtoExternal("notts.wav");
             return true;
         } else {
             Constants.STORAGE_ACCESS = false;
@@ -888,7 +889,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Constants.STORAGE_ACCESS = true;
                     makeDirectory();
-                    onSaveRawtoExternal();
+                    onSaveRawtoExternal("warning.wav");
+                    onSaveRawtoExternal("notts.wav");
                     Toast.makeText(this, "存储读写已授权", Toast.LENGTH_SHORT).show();
                     Log.d("Permission", "Permission Granted, Now you can use local drive .");
                 } else {
@@ -908,11 +910,20 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
-    private void onSaveRawtoExternal() {
-        InputStream ins = getResources().openRawResource(R.raw.warning);
+    private void onSaveRawtoExternal(String voice) {
+        InputStream ins = null;
+        if ( voice == "warning.wav" ) {
+            ins = getResources().openRawResource(R.raw.warning);
+        }
+        else if ( voice == "notts.wav" ) {
+            ins = getResources().openRawResource(R.raw.notts);
+        }
+        else {
+            return;
+        }
         OutputStream os = null;
         try {
-            os = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav");
+            os = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/" + voice);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

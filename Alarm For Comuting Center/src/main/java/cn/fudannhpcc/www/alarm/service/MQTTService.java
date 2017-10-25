@@ -412,23 +412,46 @@ public class MQTTService extends Service {
             }
             message = message.trim();
             String voicetitle = voicetemperature + voiceabnormal + voicedead;
+            String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
             if ( SERIOUS ) {
-                String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
-                HashMap<String, String> myHashRender = new HashMap();
-                String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
-                myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
-                tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
-
-            }
-            else {
                 if (Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS) {
                     String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
                     HashMap<String, String> myHashRender = new HashMap();
-                    String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
+                    String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
                     myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                     tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
                 }
-                else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                else {
+                    String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav";
+                    String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notts.wav";
+                    CombineWaveFile(file1, file2, path);
+                }
+            }
+            else {
+                Log.d(TAG,String.valueOf(Constants.TTS_SUPPORT) + "  " + String.valueOf(Constants.STORAGE_ACCESS));
+                if (Constants.TTS_SUPPORT) {
+                    if (Constants.STORAGE_ACCESS) {
+                        String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
+                        HashMap<String, String> myHashRender = new HashMap();
+                        String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + path;
+                        myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
+                        tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
+                    }
+                    else qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                }
+                else {
+                    if (Constants.STORAGE_ACCESS) {
+                        String voiceFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notts.wav";
+                        Log.d(TAG, voiceFileName);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            WARNINGSOUND = FileProvider.getUriForFile(context, getPackageName() + ".fileprovider", new File(voiceFileName));
+                            context.grantUriPermission("com.android.systemui", WARNINGSOUND, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } else {
+                            WARNINGSOUND = Uri.parse("file://" + voiceFileName);
+                        }
+                    }
+                    qmtt_notification(NOTIFY_ID, title, message, WARNINGSOUND);
+                }
             }
         }
     }
