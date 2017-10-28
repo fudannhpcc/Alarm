@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.fudannhpcc.www.alarm.R;
-import cn.fudannhpcc.www.alarm.commonclass.Log;
 import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 
 public class CoreService extends Service {
@@ -55,15 +54,14 @@ public class CoreService extends Service {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         String MQTTerviceName = getString(R.string.mqtt_service_name);
         boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
-//        Log.d("MQTTerviceName",String.valueOf(isService));
         if ( !isService ) this.startService(new Intent(this,MQTTService.class));
-//        new Handler(Looper.getMainLooper()).post(
-//                new Runnable() {
-//                    public void run() {
-//                        Toast.makeText(getApplicationContext(), "CoreService onStartCommand()",Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//        );
+        new Handler(Looper.getMainLooper()).post(
+                new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Core服务保护启动",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
         return START_STICKY;
     }
 
@@ -81,26 +79,7 @@ public class CoreService extends Service {
         context = getApplicationContext();
         SharedPreferences sprefs = context.getSharedPreferences(PREFS_NAME, context.MODE_PRIVATE);
         Map<String,Object> sprefsMap = new HashMap<String,Object>();
-        sprefsMap.put("connection_hostname",sprefs.getString(getString(R.string.connection_hostname), ""));
-        sprefsMap.put("connection_protocol_tcp",sprefs.getBoolean(getString(R.string.connection_protocol_tcp), false));
-        sprefsMap.put("connection_protocol_ssl",sprefs.getBoolean(getString(R.string.connection_protocol_ssl), false));
-        sprefsMap.put("connection_protocol_xyz",sprefs.getBoolean(getString(R.string.connection_protocol_tls), false));
-        sprefsMap.put("connection_port",sprefs.getString(getString(R.string.connection_port), ""));
-        sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
-        sprefsMap.put("connection_password",sprefs.getString(getString(R.string.connection_password), ""));
-        sprefsMap.put("connection_push_notifications_subscribe_topic",sprefs.getString(getString(R.string.connection_push_notifications_subscribe_topic), ""));
-        sprefsMap.put("connection_server_topic",sprefs.getString(getString(R.string.connection_server_topic), ""));
-        sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
-        sprefsMap.put("connection_username",sprefs.getString(getString(R.string.connection_username), ""));
         sprefsMap.put("connection_keep_alive",sprefs.getInt(getString(R.string.connection_keep_alive), 60));
-        if (sprefsMap.get("connection_hostname").equals("")) {
-            sprefsMap.put("connection_hostname","fudannhpcc.cn");
-            sprefsMap.put("connection_port","1883");
-            sprefsMap.put("connection_username","nhpcc");
-            sprefsMap.put("connection_password","rtfu2002");
-            sprefsMap.put("connection_push_notifications_subscribe_topic","fudannhpcc/warning/#");
-            sprefsMap.put("connection_server_topic","fudannhpcc/cluster/#");
-        }
         return sprefsMap;
     }
 

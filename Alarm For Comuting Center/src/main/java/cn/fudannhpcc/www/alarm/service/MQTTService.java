@@ -187,8 +187,6 @@ public class MQTTService extends Service {
 
     @Override
     public void onDestroy() {
-        iService = false;
-//        stopForeground(true);
         new Handler(Looper.getMainLooper()).post(
                 new Runnable() {
                     public void run() {
@@ -196,15 +194,6 @@ public class MQTTService extends Service {
                     }
                 }
         );
-        try {
-            iService = (boolean) SprefsMap.get("connection_server_mode");
-        } catch ( Exception e ) {
-
-        }
-        if ( iService ) {
-            Intent broadcastIntent = new Intent(String.valueOf(R.string.mqtt_restart_name));
-            sendBroadcast(broadcastIntent);
-        }
         if (tts != null) {
             tts.shutdown();
         }

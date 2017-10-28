@@ -72,16 +72,6 @@
             <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <receiver
-            android:name=".receiver.MqttRestarterBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="MqttRestartServiceWhenStopped">
-            <intent-filter>
-                <action android:name="cn.fudannhpcc.www.alarm.receiver.MqttRestarterBroadcastReceiver"/>
-            </intent-filter>
-        </receiver>
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="cn.fudannhpcc.www.alarm.fileprovider"

@@ -727,8 +727,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     mqttservice_intent.setAction(MqttServiceName);
                     stopService(mqttservice_intent);
                     moveTaskToBack(true);
+                    System.exit(0);
                     android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(1);
                 }
             });
         CustomDialog.setNoOnclickListener("取消", new CustomDialog.onNoOnclickListener() {
