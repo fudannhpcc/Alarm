@@ -1,12 +1,8 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -14,22 +10,15 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import java.io.UnsupportedEncodingException;
-
-import cn.fudannhpcc.www.alarm.activity.MainActivity;
 
 public class PahoMqttClient {
 
     private static final String TAG = "PahoMqttClient";
     private MqttAndroidClient mqttAndroidClient;
-    Context thiscontext;
 
     public MqttAndroidClient getMqttClient(Context context, String brokerUrl, String clientId) {
 
         mqttAndroidClient = new MqttAndroidClient(context, brokerUrl, clientId);
-        thiscontext = context;
         try {
             IMqttToken token = mqttAndroidClient.connect(getMqttConnectionOption());
             token.setActionCallback(new IMqttActionListener() {
@@ -51,7 +40,6 @@ public class PahoMqttClient {
         return mqttAndroidClient;
     }
 
-    @NonNull
     public void disconnect(@NonNull MqttAndroidClient client) throws MqttException {
         IMqttToken mqttToken = client.disconnect();
         mqttToken.setActionCallback(new IMqttActionListener() {

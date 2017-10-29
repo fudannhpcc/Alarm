@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.receiver;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,6 +25,7 @@ import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -84,9 +86,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 List<String> nettype = new ArrayList<String>();
                 //通过循环将网络信息逐个取出来
                 boolean iconn = false;
-                for (int i = 0; i < networks.length; i++) {
+                for (Network network : networks) {
                     //获取ConnectivityManager对象对应的NetworkInfo对象
-                    NetworkInfo networkInfo = connMgr.getNetworkInfo(networks[i]);
+                    NetworkInfo networkInfo = connMgr.getNetworkInfo(network);
                     if (networkInfo.isConnected()) iconn = true;
                     String type = networkInfo.getTypeName();
                     if (type.equalsIgnoreCase("WIFI")) {
@@ -102,7 +104,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                             sb.append(nettype.get(i));
                         }
                         else{
-                            sb.append(nettype.get(i) + ", ");
+                            sb.append(nettype.get(i)).append(", ");
                         }
                     }
                     Toast.makeText(context, sb.toString(), Toast.LENGTH_SHORT).show();

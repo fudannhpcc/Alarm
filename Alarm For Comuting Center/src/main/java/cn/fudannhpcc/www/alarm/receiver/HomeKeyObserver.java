@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 
 public class HomeKeyObserver {
     private Context mContext;
-    private IntentFilter mIntentFilter;
     private OnHomeKeyListener mOnHomeKeyListener;
     private HomeKeyBroadcastReceiver mHomeKeyBroadcastReceiver;
     public HomeKeyObserver(Context context) {
@@ -16,7 +15,7 @@ public class HomeKeyObserver {
 
     //注册广播接收者
     public void startListen(){
-        mIntentFilter=new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        IntentFilter mIntentFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         mHomeKeyBroadcastReceiver=new HomeKeyBroadcastReceiver();
         mContext.registerReceiver(mHomeKeyBroadcastReceiver, mIntentFilter);
         System.out.println("----> 开始监听");

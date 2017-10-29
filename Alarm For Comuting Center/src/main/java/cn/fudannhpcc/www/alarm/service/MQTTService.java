@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.service;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,6 +22,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -62,9 +64,8 @@ public class MQTTService extends Service {
     private int pendingNotificationsCount = 0;
 
     private static final String TAG = "MqttService";
-    private PahoMqttClient pahoMqttClient;
-    private MqttAndroidClient mqttAndroidClient;
 
+    @SuppressLint("StaticFieldLeak")
     private static MQTTService instance;
     static public MQTTService getInstance() {
         return instance;
@@ -83,10 +84,10 @@ public class MQTTService extends Service {
         SprefsMap = new HashMap<String,Object>();
     }
 
-    private Messenger activityMessenger;
-    private Messenger activityMessengerReply;
+    protected Messenger activityMessenger;
 
 
+    @SuppressLint("HandlerLeak")
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -100,7 +101,7 @@ public class MQTTService extends Service {
                 }
                 activityMessenger = msg.replyTo;
                 Log.d("DemoLog-Service", "activityMessengerReply");
-                activityMessengerReply = msg.replyTo;
+                Messenger activityMessengerReply = msg.replyTo;
                 if(activityMessengerReply != null) {
                     Log.d("DemoLog-Service", "activityMessengerReply-send");
                     Message NotificationMessage = Message.obtain();
@@ -131,11 +132,9 @@ public class MQTTService extends Service {
         return mMessenger.getBinder();
     }
 
-    private static volatile boolean isRunning;
-
     @Override
     public boolean onUnbind(Intent intent) {
-        isRunning = false;
+        boolean isRunning = false;
         return super.onUnbind(intent);
     }
 
@@ -158,8 +157,8 @@ public class MQTTService extends Service {
             }
         }).start();
 
-        pahoMqttClient = new PahoMqttClient();
-        mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+        PahoMqttClient pahoMqttClient = new PahoMqttClient();
+        MqttAndroidClient mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
 
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
@@ -213,7 +212,7 @@ public class MQTTService extends Service {
                         int result = tts.setLanguage(Locale.CHINESE);
                         // 如果不支持所设置的语言
                         if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-//                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
                         }
                         tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                             public void onUtteranceCompleted(String utteranceId) {
@@ -241,7 +240,7 @@ public class MQTTService extends Service {
 
     public Map<String,Object> readFromPrefs() {
         context = getApplicationContext();
-        SharedPreferences sprefs = context.getSharedPreferences(PREFS_NAME, context.MODE_PRIVATE);
+        SharedPreferences sprefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         Map<String,Object> sprefsMap = new HashMap<String,Object>();
         sprefsMap.put("connection_hostname",sprefs.getString(getString(R.string.connection_hostname), ""));
         sprefsMap.put("connection_protocol_tcp",sprefs.getBoolean(getString(R.string.connection_protocol_tcp), false));
@@ -336,7 +335,9 @@ public class MQTTService extends Service {
         }
         builder.setWhen(System.currentTimeMillis());
         builder.setOngoing(false);
-        builder.setCategory(Notification.CATEGORY_MESSAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setCategory(Notification.CATEGORY_MESSAGE);
+        }
         builder.setColor(0xff0000);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
         builder.setNumber(pendingNotificationsCount);
@@ -361,6 +362,7 @@ public class MQTTService extends Service {
         notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
         notificationManager.notify(NOTIFY_ID, builder.build());
     }
 
@@ -406,7 +408,7 @@ public class MQTTService extends Service {
                 if (Constants.TTS_SUPPORT ) {
                     if (Constants.STORAGE_ACCESS) {
                         String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
-                        HashMap<String, String> myHashRender = new HashMap();
+                        HashMap<String, String> myHashRender = new HashMap<String, String>();
                         String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
                         myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                         tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
@@ -436,7 +438,7 @@ public class MQTTService extends Service {
                 if (Constants.TTS_SUPPORT) {
                     if (Constants.STORAGE_ACCESS) {
                         String textToConvert = "复旦大学高端计算中心.. 集群出现.. " + voicetitle + ".. 请速速查看";
-                        HashMap<String, String> myHashRender = new HashMap();
+                        HashMap<String, String> myHashRender = new HashMap<String, String>();
                         String destinationFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
                         myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, textToConvert);
                         tts.synthesizeToFile(textToConvert, myHashRender, destinationFileName);
@@ -471,7 +473,6 @@ public class MQTTService extends Service {
         FileOutputStream out = null;
         long totalAudioLen = 0;
         long totalDataLen = totalAudioLen + 36;
-        long longSampleRate = RECORDER_SAMPLERATE;
         int channels = 2;
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
 
@@ -481,14 +482,14 @@ public class MQTTService extends Service {
             in1 = new FileInputStream(file1);
             in2 = new FileInputStream(file2);
             File file_path = new File(path);
-            file_path.setReadable(true);
+            boolean b = file_path.setReadable(true);
             out = new FileOutputStream(file_path);
 
             totalAudioLen = in1.getChannel().size() + in2.getChannel().size();
             totalDataLen = totalAudioLen + 36;
 
             WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
-                    longSampleRate, channels, byteRate);
+                    (long) RECORDER_SAMPLERATE, channels, byteRate);
 
             while (in1.read(data) != -1) {
 

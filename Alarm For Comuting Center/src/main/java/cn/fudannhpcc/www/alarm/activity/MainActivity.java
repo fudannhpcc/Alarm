@@ -1,6 +1,7 @@
 package cn.fudannhpcc.www.alarm.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -24,6 +25,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -65,6 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
@@ -90,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
 
-    static Activity thisActivity = null;
+    @SuppressLint("StaticFieldLeak")
+    private static Activity thisActivity = null;
 
     private boolean isService = false;
     private String CoreServiceName = "";
@@ -174,9 +179,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Log.d("TTS", "Got a failure. TTS not available");
             }
         }
-        else {
-            //其他Intent返回的结果
-        }
     }
 
     @Override
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Intent intent = new Intent(this, MQTTService.class);
             bindService(intent, mqttConnection, Context.BIND_AUTO_CREATE);
             monResume = true;
-        }catch (Exception e) {
+        }catch (Exception ignored) {
         }
         monResume = true;
         super.onResume();
@@ -230,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onStop() {
         super.onStop();
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
         notificationManager.cancelAll();
         Constants.PENDINGNOTIFICATIONCCOUNT = true;
         AppUpdateTimer = new Timer("UpdateTimer",true);
@@ -336,11 +339,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
-                return true;
+                break;
             case R.id.detail:
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.fudannhpcc.cn/mqttreceiver.php"));
                 startActivity(browserIntent);
-                return true;
+                break;
             case R.id.deletemag:
                 Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
                 Constants.PENDINGNOTIFICATIONCCOUNT = false;
@@ -352,8 +355,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 mqtt_message_adapter.notifyDataSetChanged();
                 mqtt_message_echo.setAdapter(mqtt_message_adapter);
                 NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                assert notificationManager != null;
                 notificationManager.cancelAll();
-                return true;
+                break;
             case R.id.tts:
                 if (Constants.TTS_SUPPORT) {
                     String textToConvert = "谷歌文本朗读可以正常工作！";
@@ -362,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 else {
                     Toast.makeText(this, "谷歌文本朗读不能正常工作！", Toast.LENGTH_SHORT).show();
                 }
-                return true;
+                break;
             case R.id.update:
                 if ( ! newversion ) return true;
                 RequestQueue queue = Volley.newRequestQueue(this);
@@ -388,11 +392,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     }
                 });
                 queue.add(mJsonObjectRequest);
-                return true;
+                break;
             case R.id.exit:
                 Toast.makeText(this, "退出", Toast.LENGTH_SHORT).show();
                 showChangeLangDialog(getString(R.string.exittitle),getString(R.string.exitmessage));
-                return true;
+                break;
             default:
                 break;
         }
@@ -404,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (menu != null) {
             if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
                 try {
-                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    @SuppressLint("PrivateApi") Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
                     method.setAccessible(true);
                     method.invoke(menu, true);
                 } catch (Exception e) {
@@ -426,33 +430,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextToSpeech tts;
 
     private void init() {
-
         if (Build.VERSION.SDK_INT >= 23)
         {
-            if (checkPermission())
-            {
-                // Code for above or equal 23 API Oriented Device
-                // Your Permission granted already .Do next code
-            } else {
+            if (!checkPermission()) {
                 requestPermission(); // Code for permission
             }
         }
-        else
-        {
-
-            // Code for Below 23 API Oriented Device
-            // Do next code
-        }
 
         /*  判断是否第一次启动程序 */
-        if (isFirstStart()) {
-//            Toast.makeText(this, "第一次启动", Toast.LENGTH_SHORT).show();
-        } else {
+        if (!isFirstStart()) {
             Bundle extrasInBackground = getIntent().getExtras();
             if (extrasInBackground != null && extrasInBackground.getBoolean("MainActivityInBackground", false)) {
                 moveTaskToBack(true);
             }
-//            Toast.makeText(this, "不是第一次启动", Toast.LENGTH_SHORT).show();
         }
 
         /*  启动MQTT客户端连接 */
@@ -522,15 +512,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Constants.MQTT_BROKER_URL = sprefs.getString(getString(R.string.connection_mqtt_server),"tcp://fudannhpcc.cn:18883");
             Constants.UPDATE_URL = sprefs.getString(getString(R.string.connection_update_url),"http://www.fudannhpcc.cn/apkupdate");
         }
-        Constants.CLIENT_ID = getRandomString(8);
+        Constants.CLIENT_ID = getRandomString();
         return isFirstRun;
     }
 
-    public static String getRandomString(int length){
+    public static String getRandomString(){
         String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random random=new Random();
-        StringBuffer sb=new StringBuffer();
-        for(int i=0;i<length;i++){
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<8;i++){
             int number=random.nextInt(52);
             sb.append(str.charAt(number));
         }
@@ -589,7 +579,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                                     } catch (MqttException e) {
                                         e.printStackTrace();
                                     }
-                                } else {
                                 }
                             }
 
@@ -616,6 +605,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         }
     };
+    @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == 999) {
@@ -660,8 +650,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     };
 
-
+    @SuppressLint("HandlerLeak")
     private Handler mMessengerHandler = new Handler() {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == RECEIVE_MESSAGE_CODE){
@@ -679,6 +670,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     ListView mqtt_message_echo;
     SimpleAdapter mqtt_message_adapter;
     private Intent intentListViewActivity;
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         assert mNotificationList != null;
@@ -687,7 +680,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Set<String> set = tempMap.keySet();
             int WARNINGID = 0;
             for (String s : set) {
-                if ( s == "warningid") WARNINGID = (int)tempMap.get(s);
+                if (Objects.equals(s, "warningid")) WARNINGID = (int)tempMap.get(s);
                 else map.put(s, String.valueOf(tempMap.get(s)));
             }
             if ( WARNINGID > 0 ) map.put("img", WARNINGIMG[WARNINGID-1]);
@@ -776,7 +769,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private PackageInfo getVersionCode() {
         try {
             PackageManager packageManager = getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
+            PackageInfo packageInfo;
+            packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
             return packageInfo;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -809,7 +803,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         }
                     }
                 }
-                return;
             }
             else {
                 realUpdate();
@@ -836,8 +829,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String aChildren : children) {
+                boolean success = deleteDir(new File(dir, aChildren));
                 if (!success) {
                     return false;
                 }
@@ -845,6 +838,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
 
         // The directory is now empty so delete it
+        assert dir != null;
         return dir.delete();
     }
     private void realUpdate() {
@@ -865,6 +859,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private static final int PERMISSION_REQUEST_CODE = 2222;
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
@@ -887,8 +882,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -911,16 +907,17 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         String folder = "AlarmSound";
         File f = new File(Environment.getExternalStorageDirectory(), folder);
         if (!f.exists()) {
-            f.mkdirs();
+            final boolean mkdirs = f.mkdirs();
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void onSaveRawtoExternal(String voice) {
         InputStream ins = null;
-        if ( voice == "warning.wav" ) {
+        if (Objects.equals(voice, "warning.wav")) {
             ins = getResources().openRawResource(R.raw.warning);
         }
-        else if ( voice == "notts.wav" ) {
+        else if (Objects.equals(voice, "notts.wav")) {
             ins = getResources().openRawResource(R.raw.notts);
         }
         else {
@@ -937,6 +934,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         try {
             while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
                 try {
+                    assert os != null;
                     os.write(buffer, 0, bytesRead);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -946,6 +944,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             e.printStackTrace();
         }
         try {
+            assert os != null;
             os.close();
         } catch (IOException e) {
             e.printStackTrace();

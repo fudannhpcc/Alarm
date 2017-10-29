@@ -2,7 +2,6 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,30 +17,24 @@ import cn.fudannhpcc.www.alarm.R;
 
 public class ListViewActivity extends AppCompatActivity {
 
-    private HashMap<String, Object> listviewItem;
-    private TextView listview_activity_title;
-    private ImageView listview_activity_image;
-    private TextView listview_activity_datetime;
-    private TextView listview_activity_message;
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
 
         Intent intent = getIntent();
-        listviewItem = (HashMap<String, Object>) intent.getSerializableExtra("listviewItem");
-        String title = (String)listviewItem.get("title");
+        HashMap<String, Object> listviewItem = (HashMap<String, Object>) intent.getSerializableExtra("listviewItem");
+        String title = (String) listviewItem.get("title");
         int imageid = (int) listviewItem.get("img");
-        String datetime = (String)listviewItem.get("datetime");
-        String message = (String)listviewItem.get("message");
+        String datetime = (String) listviewItem.get("datetime");
+        String message = (String) listviewItem.get("message");
 
-        listview_activity_title = (TextView) findViewById(R.id.listview_activity_title);
+        TextView listview_activity_title = (TextView) findViewById(R.id.listview_activity_title);
         listview_activity_title.setText(title);
-        listview_activity_image = (ImageView) findViewById(R.id.listview_activity_image);
+        ImageView listview_activity_image = (ImageView) findViewById(R.id.listview_activity_image);
         listview_activity_image.setImageResource(imageid);
-        listview_activity_datetime = (TextView) findViewById(R.id.listview_activity_datetime);
+        TextView listview_activity_datetime = (TextView) findViewById(R.id.listview_activity_datetime);
         listview_activity_datetime.setText(datetime);
-        listview_activity_message = (TextView) findViewById(R.id.listview_activity_message);
+        TextView listview_activity_message = (TextView) findViewById(R.id.listview_activity_message);
         listview_activity_message.setText(message);
 
     }

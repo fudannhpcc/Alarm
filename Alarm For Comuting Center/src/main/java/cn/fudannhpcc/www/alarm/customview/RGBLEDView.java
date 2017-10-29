@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.customview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -71,11 +72,12 @@ public class RGBLEDView extends View {
     }
 
     private void setLayerToHW(View v) {
-        if (!v.isInEditMode() && Build.VERSION.SDK_INT >= 11) {
+        if (!v.isInEditMode()) {
             setLayerType(View.LAYER_TYPE_HARDWARE, null);
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);

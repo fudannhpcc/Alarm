@@ -20,8 +20,6 @@ import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 public class CoreService extends Service {
 
     public static final String PREFS_NAME = "AppSettings";
-    private Context context;
-    private Map<String,Object> SprefsMap;
 
     private int keepaliveTimer = -1;
 
@@ -33,8 +31,8 @@ public class CoreService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        SprefsMap = readFromPrefs();
-        keepaliveTimer = Integer.parseInt(SprefsMap.get(getString(R.string.connection_keep_alive)).toString());
+        Map<String, Object> sprefsMap = readFromPrefs();
+        keepaliveTimer = Integer.parseInt(sprefsMap.get(getString(R.string.connection_keep_alive)).toString());
         keepMeAlive();
     }
 
@@ -72,12 +70,13 @@ public class CoreService extends Service {
         final Intent intent = new Intent(this, MQTTService.class);
         final PendingIntent operation = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         final AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        assert alarm != null;
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, operation);
     }
 
     public Map<String,Object> readFromPrefs() {
-        context = getApplicationContext();
-        SharedPreferences sprefs = context.getSharedPreferences(PREFS_NAME, context.MODE_PRIVATE);
+        Context context = getApplicationContext();
+        SharedPreferences sprefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         Map<String,Object> sprefsMap = new HashMap<String,Object>();
         sprefsMap.put("connection_keep_alive",sprefs.getInt(getString(R.string.connection_keep_alive), 60));
         return sprefsMap;

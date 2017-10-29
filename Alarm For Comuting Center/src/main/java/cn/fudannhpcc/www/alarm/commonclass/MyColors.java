@@ -2,7 +2,7 @@ package cn.fudannhpcc.www.alarm.commonclass;
 
 public class MyColors {
 
-    public static final int colors[] = {
+    private static final int colors[] = {
             0xff1abc9c, -7617718  , 0xff3498db, 0xff9b59b6, 0xff34495e,
             0xff16a085, 0xff27ae60, 0xff2980b9, 0xff8e44ad, 0xff2c3e50,
             0xfff1c40f, 0xffe67e22, 0xffe74c3c, 0xffecf0f1, 0xff95a5a6,

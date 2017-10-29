@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 
 public class PowerKeyObserver {
     private Context mContext;
-    private IntentFilter mIntentFilter;
     private OnPowerKeyListener mOnPowerKeyListener;
     private PowerKeyBroadcastReceiver mPowerKeyBroadcastReceiver;
     public PowerKeyObserver(Context context) {
@@ -16,7 +15,7 @@ public class PowerKeyObserver {
 
     //注册广播接收者
     public void startListen(){
-        mIntentFilter=new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        IntentFilter mIntentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mPowerKeyBroadcastReceiver=new PowerKeyBroadcastReceiver();
         mContext.registerReceiver(mPowerKeyBroadcastReceiver, mIntentFilter);
         System.out.println("----> 开始监听");

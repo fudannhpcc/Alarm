@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,7 @@ public class SettingActivity extends AppCompatActivity {
 
     private String mqtt_protocol = "";
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,11 +151,11 @@ public class SettingActivity extends AppCompatActivity {
                     break;
                 }
                 String portstr = port.getText().toString().replace(" ", "");
-                String protocolstr = new String();
+                String protocolstr = "";
                 if ( protocol_tcp.isChecked() ) protocolstr = "tcp://";
                 if ( protocol_ssl.isChecked() ) protocolstr = "ssl://";
                 if ( protocol_tls.isChecked() ) protocolstr = "tls://";
-                String connection_mqtt_server = new String();
+                String connection_mqtt_server = "";
                 connection_mqtt_server = protocolstr + hostnamestr + ":" + portstr;
                 Editor.putString(getString(R.string.connection_mqtt_server), connection_mqtt_server);
                 Constants.SUBSCRIBE_TOPIC = push_notifications_subscribe_topic.getText().toString().replace(" ", "");
@@ -183,7 +185,7 @@ public class SettingActivity extends AppCompatActivity {
         if (menu != null) {
             if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
                 try {
-                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    @SuppressLint("PrivateApi") Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
                     method.setAccessible(true);
                     method.invoke(menu, true);
                 } catch (Exception e) {
