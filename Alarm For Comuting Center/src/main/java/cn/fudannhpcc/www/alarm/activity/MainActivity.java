@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -335,6 +336,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
+                return true;
+            case R.id.detail:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.fudannhpcc.cn/mqttreceiver.php"));
+                startActivity(browserIntent);
                 return true;
             case R.id.deletemag:
                 Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
