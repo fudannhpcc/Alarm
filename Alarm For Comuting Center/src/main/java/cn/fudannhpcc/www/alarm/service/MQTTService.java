@@ -283,12 +283,12 @@ public class MQTTService extends Service {
         mNotificationMap.put("datetime", datestr);
         if ( Constants.PENDINGNOTIFICATIONCCOUNT ) {
             Constants.PENDINGNOTIFICATIONCCOUNT = false;
-            pendingNotificationsCount = 1;
+            pendingNotificationsCount = 0;
         }
         else {
             if (pendingNotificationsCount == 1) mNotificationList.clear();
             if ( Constants.MESSAGECLEAR ) {
-                pendingNotificationsCount = 1;
+                pendingNotificationsCount = 0;
                 mNotificationList.clear();
                 Constants.MESSAGECLEAR = false;
             }
