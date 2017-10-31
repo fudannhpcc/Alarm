@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName '1.006'
+        versionName '1.007'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -72,4 +72,5 @@ dependencies {
     compile files('libs/org.eclipse.paho.client.mqttv3-1.1.1.jar')
     compile files('libs/picasso-2.5.2.jar')
     compile project(':UpdateAppUtils')
+    implementation project(':photoview')
 }

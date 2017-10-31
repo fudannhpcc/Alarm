@@ -53,6 +53,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 if ( ! dawningA.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png");
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png","获取温控探头曲线");
                 }
             }
         });
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 if ( ! dawningB.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png");
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png","获取温控探头曲线");
                 }
             }
         });
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 if ( ! dawningC.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png");
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线");
                 }
             }
         });
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 if ( ! dawningD.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png");
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线");
                 }
             }
         });
@@ -220,15 +221,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 if ( ! nodeinfo.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebResouces.png");
+                    showImage("http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形");
                 }
             }
         });
 
     }
 
-    public void showImage(String IMAGEURL) {
-
+    public void showImage(String IMAGEURL, final String TITLE) {
         final Dialog builder = new Dialog(this);
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
         builder.getWindow().setBackgroundDrawable(
@@ -240,7 +240,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         });
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        ImageView imageView = new ImageView(this);
+//        ImageView imageView = new ImageView(this);
+        final PhotoView imageView = new PhotoView(this);
         Picasso.with(this)
                 .load(IMAGEURL)
                 .networkPolicy(NetworkPolicy.NO_CACHE)
@@ -258,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
                         builder.dismiss();
-                        Toast.makeText(getApplicationContext(), "获取温控探头曲线失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), TITLE + "图形失败", Toast.LENGTH_SHORT).show();
                     }
                 });
 
