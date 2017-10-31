@@ -104,9 +104,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:paddingLeft="0dp"
-                    android:paddingRight="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:text="@string/lbl_temperature"
+                    android:background="#E0EEE0"
                     android:textColor="@color/colorPrimaryDark"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="12sp" />
@@ -116,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:paddingLeft="0dp"
+                    android:paddingLeft="5dp"
                     android:paddingRight="10dp"
                     android:text="@string/lbl_dawningA"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -132,7 +133,11 @@
                     android:text=""
                     android:textColor="@color/colorAccent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:focusable="false" />
+
 
                 <TextView
                     android:id="@+id/textView_lbl_dawningB"
@@ -155,7 +160,10 @@
                     android:text=""
                     android:textColor="@color/colorAccent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:focusable="false" />
 
                 <TextView
                     android:id="@+id/textView_lbl_dawningC"
@@ -178,7 +186,10 @@
                     android:text=""
                     android:textColor="@color/colorAccent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:focusable="false" />
 
                 <TextView
                     android:id="@+id/textView_lbl_dawningD"
@@ -201,7 +212,10 @@
                     android:text=""
                     android:textColor="@color/colorAccent"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:focusable="false" />
 
             </LinearLayout>
 

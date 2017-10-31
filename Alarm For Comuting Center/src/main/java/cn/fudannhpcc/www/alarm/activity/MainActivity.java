@@ -1,18 +1,21 @@
 package cn.fudannhpcc.www.alarm.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
@@ -23,7 +26,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -33,9 +35,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,9 +53,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -65,7 +72,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -118,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private static final int REQ_TTS_STATUS_CHECK = 0;
 
+    private TextView timestamp;
     private TextView dawningA;
     private TextView dawningB;
     private TextView dawningC;
@@ -162,12 +173,97 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         mActivityMessenger = new Messenger(mMessengerHandler);
 
+        timestamp = (TextView) findViewById(R.id.textView_lbl_temperature);
         dawningA = (TextView) findViewById(R.id.textView_text_dawningA);
+        dawningA.setText("");
+        dawningA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ! dawningA.getText().toString().equals("") ) {
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png");
+                    Log.d("MqttService", "ClickA");
+                }
+            }
+        });
         dawningB = (TextView) findViewById(R.id.textView_text_dawningB);
+        dawningB.setText("");
+        dawningB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ! dawningB.getText().toString().equals("") ) {
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png");
+                    Log.d("MqttService", "ClickB");
+                }
+            }
+        });
         dawningC = (TextView) findViewById(R.id.textView_text_dawningC);
+        dawningC.setText("");
+        dawningC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ! dawningC.getText().toString().equals("") ) {
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png");
+                    Log.d("MqttService", "ClickC");
+                }
+            }
+        });
         dawningD = (TextView) findViewById(R.id.textView_text_dawningD);
+        dawningD.setText("");
+        dawningD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ! dawningD.getText().toString().equals("") ) {
+                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png");
+                    Log.d("MqttService", "ClickD");
+                }
+            }
+        });
         nodeinfo = (TextView) findViewById(R.id.textView_text_alive);
 
+    }
+
+    public void showImage(String IMAGEURL) {
+
+        Dialog builder = new Dialog(this);
+        builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        builder.getWindow().setBackgroundDrawable(
+                new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+            }
+        });
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        ImageView imageView = new ImageView(this);
+        Picasso.with(this)
+                .load(IMAGEURL)
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
+                .into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (progressDialog.isShowing())
+                            progressDialog.dismiss();
+//                        Toast.makeText(getApplicationContext(), "获取温控探头曲线成功", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError() {
+                        if (progressDialog.isShowing())
+                            progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "获取温控探头曲线失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        builder.addContentView(imageView, new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        builder.show();
+
+        progressDialog.setMessage("图片加载中");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -541,6 +637,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
         return sb.toString();
     }
+
+    public void onClick(View view) {
+    }
     /* 结束： 判断程序是不是第一次启动 */
 
     private class UpdateTimerTask extends TimerTask {
@@ -696,6 +795,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                             default:
                                 break;
                         }
+                        DateFormat df = new SimpleDateFormat("HH:mm:ss");
+                        String date = df.format(Calendar.getInstance().getTime());
+                        timestamp.setText(date);
                     }
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
