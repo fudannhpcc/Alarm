@@ -113,7 +113,10 @@
                     android:background="#E0EEE0"
                     android:textColor="@color/colorPrimaryDark"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:focusable="false" />
 
                 <TextView
                     android:id="@+id/textView_lbl_dawningA"

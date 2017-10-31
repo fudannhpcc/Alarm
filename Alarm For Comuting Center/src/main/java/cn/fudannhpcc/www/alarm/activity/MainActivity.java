@@ -38,7 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
@@ -65,6 +64,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,6 +79,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -129,12 +130,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private static final int REQ_TTS_STATUS_CHECK = 0;
 
-    private TextView timestamp;
-    private TextView dawningA;
-    private TextView dawningB;
-    private TextView dawningC;
-    private TextView dawningD;
-    private TextView nodeinfo;
+    private HashMap<String, TextView> TextViewMap = new HashMap<String, TextView>(16);
+    private static final HashMap<String, Object[]> TextViewIDMap = new HashMap<String, Object[]>() {{
+        put("timestamp", new Object[]{R.id.textView_lbl_temperature,"",""});
+        put("dawningA", new Object[]{R.id.textView_text_dawningA,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png","获取温控探头曲线"});
+        put("dawningB", new Object[]{R.id.textView_text_dawningB,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png","获取温控探头曲线"});
+        put("dawningC", new Object[]{R.id.textView_text_dawningC,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线"});
+        put("dawningD", new Object[]{R.id.textView_text_dawningD,"http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线"});
+        put("NodeInfo", new Object[]{R.id.textView_text_alive,"http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形"});
+    }};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,58 +178,31 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         mActivityMessenger = new Messenger(mMessengerHandler);
 
-        timestamp = (TextView) findViewById(R.id.textView_lbl_temperature);
-        dawningA = (TextView) findViewById(R.id.textView_text_dawningA);
-        dawningA.setText("");
-        dawningA.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( ! dawningA.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png","获取温控探头曲线");
-                }
-            }
-        });
-        dawningB = (TextView) findViewById(R.id.textView_text_dawningB);
-        dawningB.setText("");
-        dawningB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( ! dawningB.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png","获取温控探头曲线");
-                }
-            }
-        });
-        dawningC = (TextView) findViewById(R.id.textView_text_dawningC);
-        dawningC.setText("");
-        dawningC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( ! dawningC.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线");
-                }
-            }
-        });
-        dawningD = (TextView) findViewById(R.id.textView_text_dawningD);
-        dawningD.setText("");
-        dawningD.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( ! dawningD.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线");
-                }
-            }
-        });
-        nodeinfo = (TextView) findViewById(R.id.textView_text_alive);
-        nodeinfo.setText("");
-        nodeinfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( ! nodeinfo.getText().toString().equals("") ) {
-                    showImage("http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形");
-                }
-            }
-        });
+        for (Object o : TextViewIDMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            String key = (String) entry.getKey();
+            Object[] obj = (Object[]) entry.getValue();
+            int id = (int) obj[0];
+            TextViewMap.put(key, (TextView) findViewById(id));
+        }
 
+        for (Object o : TextViewMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            final String key = (String) entry.getKey();
+            final TextView sensor = (TextView) entry.getValue();
+            if ( ! key.equals("timestamp") ) sensor.setText("");
+            sensor.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                if ( ! sensor.getText().toString().equals("") ) {
+                    Object[] obj = TextViewIDMap.get(key);
+                    String url = (String) obj[1];
+                    String title = (String) obj[2];
+                    if ( ! url.equals("") ) showImage(url,title);
+                }
+                }
+            });
+        }
     }
 
     public void showImage(String IMAGEURL, final String TITLE) {
@@ -240,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         });
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
-//        ImageView imageView = new ImageView(this);
         final PhotoView imageView = new PhotoView(this);
         Picasso.with(this)
                 .load(IMAGEURL)
@@ -251,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     public void onSuccess() {
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
-//                        Toast.makeText(getApplicationContext(), "获取温控探头曲线成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -268,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 ViewGroup.LayoutParams.MATCH_PARENT));
         builder.show();
 
-        progressDialog.setMessage("图片加载中");
+        progressDialog.setMessage("图片加载中...");
         progressDialog.setCancelable(false);
         progressDialog.show();
     }
@@ -786,45 +761,30 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     }
                     else if (data.containsKey("TemperatureMessage")) {
                         String message[] = data.getString("TemperatureMessage").trim().split("\t");
-                        switch ( message[0] ) {
-                            case "dawningA":
-                                dawningA.setText(message[1] + " \u2103");
-                                dawningA.setTextColor(getResources().getColor(R.color.colorAccent));
-                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
-                                break;
-                            case "dawningB":
-                                dawningB.setText(message[1] + " \u2103");
-                                dawningB.setTextColor(getResources().getColor(R.color.colorAccent));
-                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
-                                break;
-                            case "dawningC":
-                                dawningC.setText(message[1] + " \u2103");
-                                dawningC.setTextColor(getResources().getColor(R.color.colorAccent));
-                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
-                                break;
-                            case "dawningD":
-                                dawningD.setText(message[1] + " \u2103");
-                                dawningD.setTextColor(getResources().getColor(R.color.colorAccent));
-                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
-                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
-                                break;
-                            default:
-                                break;
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if ( key.equals(message[0]) ) {
+                                sensor.setText(message[1] + " \u2103");
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            else if ( key.equals("timestamp") || key.equals("NodeInfo") ) {
+                                continue;
+                            }
+                            else {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
+                            }
                         }
                         DateFormat df = new SimpleDateFormat("HH:mm:ss");
                         String date = df.format(Calendar.getInstance().getTime());
-                        timestamp.setText(date);
+                        TextView sensorTime = TextViewMap.get("timestamp");
+                        sensorTime.setText(date);
                     }
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
-                        nodeinfo.setText(String.valueOf(message.length-1));
+                        TextView sensor = TextViewMap.get("NodeInfo");
+                        sensor.setText(String.valueOf(message.length-1));
                     }
                 }
             }
