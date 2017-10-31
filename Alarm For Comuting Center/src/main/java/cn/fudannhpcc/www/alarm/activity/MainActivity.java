@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     public void showImage(String IMAGEURL) {
 
-        Dialog builder = new Dialog(this);
+        final Dialog builder = new Dialog(this);
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
         builder.getWindow().setBackgroundDrawable(
                 new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -252,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     public void onError() {
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
+                        builder.dismiss();
                         Toast.makeText(getApplicationContext(), "获取温控探头曲线失败", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -782,15 +783,31 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         switch ( message[0] ) {
                             case "dawningA":
                                 dawningA.setText(message[1] + " \u2103");
+                                dawningA.setTextColor(getResources().getColor(R.color.colorAccent));
+                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
                                 break;
                             case "dawningB":
                                 dawningB.setText(message[1] + " \u2103");
+                                dawningB.setTextColor(getResources().getColor(R.color.colorAccent));
+                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
                                 break;
                             case "dawningC":
                                 dawningC.setText(message[1] + " \u2103");
+                                dawningC.setTextColor(getResources().getColor(R.color.colorAccent));
+                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningD.setTextColor(getResources().getColor(R.color.text_black));
                                 break;
                             case "dawningD":
                                 dawningD.setText(message[1] + " \u2103");
+                                dawningD.setTextColor(getResources().getColor(R.color.colorAccent));
+                                dawningA.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningB.setTextColor(getResources().getColor(R.color.text_black));
+                                dawningC.setTextColor(getResources().getColor(R.color.text_black));
                                 break;
                             default:
                                 break;
