@@ -181,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if ( ! dawningA.getText().toString().equals("") ) {
                     showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png");
-                    Log.d("MqttService", "ClickA");
                 }
             }
         });
@@ -192,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if ( ! dawningB.getText().toString().equals("") ) {
                     showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png");
-                    Log.d("MqttService", "ClickB");
                 }
             }
         });
@@ -203,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if ( ! dawningC.getText().toString().equals("") ) {
                     showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png");
-                    Log.d("MqttService", "ClickC");
                 }
             }
         });
@@ -214,11 +211,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if ( ! dawningD.getText().toString().equals("") ) {
                     showImage("http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png");
-                    Log.d("MqttService", "ClickD");
                 }
             }
         });
         nodeinfo = (TextView) findViewById(R.id.textView_text_alive);
+        nodeinfo.setText("");
+        nodeinfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( ! nodeinfo.getText().toString().equals("") ) {
+                    showImage("http://www.fudannhpcc.cn/upload/WebResouces.png");
+                }
+            }
+        });
 
     }
 

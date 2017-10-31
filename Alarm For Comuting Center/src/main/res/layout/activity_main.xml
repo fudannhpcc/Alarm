@@ -73,7 +73,10 @@
             android:text=""
             android:textColor="@color/text_blue"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:focusable="false" />
 
     </LinearLayout>
 
