@@ -174,7 +174,20 @@ public class MQTTService extends Service {
             @Override
             public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                 Log.d(TAG, new String(mqttMessage.getPayload()));
-                setMessageNotification(s, new String(mqttMessage.getPayload()));
+                String message = new String(mqttMessage.getPayload());
+                if (activityMessenger != null) {
+                    Message TemperatureMessage = Message.obtain();
+                    TemperatureMessage.what = SEND_MESSAGE_CODE;
+                    Bundle bundle = new Bundle();
+                    if ( message.startsWith("dawning") ) bundle.putString("TemperatureMessage", message);
+                    else if (message.startsWith("NODESINFO")) bundle.putString("NodeinfoMessage", message);
+                    TemperatureMessage.setData(bundle);
+                    try {
+                        activityMessenger.send(TemperatureMessage);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override

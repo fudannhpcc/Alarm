@@ -63,7 +63,12 @@
     <string name="network_status">网络状态</string>
     <string name="mqtt_status" translatable="false">MQTT服务</string>
     <string name="core_status" translatable="false">CORE服务</string>
-    <string name="lbl_mqtt_message_echo">信息输出</string>
+    <string name="nodesalive"  translatable="false">运行节点数</string>
+    <string name="lbl_temperature">温控探头</string>
+    <string name="lbl_dawningA">A</string>
+    <string name="lbl_dawningB">B</string>
+    <string name="lbl_dawningC">C</string>
+    <string name="lbl_dawningD">D</string>
 
     <string name="mqtt_service_name">cn.fudannhpcc.www.alarm.service.MQTTService</string>
     <string name="core_service_name">cn.fudannhpcc.www.alarm.service.CoreService</string>

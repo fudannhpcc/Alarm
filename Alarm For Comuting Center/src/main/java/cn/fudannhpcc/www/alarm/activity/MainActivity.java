@@ -34,8 +34,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -48,6 +50,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -115,6 +118,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private static final int REQ_TTS_STATUS_CHECK = 0;
 
+    private TextView dawningA;
+    private TextView dawningB;
+    private TextView dawningC;
+    private TextView dawningD;
+    private TextView nodeinfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +161,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
 
         mActivityMessenger = new Messenger(mMessengerHandler);
+
+        dawningA = (TextView) findViewById(R.id.textView_text_dawningA);
+        dawningB = (TextView) findViewById(R.id.textView_text_dawningB);
+        dawningC = (TextView) findViewById(R.id.textView_text_dawningC);
+        dawningD = (TextView) findViewById(R.id.textView_text_dawningD);
+        nodeinfo = (TextView) findViewById(R.id.textView_text_alive);
 
     }
 
@@ -658,9 +673,34 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if(msg.what == RECEIVE_MESSAGE_CODE){
                 Bundle data = msg.getData();
                 if(data != null){
-                    ArrayList<HashMap<String, Object>> mNotificationList =
-                            (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
-                    UpdateListView(mNotificationList);
+                    if (data.containsKey("NotificationMessage")) {
+                        ArrayList<HashMap<String, Object>> mNotificationList =
+                                (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                        UpdateListView(mNotificationList);
+                    }
+                    else if (data.containsKey("TemperatureMessage")) {
+                        String message[] = data.getString("TemperatureMessage").trim().split("\t");
+                        switch ( message[0] ) {
+                            case "dawningA":
+                                dawningA.setText(message[1] + " \u2103");
+                                break;
+                            case "dawningB":
+                                dawningB.setText(message[1] + " \u2103");
+                                break;
+                            case "dawningC":
+                                dawningC.setText(message[1] + " \u2103");
+                                break;
+                            case "dawningD":
+                                dawningD.setText(message[1] + " \u2103");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if (data.containsKey("NodeinfoMessage")) {
+                        String message[] = data.getString("NodeinfoMessage").trim().split(" ");
+                        nodeinfo.setText(String.valueOf(message.length-1));
+                    }
                 }
             }
             super.handleMessage(msg);
