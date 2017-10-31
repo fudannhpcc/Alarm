@@ -188,6 +188,7 @@ public class MQTTService extends Service {
                         e.printStackTrace();
                     }
                 }
+                setMessageNotification(s,message);
             }
 
             @Override
