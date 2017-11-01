@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Map.Entry entry = (Map.Entry) o;
             final String key = (String) entry.getKey();
             final TextView sensor = (TextView) entry.getValue();
-            if ( ! key.equals("timestamp") ) sensor.setText("");
+            if ( ! key.equals("timestamp") && !key.equals("NodeInfo") ) sensor.setText("");
             sensor.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -776,16 +776,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                                 sensor.setTextColor(getResources().getColor(R.color.text_black));
                             }
                         }
-                        DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                        String date = df.format(Calendar.getInstance().getTime());
-                        TextView sensorTime = TextViewMap.get("timestamp");
-                        sensorTime.setText(date);
                     }
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodeInfo");
-                        sensor.setText(String.valueOf(message.length-1));
+                        sensor.setText("运行的节点数： " + String.valueOf(message.length-1));
                     }
+                    DateFormat df = new SimpleDateFormat("HH:mm:ss");
+                    String date = df.format(Calendar.getInstance().getTime());
+                    TextView sensorTime = TextViewMap.get("timestamp");
+                    sensorTime.setText("更新时间：  " + date);
                 }
             }
             super.handleMessage(msg);
