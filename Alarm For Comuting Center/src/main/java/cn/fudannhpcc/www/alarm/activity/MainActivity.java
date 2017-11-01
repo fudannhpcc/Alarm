@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         put("dawningA", new Object[]{R.id.textView_text_dawningA,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningA.png","获取温控探头曲线"});
         put("dawningB", new Object[]{R.id.textView_text_dawningB,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningB.png","获取温控探头曲线"});
         put("dawningC", new Object[]{R.id.textView_text_dawningC,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线"});
-        put("dawningD", new Object[]{R.id.textView_text_dawningD,"http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线"});
+        put("inspur", new Object[]{R.id.textView_text_dawningD,"http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线"});
         put("NodeInfo", new Object[]{R.id.textView_text_alive,"http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形"});
     }};
 

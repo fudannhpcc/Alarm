@@ -179,7 +179,7 @@ public class MQTTService extends Service {
                     Message TemperatureMessage = Message.obtain();
                     TemperatureMessage.what = SEND_MESSAGE_CODE;
                     Bundle bundle = new Bundle();
-                    if ( message.startsWith("dawning") ) bundle.putString("TemperatureMessage", message);
+                    if ( message.startsWith("dawning") || message.startsWith("inspur") ) bundle.putString("TemperatureMessage", message);
                     else if (message.startsWith("NODESINFO")) bundle.putString("NodeinfoMessage", message);
                     TemperatureMessage.setData(bundle);
                     try {
