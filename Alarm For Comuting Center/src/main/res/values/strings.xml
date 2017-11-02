@@ -62,7 +62,8 @@
     <!--   网络和服务状态显示  -->
     <string name="network_status">网络状态</string>
     <string name="mqtt_status" translatable="false">MQTT服务</string>
-    <string name="core_status" translatable="false">CORE服务</string>
+    <string name="filepermission_status" translatable="false">外部存储</string>
+    <string name="ttspermission_status" translatable="false">文字语言</string>
     <string name="nodesalive"  translatable="false">运行的节点数</string>
     <string name="lbl_temperature">时间戳</string>
     <string name="lbl_dawningA">温控探头A</string>

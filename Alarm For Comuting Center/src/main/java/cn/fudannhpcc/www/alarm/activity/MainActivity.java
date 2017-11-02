@@ -289,6 +289,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             else {
                 Toast.makeText(MainActivity.this,"谷歌文本朗读功能开启！", Toast.LENGTH_LONG).show();
             }
+            RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.ttspermission_RGBLed);
+            if ( Constants.TTS_SUPPORT ) connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
+            else connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
+
         }
     }
 
@@ -987,7 +991,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.filepermission_RGBLed);
         if (result == PackageManager.PERMISSION_GRANTED) {
+            connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
             Constants.STORAGE_ACCESS = true;
             makeDirectory();
             onSaveRawtoExternal("warning.wav");
@@ -995,6 +1001,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             return true;
         } else {
             Constants.STORAGE_ACCESS = false;
+            connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
             return false;
         }
     }
@@ -1026,6 +1033,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 }
                 break;
         }
+        RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.filepermission_RGBLed);
+        if ( Constants.STORAGE_ACCESS ) connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
+        else connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
     }
 
     private void makeDirectory() {
