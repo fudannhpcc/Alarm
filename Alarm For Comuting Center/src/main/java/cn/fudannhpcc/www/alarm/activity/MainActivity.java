@@ -2,6 +2,7 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -38,6 +39,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -440,8 +445,29 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 startActivity(intentSettingActivity);
                 break;
             case R.id.detail:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.fudannhpcc.cn/mqttreceiver.php"));
-                startActivity(browserIntent);
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//                alert.setTitle("Title here");
+
+                WebView wv = new WebView(this);
+                wv.loadUrl("http://www.fudannhpcc.cn/mqttreceiver.php");
+                wv.getSettings().setSupportZoom(true);
+                wv.getSettings().setBuiltInZoomControls(true);
+                wv.getSettings().setDisplayZoomControls(true);
+                wv.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        view.loadUrl(url);
+                        return true;
+                    }
+                });
+                alert.setView(wv);
+                alert.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.show();
                 break;
             case R.id.deletemag:
                 Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
@@ -528,6 +554,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean init_finish = false;
     private TextToSpeech tts;
 
+    private Animation animtext;
+
     private void init() {
         if (Build.VERSION.SDK_INT >= 23)
         {
@@ -574,6 +602,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
         mPowerKeyObserver.startListen();
+
+        animtext = new AlphaAnimation(0.2f, 1.0f);
+        animtext.setDuration(3000); //You can manage the blinking time with this parameter
+        animtext.setStartOffset(0);
+        animtext.setRepeatMode(Animation.REVERSE);
+        animtext.setRepeatCount(Animation.INFINITE);
+
     }
 
     /* 开始： 判断程序是不是第一次启动 */
@@ -785,19 +820,21 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodeInfo");
-                        String htmlString="可使用节点数： <u><font color='red'>" + String.valueOf(message.length-1) + "</font></u>";
+                        String htmlString="<u><font color='red'>" + String.valueOf(message.length-1) + "</font></u>";
                         sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                        sensor.startAnimation(animtext);
                     }
                     else if (data.containsKey("NodesnumMessage")) {
                         String message[] = data.getString("NodesnumMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodesNum");
-                        String htmlString="正使用核数： <u><font color='red'>" + message[1] + "</font></u>";
+                        String htmlString="<u><font color='red'>" + message[1] + "</font></u>";
                         sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                        sensor.startAnimation(animtext);
                     }
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
                     String date = df.format(Calendar.getInstance().getTime());
                     TextView sensorTime = TextViewMap.get("timestamp");
-                    sensorTime.setText("更新时间：  " + date);
+                    sensorTime.setText(date);
                 }
             }
             super.handleMessage(msg);
