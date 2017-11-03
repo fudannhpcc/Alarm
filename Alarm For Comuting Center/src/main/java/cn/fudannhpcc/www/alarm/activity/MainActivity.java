@@ -32,6 +32,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         put("dawningC", new Object[]{R.id.textView_text_dawningC,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线"});
         put("inspur", new Object[]{R.id.textView_text_dawningD,"http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线"});
         put("NodeInfo", new Object[]{R.id.textView_text_alive,"http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形"});
+        put("NodesNum", new Object[]{R.id.textView_text_nodesnum,"",""});
     }};
 
     @Override
@@ -190,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Map.Entry entry = (Map.Entry) o;
             final String key = (String) entry.getKey();
             final TextView sensor = (TextView) entry.getValue();
-            if ( ! key.equals("timestamp") && !key.equals("NodeInfo") ) sensor.setText("");
+            if ( ! key.equals("timestamp") && !key.equals("NodeInfo") && !key.equals("NodesNum") ) sensor.setText("");
             sensor.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -752,6 +754,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @SuppressLint("HandlerLeak")
     private Handler mMessengerHandler = new Handler() {
+        @SuppressLint("SetTextI18n")
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void handleMessage(Message msg) {
@@ -770,13 +773,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                             final String key = (String) entry.getKey();
                             final TextView sensor = (TextView) entry.getValue();
                             if ( key.equals(message[0]) ) {
-                                sensor.setText(message[1] + " \u2103");
+                                String htmlString="<u>" + message[1] + " \u2103</u>";
+                                sensor.setText(Html.fromHtml(htmlString));
                                 sensor.setTextColor(getResources().getColor(R.color.colorAccent));
                             }
-                            else if ( key.equals("timestamp") || key.equals("NodeInfo") ) {
-                                continue;
-                            }
-                            else {
+                            else if (!key.equals("timestamp") && !key.equals("NodeInfo") && !key.equals("NodesNum")) {
                                 sensor.setTextColor(getResources().getColor(R.color.text_black));
                             }
                         }
@@ -784,7 +785,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodeInfo");
-                        sensor.setText("运行的节点数： " + String.valueOf(message.length-1));
+                        String htmlString="可使用节点数： <u>" + String.valueOf(message.length-1) + "</u>";
+                        sensor.setText(Html.fromHtml(htmlString));
+                    }
+                    else if (data.containsKey("NodesnumMessage")) {
+                        String message[] = data.getString("NodesnumMessage").trim().split(" ");
+                        TextView sensor = TextViewMap.get("NodesNum");
+                        sensor.setText("正使用核数： " +  message[1]);
                     }
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
                     String date = df.format(Calendar.getInstance().getTime());

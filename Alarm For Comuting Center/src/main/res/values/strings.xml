@@ -64,7 +64,8 @@
     <string name="mqtt_status" translatable="false">MQTT服务</string>
     <string name="filepermission_status" translatable="false">外部存储许可</string>
     <string name="ttspermission_status" translatable="false">文字语言许可</string>
-    <string name="nodesalive"  translatable="false">运行的节点数</string>
+    <string name="nodesalive"  translatable="false">可使用节点数：</string>
+    <string name="nodesnum"  translatable="false">正使用核数：</string>
     <string name="lbl_temperature">时间戳</string>
     <string name="lbl_dawningA">温控探头A</string>
     <string name="lbl_dawningB">温控探头B</string>
