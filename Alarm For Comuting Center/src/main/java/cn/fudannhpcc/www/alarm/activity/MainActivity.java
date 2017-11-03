@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         put("dawningC", new Object[]{R.id.textView_text_dawningC,"http://www.fudannhpcc.cn/upload/WebEnvRes.dawningC.png","获取温控探头曲线"});
         put("inspur", new Object[]{R.id.textView_text_dawningD,"http://www.fudannhpcc.cn/upload/WebEnvRes.inspur.png","获取温控探头曲线"});
         put("NodeInfo", new Object[]{R.id.textView_text_alive,"http://www.fudannhpcc.cn/upload/WebResouces.png","获取计算资源使用图形"});
-        put("NodesNum", new Object[]{R.id.textView_text_nodesnum,"",""});
+        put("NodesNum", new Object[]{R.id.textView_text_nodesnum,"http://www.fudannhpcc.cn/upload/WebHistory.png","获取当月计算资源使用状况"});
     }};
 
     @Override
@@ -785,13 +785,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodeInfo");
-                        String htmlString="可使用节点数： <u>" + String.valueOf(message.length-1) + "</u>";
-                        sensor.setText(Html.fromHtml(htmlString));
+                        String htmlString="可使用节点数： <u><font color='red'>" + String.valueOf(message.length-1) + "</font></u>";
+                        sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
                     }
                     else if (data.containsKey("NodesnumMessage")) {
                         String message[] = data.getString("NodesnumMessage").trim().split(" ");
                         TextView sensor = TextViewMap.get("NodesNum");
-                        sensor.setText("正使用核数： " +  message[1]);
+                        String htmlString="正使用核数： <u><font color='red'>" + message[1] + "</font></u>";
+                        sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
                     }
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
                     String date = df.format(Calendar.getInstance().getTime());
