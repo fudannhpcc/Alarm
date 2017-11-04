@@ -14,17 +14,6 @@
         android:title="@string/save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/back"
-        android:checkable="false"
-        android:enabled="true"
-        android:orderInCategory="200"
-        android:title="@string/back"
-        android:icon="@mipmap/ic_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

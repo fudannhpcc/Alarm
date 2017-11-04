@@ -3,6 +3,8 @@ package cn.fudannhpcc.www.alarm.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -40,6 +42,14 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        android.support.v7.app.ActionBar actionBar= getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.mipmap.ic_launcher);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#a159ff")));
 
         hostname = (EditText) findViewById(R.id.editText_hostname);
         protocol_tcp = (CheckBox) findViewById(R.id.checkBox_tcp_protocol);
@@ -168,10 +178,6 @@ public class SettingActivity extends AppCompatActivity {
                     break;
                 }
                 Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
-                finish();
-                return true;
-            case R.id.back:
-                Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
                 finish();
                 return true;
             default:

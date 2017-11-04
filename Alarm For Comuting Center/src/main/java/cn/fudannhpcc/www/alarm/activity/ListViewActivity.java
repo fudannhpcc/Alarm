@@ -1,6 +1,8 @@
 package cn.fudannhpcc.www.alarm.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -20,6 +22,14 @@ public class ListViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
+
+        android.support.v7.app.ActionBar actionBar= getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.mipmap.ic_launcher);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#a159ff")));
 
         Intent intent = getIntent();
         HashMap<String, Object> listviewItem = (HashMap<String, Object>) intent.getSerializableExtra("listviewItem");
@@ -49,10 +59,6 @@ public class ListViewActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.back:
-                Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-                finish();
-                return true;
             default:
                 break;
         }

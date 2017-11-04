@@ -16,7 +16,6 @@
     <string name="silent">静音</string>
     <string name="setting">设置</string>
         <string name="save">保存</string>
-        <string name="back">返回</string>
         <string name="title_activity_setting">设置</string>
     <string name="detailurl">故障详情</string>
     <string name="update">已是最新版本</string>
