@@ -16,4 +16,6 @@ public class Constants {
     public static boolean TTS_SUPPORT = false;
     public static boolean UPDATE_VISIBLE = false;
     public static boolean STORAGE_ACCESS = false;
+
+    public static String WEBLINK = "";
 }

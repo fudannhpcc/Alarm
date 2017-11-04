@@ -35,6 +35,11 @@
             android:theme="@style/MyTheme" />
 
         <activity
+            android:name=".activity.WebLinkActivity"
+            android:label="@string/title_activity_weblink"
+            android:theme="@style/MyTheme" />
+
+        <activity
             android:name=".activity.ListViewActivity"
             android:label="@string/title_activity_listview"
             android:theme="@style/MyTheme" />

@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
+    private Intent intentWebLinkActivity;
 
     @SuppressLint("StaticFieldLeak")
     private static Activity thisActivity = null;
@@ -455,29 +456,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 startActivity(intentSettingActivity);
                 break;
             case R.id.detail:
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//                alert.setTitle("Title here");
-
-                WebView wv = new WebView(this);
-                wv.loadUrl("http://www.fudannhpcc.cn/mqttreceiver.php");
-                wv.getSettings().setSupportZoom(true);
-                wv.getSettings().setBuiltInZoomControls(true);
-                wv.getSettings().setDisplayZoomControls(true);
-                wv.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-                        return true;
-                    }
-                });
-                alert.setView(wv);
-                alert.setNegativeButton("关闭", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-                alert.show();
+                Constants.WEBLINK = "http://www.fudannhpcc.cn/mqttreceiver.php";
+                intentWebLinkActivity = new Intent(MainActivity.this, WebLinkActivity.class);
+                startActivity(intentWebLinkActivity);
                 break;
             case R.id.deletemag:
                 Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
