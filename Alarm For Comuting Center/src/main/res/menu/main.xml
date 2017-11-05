@@ -50,17 +50,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/detail"
-        android:checkable="false"
-        android:enabled="true"
-        android:icon="@mipmap/ic_detailurl"
-        android:orderInCategory="100"
-        android:title="@string/detailurl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/deletemag"
         android:checkable="false"
         android:enabled="true"

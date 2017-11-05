@@ -6,20 +6,20 @@
     android:layout_height="match_parent"
     tools:context="cn.fudannhpcc.www.alarm.activity.MainActivity">
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/container"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="0.1dp"
+        android:weightSum="1">
 
-
-        <LinearLayout
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginTop="0.1dp"
-            android:weightSum="1">
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_marginTop="0dp"
@@ -120,7 +120,7 @@
                         android:text="@string/ttspermission_status"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textSize="10sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold" android:paddingEnd="0dp" />
 
                     <cn.fudannhpcc.www.alarm.customview.RGBLEDView
                         android:id="@+id/ttspermission_RGBLed"
@@ -158,12 +158,13 @@
                         android:gravity="left"
                         android:layout_gravity="center_vertical"
                         android:clickable="true"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:onClick="onClick"
                         android:text=""
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        tools:ignore="OnClick" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -189,7 +190,8 @@
                         android:textSize="12sp"
                         android:clickable="true"
                         android:onClick="onClick"
-                        android:focusable="false" />
+                        android:focusable="true"
+                        tools:ignore="OnClick" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -215,7 +217,8 @@
                         android:textSize="12sp"
                         android:clickable="true"
                         android:onClick="onClick"
-                        android:focusable="false" />
+                        android:focusable="true"
+                        tools:ignore="OnClick" />
 
                 </TableRow>
 
@@ -248,12 +251,13 @@
                         android:layout_weight="2"
                         android:gravity="center"
                         android:clickable="true"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:onClick="onClick"
                         android:text=""
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/colorAccent"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        tools:ignore="OnClick" />
 
                     <TextView
                         android:id="@+id/textView_lbl_dawningB"
@@ -277,12 +281,13 @@
                         android:layout_weight="2"
                         android:gravity="center"
                         android:clickable="true"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:onClick="onClick"
                         android:text=""
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/colorAccent"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        tools:ignore="OnClick" />
                 </TableRow>
 
                 <TableRow
@@ -319,7 +324,8 @@
                         android:textSize="12sp"
                         android:clickable="true"
                         android:onClick="onClick"
-                        android:focusable="false" />
+                        android:focusable="true"
+                        tools:ignore="OnClick" />
 
                     <TextView
                         android:id="@+id/textView_lbl_dawningD"
@@ -348,29 +354,66 @@
                         android:textSize="12sp"
                         android:clickable="true"
                         android:onClick="onClick"
-                        android:focusable="false" />
+                        android:focusable="true"
+                        tools:ignore="OnClick" />
 
                 </TableRow>
             </TableLayout>
+        </FrameLayout>
 
-            <ListView
-                android:id="@+id/mqtt_message_echo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="0dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="0dp"
-                android:layout_marginTop="0.3dp"
-                android:background="@drawable/ic_border"
-                android:gravity="center"
-                android:text=""
-                android:textColor="@android:color/black"
-                android:textSize="10sp" />
+        <ListView
+            android:id="@+id/mqtt_message_echo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0.3dp"
+            android:background="@drawable/ic_border"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@android:color/black"
+            android:textSize="10sp"
+            android:visibility="invisible" />
 
-        </LinearLayout>
+        <WebView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0.3dp"
+            android:background="@drawable/ic_border"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@android:color/black"
+            android:visibility="invisible" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/textView_text_temp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="暂定"
+            android:textColor="@color/colorAccent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp" />
 
+
+        <TextView
+            android:id="@+id/textView_text_log"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="系统日志"
+            android:textColor="@color/colorAccent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 </RelativeLayout>

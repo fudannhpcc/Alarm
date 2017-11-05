@@ -32,6 +32,8 @@ import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -87,7 +90,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -112,7 +114,7 @@ import cn.fudannhpcc.www.alarm.receiver.ServiceUtils;
 import cn.fudannhpcc.www.alarm.customview.RGBLEDView;
 import util.UpdateAppUtils;
 
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, ActionBar.TabListener {
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
@@ -151,6 +153,75 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }};
 
     @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        Log.d("Hello-onTabSelected", (String) tab.getText());
+        switch ((String) tab.getText()) {
+            case "集群故障":
+                mqtt_message_echo.setVisibility(View.VISIBLE);
+                break;
+            case "中心网站":
+                openweb();
+                break;
+            case "暂定":
+                textview_tmp.setVisibility(View.VISIBLE);
+                break;
+            case "日志":
+                mqtt_message_log.setVisibility(View.VISIBLE);
+                break;
+            default:
+        }
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        Log.d("Hello-onTabUnselected", (String) tab.getText());
+        switch ((String) tab.getText()) {
+            case "集群故障":
+                mqtt_message_echo.setVisibility(View.GONE);
+                break;
+            case "中心网站":
+                webView.setVisibility(View.GONE);
+                break;
+            case "暂定":
+                textview_tmp.setVisibility(View.GONE);
+                break;
+            case "日志":
+                mqtt_message_log.setVisibility(View.GONE);
+                break;
+            default:
+        }
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        Log.d("Hello-onTabReselected", (String) tab.getText());
+    }
+
+    private void openweb () {
+        webView.setVisibility(View.VISIBLE);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        webSettings.setLoadWithOverviewMode(true);
+        webView.loadUrl("http://www.fudannhpcc.cn/");
+        final PackageManager pm = this.getPackageManager();
+        boolean supportsMultiTouch =
+                pm.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)
+                        || pm.hasSystemFeature(PackageManager.FEATURE_FAKETOUCH_MULTITOUCH_DISTINCT);
+        webView.getSettings().setDisplayZoomControls(!supportsMultiTouch);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -158,10 +229,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         android.support.v7.app.ActionBar actionBar= getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setLogo(R.mipmap.ic_launcher);
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#a159ff")));
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#228B22")));
 
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
@@ -188,6 +260,38 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         MqttServiceName = getString(R.string.mqtt_service_name);
 
         mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
+        webView = (WebView) findViewById(R.id.webView);
+        textview_tmp = (TextView) findViewById(R.id.textView_text_temp);
+        mqtt_message_log = (TextView) findViewById(R.id.textView_text_log);
+
+        mqtt_message_echo.setVisibility(View.VISIBLE);
+        webView.setVisibility(View.GONE);
+        textview_tmp.setVisibility(View.GONE);
+        mqtt_message_log.setVisibility(View.GONE);
+
+        ActionBar.Tab TabOne = actionBar.newTab();
+        TabOne.setText("集群故障").setTabListener(this);
+        TabOne.setIcon(R.mipmap.ic_warning);
+        TabOne.setTabListener(this);
+        actionBar.addTab(TabOne);
+
+        ActionBar.Tab TabTwo = actionBar.newTab();
+        TabTwo.setText("中心网站").setTabListener(this);
+        TabTwo.setIcon(R.mipmap.ic_home);
+        TabTwo.setTabListener(this);
+        actionBar.addTab(TabTwo);
+
+        ActionBar.Tab TabThree = actionBar.newTab();
+        TabThree.setText("暂定").setTabListener(this);
+        TabThree.setIcon(R.mipmap.ic_building);
+        TabThree.setTabListener(this);
+        actionBar.addTab(TabThree);
+
+        ActionBar.Tab TabFour = actionBar.newTab();
+        TabFour.setText("日志").setTabListener(this);
+        TabFour.setIcon(R.mipmap.ic_log);
+        TabFour.setTabListener(this);
+        actionBar.addTab(TabFour);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -455,11 +559,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 intentSettingActivity = new Intent(MainActivity.this, SettingActivity.class);
                 startActivity(intentSettingActivity);
                 break;
-            case R.id.detail:
-                Constants.WEBLINK = "http://www.fudannhpcc.cn/mqttreceiver.php";
-                intentWebLinkActivity = new Intent(MainActivity.this, WebLinkActivity.class);
-                startActivity(intentWebLinkActivity);
-                break;
             case R.id.deletemag:
                 Toast.makeText(this, "删除信息", Toast.LENGTH_SHORT).show();
                 Constants.PENDINGNOTIFICATIONCCOUNT = false;
@@ -652,8 +751,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return sb.toString();
     }
 
-    public void onClick(View view) {
-    }
     /* 结束： 判断程序是不是第一次启动 */
 
     private class UpdateTimerTask extends TimerTask {
@@ -833,6 +930,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     };
 
     ListView mqtt_message_echo;
+    WebView webView;
+    TextView textview_tmp;
+    TextView mqtt_message_log;
     SimpleAdapter mqtt_message_adapter;
     private Intent intentListViewActivity;
 
