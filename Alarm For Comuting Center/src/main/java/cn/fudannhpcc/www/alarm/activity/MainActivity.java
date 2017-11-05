@@ -156,17 +156,17 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         Log.d("Hello-onTabSelected", (String) tab.getText());
         switch ((String) tab.getText()) {
-            case "集群故障":
+            case "故障":
                 mqtt_message_echo.setVisibility(View.VISIBLE);
-                break;
-            case "中心网站":
-                openweb();
                 break;
             case "暂定":
                 textview_tmp.setVisibility(View.VISIBLE);
                 break;
             case "日志":
                 mqtt_message_log.setVisibility(View.VISIBLE);
+                break;
+            case "网站":
+                openweb();
                 break;
             default:
         }
@@ -176,17 +176,17 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
         Log.d("Hello-onTabUnselected", (String) tab.getText());
         switch ((String) tab.getText()) {
-            case "集群故障":
+            case "故障":
                 mqtt_message_echo.setVisibility(View.GONE);
-                break;
-            case "中心网站":
-                webView.setVisibility(View.GONE);
                 break;
             case "暂定":
                 textview_tmp.setVisibility(View.GONE);
                 break;
             case "日志":
                 mqtt_message_log.setVisibility(View.GONE);
+                break;
+            case "网站":
+                webView.setVisibility(View.GONE);
                 break;
             default:
         }
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         webSettings.setUseWideViewPort(true);
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webSettings.setLoadWithOverviewMode(true);
-        webView.loadUrl("http://www.fudannhpcc.cn/");
+        webView.loadUrl("http://www.fudannhpcc.cn/resources.php");
         final PackageManager pm = this.getPackageManager();
         boolean supportsMultiTouch =
                 pm.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)
@@ -270,26 +270,26 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         mqtt_message_log.setVisibility(View.GONE);
 
         ActionBar.Tab TabOne = actionBar.newTab();
-        TabOne.setText("集群故障").setTabListener(this);
+        TabOne.setText("故障").setTabListener(this);
         TabOne.setIcon(R.mipmap.ic_warning);
         TabOne.setTabListener(this);
         actionBar.addTab(TabOne);
 
         ActionBar.Tab TabTwo = actionBar.newTab();
-        TabTwo.setText("中心网站").setTabListener(this);
-        TabTwo.setIcon(R.mipmap.ic_home);
+        TabTwo.setText("暂定").setTabListener(this);
+        TabTwo.setIcon(R.mipmap.ic_building);
         TabTwo.setTabListener(this);
         actionBar.addTab(TabTwo);
 
         ActionBar.Tab TabThree = actionBar.newTab();
-        TabThree.setText("暂定").setTabListener(this);
-        TabThree.setIcon(R.mipmap.ic_building);
+        TabThree.setText("日志").setTabListener(this);
+        TabThree.setIcon(R.mipmap.ic_log);
         TabThree.setTabListener(this);
         actionBar.addTab(TabThree);
 
         ActionBar.Tab TabFour = actionBar.newTab();
-        TabFour.setText("日志").setTabListener(this);
-        TabFour.setIcon(R.mipmap.ic_log);
+        TabFour.setText("网站").setTabListener(this);
+        TabFour.setIcon(R.mipmap.ic_home);
         TabFour.setTabListener(this);
         actionBar.addTab(TabFour);
 
