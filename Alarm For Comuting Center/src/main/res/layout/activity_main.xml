@@ -392,28 +392,5 @@
             android:textColor="@android:color/black"
             android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/textView_text_temp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:text="暂定"
-            android:textColor="@color/colorAccent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="12sp" />
-
-
-        <TextView
-            android:id="@+id/textView_text_log"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:text="系统日志"
-            android:textColor="@color/colorAccent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="12sp" />
-
     </LinearLayout>
 </RelativeLayout>

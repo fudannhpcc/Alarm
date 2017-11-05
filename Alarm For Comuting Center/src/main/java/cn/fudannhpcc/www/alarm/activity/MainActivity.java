@@ -2,7 +2,6 @@ package cn.fudannhpcc.www.alarm.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -19,7 +18,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -32,7 +30,6 @@ import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -75,7 +72,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -118,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private CustomDialog CustomDialog;
     private Intent intentSettingActivity;
-    private Intent intentWebLinkActivity;
 
     @SuppressLint("StaticFieldLeak")
     private static Activity thisActivity = null;
@@ -154,18 +149,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        Log.d("Hello-onTabSelected", (String) tab.getText());
         switch ((String) tab.getText()) {
-            case "故障":
+            case "集群故障":
                 mqtt_message_echo.setVisibility(View.VISIBLE);
                 break;
-            case "暂定":
-                textview_tmp.setVisibility(View.VISIBLE);
-                break;
-            case "日志":
-                mqtt_message_log.setVisibility(View.VISIBLE);
-                break;
-            case "网站":
+            case "中心网站":
                 openweb();
                 break;
             default:
@@ -174,18 +162,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        Log.d("Hello-onTabUnselected", (String) tab.getText());
         switch ((String) tab.getText()) {
-            case "故障":
+            case "集群故障":
                 mqtt_message_echo.setVisibility(View.GONE);
                 break;
-            case "暂定":
-                textview_tmp.setVisibility(View.GONE);
-                break;
-            case "日志":
-                mqtt_message_log.setVisibility(View.GONE);
-                break;
-            case "网站":
+            case "中心网站":
                 webView.setVisibility(View.GONE);
                 break;
             default:
@@ -194,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        Log.d("Hello-onTabReselected", (String) tab.getText());
     }
 
     private void openweb () {
@@ -261,34 +241,18 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         mqtt_message_echo = (ListView) findViewById(R.id.mqtt_message_echo);
         webView = (WebView) findViewById(R.id.webView);
-        textview_tmp = (TextView) findViewById(R.id.textView_text_temp);
-        mqtt_message_log = (TextView) findViewById(R.id.textView_text_log);
 
         mqtt_message_echo.setVisibility(View.VISIBLE);
         webView.setVisibility(View.GONE);
-        textview_tmp.setVisibility(View.GONE);
-        mqtt_message_log.setVisibility(View.GONE);
 
         ActionBar.Tab TabOne = actionBar.newTab();
-        TabOne.setText("故障").setTabListener(this);
+        TabOne.setText("集群故障").setTabListener(this);
         TabOne.setIcon(R.mipmap.ic_warning);
         TabOne.setTabListener(this);
         actionBar.addTab(TabOne);
 
-        ActionBar.Tab TabTwo = actionBar.newTab();
-        TabTwo.setText("暂定").setTabListener(this);
-        TabTwo.setIcon(R.mipmap.ic_building);
-        TabTwo.setTabListener(this);
-        actionBar.addTab(TabTwo);
-
-        ActionBar.Tab TabThree = actionBar.newTab();
-        TabThree.setText("日志").setTabListener(this);
-        TabThree.setIcon(R.mipmap.ic_log);
-        TabThree.setTabListener(this);
-        actionBar.addTab(TabThree);
-
         ActionBar.Tab TabFour = actionBar.newTab();
-        TabFour.setText("网站").setTabListener(this);
+        TabFour.setText("中心网站").setTabListener(this);
         TabFour.setIcon(R.mipmap.ic_home);
         TabFour.setTabListener(this);
         actionBar.addTab(TabFour);
@@ -931,8 +895,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     ListView mqtt_message_echo;
     WebView webView;
-    TextView textview_tmp;
-    TextView mqtt_message_log;
     SimpleAdapter mqtt_message_adapter;
     private Intent intentListViewActivity;
 
