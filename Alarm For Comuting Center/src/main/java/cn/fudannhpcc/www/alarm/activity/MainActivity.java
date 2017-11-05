@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.connection_status_RGBLed);
         connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
 
-        Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "启动服务", Toast.LENGTH_SHORT).show();
         Intent coreservice_intent = new Intent(this, CoreService.class);
         coreservice_intent.setAction(CoreServiceName);
         startService(coreservice_intent);
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Constants.TTS_SUPPORT = false;
             }
             else {
-                Toast.makeText(MainActivity.this,"谷歌文本朗读功能开启！", Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this,"谷歌文本朗读功能开启！", Toast.LENGTH_LONG).show();
             }
             RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) findViewById(R.id.ttspermission_RGBLed);
             if ( Constants.TTS_SUPPORT ) connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
                 }
                 else {
-                    Toast.makeText(this, "谷歌文本朗读不能正常工作！", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "谷歌文本朗读不能正常工作！", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.update:
@@ -608,8 +608,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     boolean init_finish = false;
     private TextToSpeech tts;
 
-    private Animation animtext;
-
     private void init() {
         if (Build.VERSION.SDK_INT >= 23)
         {
@@ -656,13 +654,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
         mPowerKeyObserver.startListen();
-
-        animtext = new AlphaAnimation(0.2f, 1.0f);
-        animtext.setDuration(3000); //You can manage the blinking time with this parameter
-        animtext.setStartOffset(0);
-        animtext.setRepeatMode(Animation.REVERSE);
-        animtext.setRepeatCount(Animation.INFINITE);
-
     }
 
     /* 开始： 判断程序是不是第一次启动 */
@@ -864,24 +855,48 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                                 sensor.setText(Html.fromHtml(htmlString));
                                 sensor.setTextColor(getResources().getColor(R.color.colorAccent));
                             }
-                            else if (!key.equals("timestamp") && !key.equals("NodeInfo") && !key.equals("NodesNum")) {
+                            else if (!key.equals("timestamp")) {
                                 sensor.setTextColor(getResources().getColor(R.color.text_black));
                             }
                         }
                     }
                     else if (data.containsKey("NodeinfoMessage")) {
                         String message[] = data.getString("NodeinfoMessage").trim().split(" ");
-                        TextView sensor = TextViewMap.get("NodeInfo");
-                        String htmlString="<u><font color='red'>" + String.valueOf(message.length-1) + "</font></u>";
-                        sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
-                        sensor.startAnimation(animtext);
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if ( key.equals("NodeInfo") ) {
+                                String htmlString="<u>" + String.valueOf(message.length-1) + "</u>";
+                                sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            if ( key.equals("NodesNum") ) {
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            else if (!key.equals("timestamp")) {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
+                            }
+                        }
                     }
                     else if (data.containsKey("NodesnumMessage")) {
                         String message[] = data.getString("NodesnumMessage").trim().split(" ");
-                        TextView sensor = TextViewMap.get("NodesNum");
-                        String htmlString="<u><font color='red'>" + message[1] + "</font></u>";
-                        sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
-                        sensor.startAnimation(animtext);
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if ( key.equals("NodesNum") ) {
+                                String htmlString="<u>" + message[1] + "</u>";
+                                sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            else if (key.equals("NodeInfo")) {
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            else if (!key.equals("timestamp")) {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
+                            }
+                        }
                     }
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
                     String date = df.format(Calendar.getInstance().getTime());

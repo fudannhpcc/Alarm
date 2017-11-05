@@ -34,17 +34,12 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         AppCompatActivity yourActivity = (AppCompatActivity) context;
         RGBLEDView connectionStatusRGBLEDView = (RGBLEDView) yourActivity.findViewById(R.id.connection_status_RGBLed);
-//        RGBLEDView mqttbrokerStatusRGBLEDView = (RGBLEDView) ((Activity)context).findViewById(R.id.mqtt_broker_status_RGBLed);
         try
         {
             if (isOnline(context)) {
                 connectionStatusRGBLEDView.setColorLight(MyColors.getGreen());
-//                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getGreen());
-                Toast.makeText(context, "网络连通啦",Toast.LENGTH_SHORT).show();
             } else {
                 connectionStatusRGBLEDView.setColorLight(MyColors.getRed());
-//                mqttbrokerStatusRGBLEDView.setColorLight(MyColors.getRed());
-                Toast.makeText(context, "网络断开啦",Toast.LENGTH_SHORT).show();
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -63,16 +58,16 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 //获取移动数据连接的信息
                 NetworkInfo dataNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    Toast.makeText(context, "WIFI已连接,移动数据已连接", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "WIFI已连接,移动数据已连接", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
-                    Toast.makeText(context, "WIFI已连接,移动数据已断开", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "WIFI已连接,移动数据已断开", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    Toast.makeText(context, "WIFI已断开,移动数据已连接", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "WIFI已断开,移动数据已连接", Toast.LENGTH_SHORT).show();
                     return true;
                 } else {
-                    Toast.makeText(context, "WIFI已断开,移动数据已断开", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "WIFI已断开,移动数据已断开", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -107,7 +102,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                             sb.append(nettype.get(i)).append(", ");
                         }
                     }
-                    Toast.makeText(context, sb.toString(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, sb.toString(), Toast.LENGTH_SHORT).show();
                 }
                 return iconn;
             }

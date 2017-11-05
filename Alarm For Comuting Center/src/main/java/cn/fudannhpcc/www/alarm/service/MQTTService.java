@@ -144,18 +144,18 @@ public class MQTTService extends Service {
         super.onCreate();
         context = getApplicationContext();
         SprefsMap = readFromPrefs();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new Handler(Looper.getMainLooper()).post(
-                        new Runnable() {
-                            public void run() {
-                                Toast.makeText(context,"MQTT服务启动", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                new Handler(Looper.getMainLooper()).post(
+//                        new Runnable() {
+//                            public void run() {
+//                                Toast.makeText(context,"MQTT服务启动", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                );
+//            }
+//        }).start();
 
         PahoMqttClient pahoMqttClient = new PahoMqttClient();
         MqttAndroidClient mqttAndroidClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);

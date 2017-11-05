@@ -38,13 +38,13 @@ public class CoreService extends Service {
 
     @Override
     public void onDestroy() {
-        new Handler(Looper.getMainLooper()).post(
-                new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "CORE服务退出",Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
+//        new Handler(Looper.getMainLooper()).post(
+//                new Runnable() {
+//                    public void run() {
+//                        Toast.makeText(getApplicationContext(), "CORE服务退出",Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//        );
         super.onDestroy();
     }
 
@@ -53,13 +53,13 @@ public class CoreService extends Service {
         String MQTTerviceName = getString(R.string.mqtt_service_name);
         boolean isService = ServiceUtils.isServiceRunning(getApplicationContext(),MQTTerviceName);
         if ( !isService ) this.startService(new Intent(this,MQTTService.class));
-        new Handler(Looper.getMainLooper()).post(
-                new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Core服务保护启动",Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
+//        new Handler(Looper.getMainLooper()).post(
+//                new Runnable() {
+//                    public void run() {
+//                        Toast.makeText(getApplicationContext(), "Core服务保护启动",Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//        );
         return START_STICKY;
     }
 
