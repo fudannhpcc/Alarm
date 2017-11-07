@@ -383,6 +383,7 @@ public class MQTTService extends Service {
 
     String title = null, message = null; Uri WARNINGSOUND = null;
     private boolean SERIOUS;
+    private static final int TEMPERATURE_SERIOUS = 1, RUNNING_SERIOUS = 20, DEAD_SERIOUS = 10;
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
             SERIOUS = false;
@@ -391,31 +392,32 @@ public class MQTTService extends Service {
             message = msg.split("]")[1].trim();
             String messagelist[] = message.split("\n");
             WARNINGID = 0;
+            int iaa = 0, ibb = 0, icc = 0;
             for(String tmp : messagelist) {
                 tmp = tmp.trim();
                 if (tmp.contains("温控报警")) {
                     title += "温控 ";
                     WARNINGID += 1;
                     String[] aa = ((tmp.split("：")[1]).trim()).split(" ");
-                    int iaa = aa.length;
+                    iaa = aa.length;
                     voicetemperature = ".. " + iaa + "个温控报警";
-                    SERIOUS = true;
                 }
                 if (tmp.contains("节点故障")) {
                     title += "运行 ";
                     WARNINGID += 1;
                     String[] bb = ((tmp.split("：")[1]).trim()).split(" ");
-                    int ibb = bb.length;
+                    ibb = bb.length;
                     voiceabnormal = ".. " + ibb + "个节点运行故障";
                 }
                 if (tmp.contains("宕机节点")) {
                     title += "宕机 ";
                     WARNINGID += 1;
                     String[] cc = ((tmp.split("：")[1]).trim()).split(" ");
-                    int icc = cc.length;
+                    icc = cc.length;
                     voicedead = ".. " + icc + "个节点宕机故障";
                 }
             }
+            if( iaa >= TEMPERATURE_SERIOUS || ibb >= RUNNING_SERIOUS || icc >= DEAD_SERIOUS ) SERIOUS = true;
             message = message.trim();
             String voicetitle = voicetemperature + voiceabnormal + voicedead;
             String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
