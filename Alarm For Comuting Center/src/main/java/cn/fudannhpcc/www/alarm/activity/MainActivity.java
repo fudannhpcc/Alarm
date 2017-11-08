@@ -629,7 +629,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
         /*  启动检查信息更新 */
-        UpdateTimer.schedule(updatetask, 0, 60000);
+        UpdateTimer.schedule(updatetask, 0, 5000);
 
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
@@ -797,7 +797,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             Date now = Calendar.getInstance().getTime();
             long diffInMs = now.getTime() - UPDATETIME.getTime();
             long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
-            Log.d("Hello-updatetask",String.valueOf(diffInSec));
             if ( diffInSec > 300.00 ) {
                 if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
                     String textToConvert = "数据长时间没有更新...请检查";
@@ -806,6 +805,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 else {
                     Toast.makeText(getApplicationContext(), "数据长时间没有更新，请检查！", Toast.LENGTH_SHORT).show();
                 }
+                UPDATETIME = now;
             }
         }
     };
