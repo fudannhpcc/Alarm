@@ -41,11 +41,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import cn.fudannhpcc.www.alarm.R;
 import cn.fudannhpcc.www.alarm.activity.MainActivity;
@@ -74,6 +78,10 @@ public class MQTTService extends Service {
     private Context context;
 
     private boolean iService = true;
+
+    private static final long UPDATEINTERVAL = 5 * 1000;
+    private Handler handler = new Handler();
+    private Timer mupdateTimer;
 
     private int NOTIFY_ID = 1883;
 
@@ -197,6 +205,33 @@ public class MQTTService extends Service {
 //                Log.d(TAG, "deliveryComplete");
             }
         });
+        StartServUpdateTask();
+    }
+
+    private void StartServUpdateTask() {
+        if (mupdateTimer != null) {
+            mupdateTimer.cancel();
+        } else {
+            mupdateTimer = new Timer();
+        }
+
+        mupdateTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Date now = Calendar.getInstance().getTime();
+                long diffInMs = now.getTime() - Constants.UPDATETIME.getTime();
+                long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
+                Log.d(TAG,String.valueOf(diffInSec));
+                if ( diffInSec > 300.00 ) {
+                    if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
+                        String textToConvert = "数据长时间没有更新...请检查";
+                        Log.d(TAG,textToConvert);
+                        tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                    Constants.UPDATETIME = now;
+                }
+            }
+        }, 0, UPDATEINTERVAL);
     }
 
     @Override
@@ -210,6 +245,9 @@ public class MQTTService extends Service {
         );
         if (tts != null) {
             tts.shutdown();
+        }
+        if (mupdateTimer != null) {
+            mupdateTimer.cancel();
         }
         super.onDestroy();
     }

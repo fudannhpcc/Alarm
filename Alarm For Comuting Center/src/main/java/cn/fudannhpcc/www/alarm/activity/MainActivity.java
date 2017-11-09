@@ -628,9 +628,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         /*  启动MQTT客户端连接 */
         MqttClientTimer.schedule(mqttclienttask, 0, 3000);
 
-        /*  启动检查信息更新 */
-//        UpdateTimer.schedule(updatetask, 0, 5000);
-
         /*  锁定 Home 键 */
         mHomeKeyObserver = new HomeKeyObserver(this);
         mHomeKeyObserver.setHomeKeyListener(new HomeKeyObserver.OnHomeKeyListener() {
@@ -790,26 +787,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     };
 
-    /* 开始： MQTT客户端连接认证 */
-    TimerTask updatetask = new TimerTask() {
-        @Override
-        public void run() {
-            Date now = Calendar.getInstance().getTime();
-            long diffInMs = now.getTime() - UPDATETIME.getTime();
-            long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
-            if ( diffInSec > 300.00 ) {
-                if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
-                    String textToConvert = "数据长时间没有更新...请检查";
-                    tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
-                }
-                else {
-                    Toast.makeText(getApplicationContext(), "数据长时间没有更新，请检查！", Toast.LENGTH_SHORT).show();
-                }
-                UPDATETIME = now;
-            }
-        }
-    };
-
     @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -925,7 +902,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         }
                     }
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                    UPDATETIME = Calendar.getInstance().getTime();
+                    Constants.UPDATETIME = Calendar.getInstance().getTime();
                     String date = df.format(Calendar.getInstance().getTime());
                     TextView sensorTime = TextViewMap.get("timestamp");
                     sensorTime.setText(date);

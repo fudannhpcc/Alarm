@@ -1,5 +1,6 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class Constants {
@@ -20,5 +21,5 @@ public class Constants {
     public static boolean STORAGE_ACCESS = false;
 
     public static String WEBLINK = "";
-    public static Date UPDATETIME = null;
+    public static Date UPDATETIME = Calendar.getInstance().getTime();
 }
