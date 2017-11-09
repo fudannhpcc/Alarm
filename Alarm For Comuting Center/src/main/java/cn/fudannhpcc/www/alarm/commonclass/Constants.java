@@ -1,5 +1,7 @@
 package cn.fudannhpcc.www.alarm.commonclass;
 
+import java.util.Date;
+
 public class Constants {
     public static String MQTT_BROKER_URL = "";
     public static String SUBSCRIBE_TOPIC = "";
@@ -18,4 +20,5 @@ public class Constants {
     public static boolean STORAGE_ACCESS = false;
 
     public static String WEBLINK = "";
+    public static Date UPDATETIME = null;
 }
