@@ -1,6 +1,7 @@
 package cn.fudannhpcc.www.alarm.service;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -79,10 +80,6 @@ public class MQTTService extends Service {
 
     private boolean iService = true;
 
-    private static final long UPDATEINTERVAL = 5 * 1000;
-    private Handler handler = new Handler();
-    private Timer mupdateTimer;
-
     private int NOTIFY_ID = 1883;
 
     private Map<String,Object> SprefsMap;
@@ -150,6 +147,7 @@ public class MQTTService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+//        UpdateAlive();
         context = getApplicationContext();
         SprefsMap = readFromPrefs();
 //        new Thread(new Runnable() {
@@ -205,33 +203,6 @@ public class MQTTService extends Service {
 //                Log.d(TAG, "deliveryComplete");
             }
         });
-        StartServUpdateTask();
-    }
-
-    private void StartServUpdateTask() {
-        if (mupdateTimer != null) {
-            mupdateTimer.cancel();
-        } else {
-            mupdateTimer = new Timer();
-        }
-
-        mupdateTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Date now = Calendar.getInstance().getTime();
-                long diffInMs = now.getTime() - Constants.UPDATETIME.getTime();
-                long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
-                Log.d(TAG,String.valueOf(diffInSec));
-                if ( diffInSec > 300.00 ) {
-                    if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
-                        String textToConvert = "数据长时间没有更新...请检查";
-                        Log.d(TAG,textToConvert);
-                        tts.speak(textToConvert, TextToSpeech.QUEUE_FLUSH, null);
-                    }
-                    Constants.UPDATETIME = now;
-                }
-            }
-        }, 0, UPDATEINTERVAL);
     }
 
     @Override
@@ -246,38 +217,36 @@ public class MQTTService extends Service {
         if (tts != null) {
             tts.shutdown();
         }
-        if (mupdateTimer != null) {
-            mupdateTimer.cancel();
-        }
         super.onDestroy();
     }
 
+    private static final String ACTION_CHECK_UPDATE = "cn.fudannhpcc.www.alarm.service.CHECK_UPDATE";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SprefsMap = readFromPrefs();
-        if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS )
+        if ( Constants.TTS_SUPPORT && Constants.STORAGE_ACCESS ) {
             tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
                 @Override
                 public void onInit(int status) {
                     // 如果装载TTS引擎成功
                     if (status == TextToSpeech.SUCCESS) {
                         // 设置使用美式英语朗读
-                        int result = tts.setLanguage(Locale.CHINESE);
-                        // 如果不支持所设置的语言
-                        if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
-                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
-                        }
+//                        int result = tts.setLanguage(Locale.CHINESE);
+//                        // 如果不支持所设置的语言
+//                        if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+////                            Toast.makeText(context, "TTS暂时不支持这种语言的朗读！", Toast.LENGTH_LONG).show();
+//                        }
                         tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
                             public void onUtteranceCompleted(String utteranceId) {
 //                                Log.d(TAG, "Speech Completed! :" + utteranceId);
-                                String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
-                                if ( SERIOUS ) {
+                                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
+                                if (SERIOUS) {
                                     String file1 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/warning.wav";
                                     String file2 = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/special.wav";
                                     CombineWaveFile(file1, file2, path);
                                 }
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    WARNINGSOUND = FileProvider.getUriForFile(context,getPackageName()+".fileprovider", new File(path));
+                                    WARNINGSOUND = FileProvider.getUriForFile(context, getPackageName() + ".fileprovider", new File(path));
                                     context.grantUriPermission("com.android.systemui", WARNINGSOUND, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 } else {
                                     WARNINGSOUND = Uri.parse("file://" + path);
@@ -288,6 +257,32 @@ public class MQTTService extends Service {
                     }
                 }
             });
+            String action = intent.getAction();
+            if (ACTION_CHECK_UPDATE.equals(action)) {
+                Date now = Calendar.getInstance().getTime();
+                long diffInMs = now.getTime() - Constants.UPDATETIME.getTime();
+                long diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs);
+                Log.d(TAG,String.valueOf(diffInSec));
+                if ( diffInSec > 300.00 ) {
+                    if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
+                        String s = "数据长时间没有更新...请检查";
+                        if (activityMessenger != null) {
+                            Message CheckUpdateMessage = Message.obtain();
+                            CheckUpdateMessage.what = SEND_MESSAGE_CODE;
+                            Bundle bundle = new Bundle();
+                            bundle.putString("CheckUpdateMessage", s);
+                            CheckUpdateMessage.setData(bundle);
+                            try {
+                                activityMessenger.send(CheckUpdateMessage);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    Constants.UPDATETIME = now;
+                }
+            }
+        }
         return START_STICKY;
     }
 
@@ -620,4 +615,16 @@ public class MQTTService extends Service {
 
         out.write(header, 0, 44);
     }
+
+//    public void UpdateAlive() {
+//        final long now = System.currentTimeMillis();
+//        final long intervalMillis = 1000 * 20;
+//        final long triggerAtMillis = now + intervalMillis;
+//        final Intent intent = new Intent(this, MQTTService.class);
+//        intent.setAction(ACTION_CHECK_UPDATE);
+//        final PendingIntent operation = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        final AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+//        assert alarm != null;
+//        alarm.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, operation);
+//    }
 }

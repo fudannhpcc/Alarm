@@ -34,6 +34,7 @@ public class CoreService extends Service {
         Map<String, Object> sprefsMap = readFromPrefs();
         keepaliveTimer = Integer.parseInt(sprefsMap.get(getString(R.string.connection_keep_alive)).toString());
         keepMeAlive();
+        UpdateAlive();
     }
 
     @Override
@@ -68,6 +69,20 @@ public class CoreService extends Service {
         final long intervalMillis = 1000 * keepaliveTimer;
         final long triggerAtMillis = now + intervalMillis;
         final Intent intent = new Intent(this, MQTTService.class);
+        final PendingIntent operation = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        final AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        assert alarm != null;
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, operation);
+    }
+
+    private static final String ACTION_CHECK_UPDATE = "cn.fudannhpcc.www.alarm.service.CHECK_UPDATE";
+
+    public void UpdateAlive() {
+        final long now = System.currentTimeMillis();
+        final long intervalMillis = 1000 * 20;
+        final long triggerAtMillis = now + intervalMillis;
+        final Intent intent = new Intent(this, MQTTService.class);
+        intent.setAction(ACTION_CHECK_UPDATE);
         final PendingIntent operation = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         final AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         assert alarm != null;

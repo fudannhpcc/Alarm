@@ -44,7 +44,10 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="true"
-            android:label="MqttService" >
+            android:label="MqttService">
+            <intent-filter>
+                <action android:name="cn.fudannhpcc.www.alarm.service.CHECK_UPDATE" />
+            </intent-filter>
         </service>
 
         <service
