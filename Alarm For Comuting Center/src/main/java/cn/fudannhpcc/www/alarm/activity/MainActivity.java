@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     String notificationMessage = null;
 
-    public static final int WARNINGIMG[] = {R.mipmap.ic_warning0,R.mipmap.ic_warning1,R.mipmap.ic_warning2};
+    public static final int WARNINGIMG[] = {R.mipmap.ic_warning0,R.mipmap.ic_warning1,R.mipmap.ic_warning2,R.mipmap.ic_dataupdate};
 
     public static final String PREFS_NAME = "AppSettings";
 
@@ -842,70 +842,63 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if(msg.what == RECEIVE_MESSAGE_CODE){
                 Bundle data = msg.getData();
                 if(data != null){
-                    if (data.containsKey("CheckUpdateMessage")) {
-                        String message = data.getString("CheckUpdateMessage");
-                        Log.d("MqttService","speak: " + message);
-                        tts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
-                    }
-                    else {
-                        if (data.containsKey("NotificationMessage")) {
-                            ArrayList<HashMap<String, Object>> mNotificationList =
-                                    (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
-                            UpdateListView(mNotificationList);
-                        } else if (data.containsKey("TemperatureMessage")) {
-                            String message[] = data.getString("TemperatureMessage").trim().split("\t");
-                            for (Object o : TextViewMap.entrySet()) {
-                                Map.Entry entry = (Map.Entry) o;
-                                final String key = (String) entry.getKey();
-                                final TextView sensor = (TextView) entry.getValue();
-                                if (key.equals(message[0])) {
-                                    String htmlString = "<u>" + message[1] + " \u2103</u>";
-                                    sensor.setText(Html.fromHtml(htmlString));
-                                    sensor.setTextColor(getResources().getColor(R.color.colorAccent));
-                                } else if (!key.equals("timestamp")) {
-                                    sensor.setTextColor(getResources().getColor(R.color.text_black));
-                                }
-                            }
-                        } else if (data.containsKey("NodeinfoMessage")) {
-                            String message[] = data.getString("NodeinfoMessage").trim().split(" ");
-                            for (Object o : TextViewMap.entrySet()) {
-                                Map.Entry entry = (Map.Entry) o;
-                                final String key = (String) entry.getKey();
-                                final TextView sensor = (TextView) entry.getValue();
-                                if (key.equals("NodeInfo")) {
-                                    String htmlString = "<u>" + String.valueOf(message.length - 1) + "</u>";
-                                    sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
-                                    sensor.setTextColor(getResources().getColor(R.color.colorAccent));
-                                }
-                                if (key.equals("NodesNum")) {
-                                    sensor.setTextColor(getResources().getColor(R.color.colorAccent));
-                                } else if (!key.equals("timestamp")) {
-                                    sensor.setTextColor(getResources().getColor(R.color.text_black));
-                                }
-                            }
-                        } else if (data.containsKey("NodesnumMessage")) {
-                            String message[] = data.getString("NodesnumMessage").trim().split(" ");
-                            for (Object o : TextViewMap.entrySet()) {
-                                Map.Entry entry = (Map.Entry) o;
-                                final String key = (String) entry.getKey();
-                                final TextView sensor = (TextView) entry.getValue();
-                                if (key.equals("NodesNum")) {
-                                    String htmlString = "<u>" + message[1] + "</u>";
-                                    sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
-                                    sensor.setTextColor(getResources().getColor(R.color.colorAccent));
-                                } else if (key.equals("NodeInfo")) {
-                                    sensor.setTextColor(getResources().getColor(R.color.colorAccent));
-                                } else if (!key.equals("timestamp")) {
-                                    sensor.setTextColor(getResources().getColor(R.color.text_black));
-                                }
+                    if (data.containsKey("NotificationMessage")) {
+                        ArrayList<HashMap<String, Object>> mNotificationList =
+                                (ArrayList<HashMap<String, Object>>) data.getSerializable("NotificationMessage");
+                        UpdateListView(mNotificationList);
+                    } else if (data.containsKey("TemperatureMessage")) {
+                        String message[] = data.getString("TemperatureMessage").trim().split("\t");
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if (key.equals(message[0])) {
+                                String htmlString = "<u>" + message[1] + " \u2103</u>";
+                                sensor.setText(Html.fromHtml(htmlString));
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            } else if (!key.equals("timestamp")) {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
                             }
                         }
-                        DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                        Constants.UPDATETIME = Calendar.getInstance().getTime();
-                        String date = df.format(Calendar.getInstance().getTime());
-                        TextView sensorTime = TextViewMap.get("timestamp");
-                        sensorTime.setText(date);
+                    } else if (data.containsKey("NodeinfoMessage")) {
+                        String message[] = data.getString("NodeinfoMessage").trim().split(" ");
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if (key.equals("NodeInfo")) {
+                                String htmlString = "<u>" + String.valueOf(message.length - 1) + "</u>";
+                                sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            }
+                            if (key.equals("NodesNum")) {
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            } else if (!key.equals("timestamp")) {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
+                            }
+                        }
+                    } else if (data.containsKey("NodesnumMessage")) {
+                        String message[] = data.getString("NodesnumMessage").trim().split(" ");
+                        for (Object o : TextViewMap.entrySet()) {
+                            Map.Entry entry = (Map.Entry) o;
+                            final String key = (String) entry.getKey();
+                            final TextView sensor = (TextView) entry.getValue();
+                            if (key.equals("NodesNum")) {
+                                String htmlString = "<u>" + message[1] + "</u>";
+                                sensor.setText(Html.fromHtml(htmlString), TextView.BufferType.SPANNABLE);
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            } else if (key.equals("NodeInfo")) {
+                                sensor.setTextColor(getResources().getColor(R.color.colorAccent));
+                            } else if (!key.equals("timestamp")) {
+                                sensor.setTextColor(getResources().getColor(R.color.text_black));
+                            }
+                        }
                     }
+                    DateFormat df = new SimpleDateFormat("HH:mm:ss");
+                    Constants.UPDATETIME = Calendar.getInstance().getTime();
+                    String date = df.format(Calendar.getInstance().getTime());
+                    TextView sensorTime = TextViewMap.get("timestamp");
+                    sensorTime.setText(date);
                 }
             }
             super.handleMessage(msg);
@@ -929,7 +922,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 if (Objects.equals(s, "warningid")) WARNINGID = (int)tempMap.get(s);
                 else map.put(s, String.valueOf(tempMap.get(s)));
             }
-            if ( WARNINGID > 0 ) map.put("img", WARNINGIMG[WARNINGID-1]);
+            if ( WARNINGID > 0 && WARNINGID < 99 ) map.put("img", WARNINGIMG[WARNINGID-1]);
+            else if ( WARNINGID == 99) {
+                map.put("img", WARNINGIMG[3]);
+                String message = "数据长时间没有更新...请检查";
+                Log.d("MqttService","speak: " + message);
+                tts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+            }
             else map.put("img", WARNINGIMG[0]);
             list.add(map);
         }

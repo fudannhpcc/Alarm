@@ -265,15 +265,24 @@ public class MQTTService extends Service {
                 Log.d(TAG,String.valueOf(diffInSec));
                 if ( diffInSec > 300.00 ) {
                     if (Constants.TTS_SUPPORT && !Constants.SILENT_SWITCH) {
-                        String s = "数据长时间没有更新...请检查";
+                        String s = "数据长时间没有更新";
                         if (activityMessenger != null) {
-                            Message CheckUpdateMessage = Message.obtain();
-                            CheckUpdateMessage.what = SEND_MESSAGE_CODE;
+                            Map<String, Object> mNotificationMap = new HashMap<String, Object>();
+                            mNotificationMap.put("title", "数据更新故障");
+                            mNotificationMap.put("message", s);
+                            mNotificationMap.put("Count", 0);
+                            mNotificationMap.put("warningid", 99);
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String datestr = sdf.format(new Date());
+                            mNotificationMap.put("datetime", datestr);
+                            mNotificationList.add(mNotificationMap);
+                            Message NotificationMessage = Message.obtain();
+                            NotificationMessage.what = SEND_MESSAGE_CODE;
                             Bundle bundle = new Bundle();
-                            bundle.putString("CheckUpdateMessage", s);
-                            CheckUpdateMessage.setData(bundle);
+                            bundle.putSerializable("NotificationMessage", (Serializable) mNotificationList);
+                            NotificationMessage.setData(bundle);
                             try {
-                                activityMessenger.send(CheckUpdateMessage);
+                                activityMessenger.send(NotificationMessage);
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             }
