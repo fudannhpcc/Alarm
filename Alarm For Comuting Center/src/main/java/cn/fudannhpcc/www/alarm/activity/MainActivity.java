@@ -85,6 +85,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -832,7 +833,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     };
 
-    Date UPDATETIME = Calendar.getInstance().getTime();
     @SuppressLint("HandlerLeak")
     private Handler mMessengerHandler = new Handler() {
         @SuppressLint("SetTextI18n")
@@ -909,11 +909,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     WebView webView;
     SimpleAdapter mqtt_message_adapter;
     private Intent intentListViewActivity;
+    String lastupdate = "";
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void UpdateListView(ArrayList<HashMap<String, Object>> mNotificationList) {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         assert mNotificationList != null;
+        String message = "", datetime = "";
         for (HashMap<String, Object> tempMap : mNotificationList) {
             Map<String, Object> map = new HashMap<String, Object>();
             Set<String> set = tempMap.keySet();
@@ -925,12 +927,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if ( WARNINGID > 0 && WARNINGID < 99 ) map.put("img", WARNINGIMG[WARNINGID-1]);
             else if ( WARNINGID == 99) {
                 map.put("img", WARNINGIMG[3]);
-                String message = "数据长时间没有更新...请检查";
-                Log.d("MqttService","speak: " + message);
-                tts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+                message = (String) tempMap.get("message");
+                datetime = (String) tempMap.get("datetime");
             }
             else map.put("img", WARNINGIMG[0]);
             list.add(map);
+        }
+        if ( !message.equals("") ) {
+            Log.d("MqttService", "speak: " + message + "  " + datetime);
+            if ( lastupdate.equals("") || !lastupdate.equals(datetime) ) {
+                lastupdate = datetime;
+                tts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+                Log.d("MqttService", "speakout: " + message + "  " + datetime);
+            }
         }
         Collections.reverse(list);
         mqtt_message_adapter = new SimpleAdapter(this, list,
