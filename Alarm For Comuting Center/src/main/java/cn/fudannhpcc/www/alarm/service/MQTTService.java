@@ -425,7 +425,8 @@ public class MQTTService extends Service {
 
     String title = null, message = null; Uri WARNINGSOUND = null;
     private boolean SERIOUS;
-    private static final int TEMPERATURE_SERIOUS = 1, RUNNING_SERIOUS = 20, DEAD_SERIOUS = 10;
+//    private static final int TEMPERATURE_SERIOUS = 1, RUNNING_SERIOUS = 20, DEAD_SERIOUS = 10;
+    private static final int TEMPERATURE_SERIOUS = 1, DEAD_SERIOUS = 10;
     private void setMessageNotification(@NonNull String topic, @NonNull String msg) {
         if (topic.toLowerCase().contains(Constants.SUBSCRIBE_TOPIC.toLowerCase())) {
             SERIOUS = false;
@@ -459,7 +460,8 @@ public class MQTTService extends Service {
                     voicedead = ".. " + icc + "个节点宕机故障";
                 }
             }
-            if( iaa >= TEMPERATURE_SERIOUS || ibb >= RUNNING_SERIOUS || icc >= DEAD_SERIOUS ) SERIOUS = true;
+//            if( iaa >= TEMPERATURE_SERIOUS || ibb >= RUNNING_SERIOUS || icc >= DEAD_SERIOUS ) SERIOUS = true;
+            if( iaa >= TEMPERATURE_SERIOUS || icc >= DEAD_SERIOUS ) SERIOUS = true;
             message = message.trim();
             String voicetitle = voicetemperature + voiceabnormal + voicedead;
             String path =  Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AlarmSound/notification.wav";
